@@ -1,21 +1,24 @@
-//
-//  ContentView.swift
-//  IELTSpeak
-//
-//  Created by Mehadi Hasan on 10/7/25.
-//
-
 import SwiftUI
 
 struct ContentView: View {
+    @AppStorage("userTheme") private var userTheme: Theme = .system
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            HomeScreen()
+                .tabItem { Label("Home", systemImage: "house") }
+
+            LessonScreen()
+                .tabItem { Label("Analytics", systemImage: "chart.bar.xaxis") }
+
+
+            SettingsScreen()
+                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
         }
-        .padding()
+        .background(.ultraThinMaterial)
+        .edgesIgnoringSafeArea(.bottom)
+        .tint(.primary)
+        .preferredColorScheme(userTheme.colorScheme)
     }
 }
 
