@@ -9,7 +9,7 @@ struct ContentView: View {
                 .tabItem { Label("Home", systemImage: "house") }
 
             LessonScreen()
-                .tabItem { Label("Analytics", systemImage: "chart.bar.xaxis") }
+                .tabItem { Label("Lesson", systemImage: "character.book.closed") }
 
 
             SettingsScreen()

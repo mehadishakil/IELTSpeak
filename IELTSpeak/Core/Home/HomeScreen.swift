@@ -67,7 +67,61 @@ struct HomeScreen: View {
                     ]
                 )
             ]
-        )
+        ),
+        TestResult(
+            id: "4",
+            date: Date().addingTimeInterval(-86400 * 5),
+            bandScore: 6.5,
+            duration: "12 min",
+            parts: [6.0, 7.0, 6.5],
+            overallFeedback: "Good overall performance with clear communication. Focus on expanding your vocabulary and reducing repetitive phrases. Your pronunciation is generally clear.",
+            conversations: [
+                Conversation(
+                    part: 1,
+                    question: "What do you do for work or study?",
+                    answer: "I am currently studying computer science at the university. It's a very intresting field because technology is always changing and evolving. I particularly enjoy programming and working with databases. After graduation, I hope to work in a tech company.",
+                    errors: [
+                        ConversationError(word: "intresting", correction: "interesting", range: NSRange(location: 65, length: 10))
+                    ]
+                )
+            ]
+        ),
+        TestResult(
+            id: "5",
+            date: Date().addingTimeInterval(-86400 * 5),
+            bandScore: 6.5,
+            duration: "12 min",
+            parts: [6.0, 7.0, 6.5],
+            overallFeedback: "Good overall performance with clear communication. Focus on expanding your vocabulary and reducing repetitive phrases. Your pronunciation is generally clear.",
+            conversations: [
+                Conversation(
+                    part: 1,
+                    question: "What do you do for work or study?",
+                    answer: "I am currently studying computer science at the university. It's a very intresting field because technology is always changing and evolving. I particularly enjoy programming and working with databases. After graduation, I hope to work in a tech company.",
+                    errors: [
+                        ConversationError(word: "intresting", correction: "interesting", range: NSRange(location: 65, length: 10))
+                    ]
+                )
+            ]
+        ),
+        TestResult(
+            id: "6",
+            date: Date().addingTimeInterval(-86400 * 5),
+            bandScore: 6.5,
+            duration: "12 min",
+            parts: [6.0, 7.0, 6.5],
+            overallFeedback: "Good overall performance with clear communication. Focus on expanding your vocabulary and reducing repetitive phrases. Your pronunciation is generally clear.",
+            conversations: [
+                Conversation(
+                    part: 1,
+                    question: "What do you do for work or study?",
+                    answer: "I am currently studying computer science at the university. It's a very intresting field because technology is always changing and evolving. I particularly enjoy programming and working with databases. After graduation, I hope to work in a tech company.",
+                    errors: [
+                        ConversationError(word: "intresting", correction: "interesting", range: NSRange(location: 65, length: 10))
+                    ]
+                )
+            ]
+        ),
     ]
     
     var averageScore: Double {
@@ -120,36 +174,14 @@ struct HomeScreen: View {
     
     private var headerSection: some View {
         VStack(spacing: 0) {
-            // Status bar space
-            Color.clear.frame(height: 44)
+            Color.clear
             
             // Header content
             HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("IELTS Speaking")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                    
-                    Text("AI-Powered Test Simulator")
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                
-                Spacer()
-                
-                // Profile button
-                Button(action: {}) {
-                    ZStack {
-                        Circle()
-                            .fill(Color.white.opacity(0.2))
-                            .frame(width: 40, height: 40)
-                        
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(.white)
-                    }
-                }
+                Text("Practice IELTS Speaking")
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 30)
@@ -275,6 +307,12 @@ struct HomeScreen: View {
                     icon: "arrow.up.circle.fill"
                 )
             }
+            
+            ScoreBarChart(
+                testResults: testResults,
+            )
+
+            
         }
     }
     
