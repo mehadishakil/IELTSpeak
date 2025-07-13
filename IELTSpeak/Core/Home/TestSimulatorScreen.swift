@@ -16,6 +16,7 @@ struct TestSimulatorScreen: View {
     @State private var userWaveformData: [Double] = Array(repeating: 0.0, count: 30)
     @State private var isExaminerSpeaking: Bool = false
     @Environment(\.dismiss) private var dismiss
+    let questions: [[QuestionItem]]
     
     let testQuestions: [TestPart] = [
         TestPart(
@@ -90,6 +91,8 @@ struct TestSimulatorScreen: View {
                 generateWaveformData()
             }
         }
+        .ignoresSafeArea()
+        .toolbar(.hidden, for: .tabBar)
     }
     
     private var headerSection: some View {
@@ -670,47 +673,6 @@ struct TestSimulatorScreen: View {
     }
 }
 
-// MARK: - Supporting Views
-
-struct TestPartCard: View {
-    let testPart: TestPart
-    
-    var body: some View {
-        HStack {
-            // Part number
-            ZStack {
-                Circle()
-                    .fill(Color.blue.opacity(0.2))
-                    .frame(width: 40, height: 40)
-                
-                Text("\(testPart.part)")
-                    .font(.headline)
-                    .fontWeight(.bold)
-                    .foregroundColor(.blue)
-            }
-            
-            // Part info
-            VStack(alignment: .leading, spacing: 4) {
-                Text(testPart.title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Text(testPart.duration)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemGray6))
-        )
-    }
-}
 
 struct ProcessingStep: View {
     let title: String
@@ -733,25 +695,8 @@ struct ProcessingStep: View {
     }
 }
 
-// MARK: - Data Models
-
-enum TestPhase {
-    case preparation
-    case testing
-    case processing
-    case completed
-}
-
-struct TestPart {
-    let part: Int
-    let title: String
-    let duration: String
-    let questions: [String]
-}
-
-// MARK: - Preview
 struct TestSimulatorScreen_Previews: PreviewProvider {
     static var previews: some View {
-        TestSimulatorScreen()
+        // TestSimulatorScreen(questions: <#[[QuestionItem]]#>)
     }
 }

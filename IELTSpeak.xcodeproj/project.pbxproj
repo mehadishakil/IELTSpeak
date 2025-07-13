@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E81FA3982E23831E002C2386 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = E81FA3972E23831E002C2386 /* Supabase */; };
+		E82D229E2E22698300F1519A /* Auth in Frameworks */ = {isa = PBXBuildFile; productRef = E82D229D2E22698300F1519A /* Auth */; };
+		E82D22A02E22698300F1519A /* Functions in Frameworks */ = {isa = PBXBuildFile; productRef = E82D229F2E22698300F1519A /* Functions */; };
+		E82D22A22E22698300F1519A /* PostgREST in Frameworks */ = {isa = PBXBuildFile; productRef = E82D22A12E22698300F1519A /* PostgREST */; };
+		E82D22A42E22698300F1519A /* Realtime in Frameworks */ = {isa = PBXBuildFile; productRef = E82D22A32E22698300F1519A /* Realtime */; };
+		E82D22A62E22698300F1519A /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = E82D22A52E22698300F1519A /* Storage */; };
 		E88719AA2E2033F1004943E6 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = E88719A92E2033F1004943E6 /* RevenueCat */; };
 		E88719AC2E2033F1004943E6 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = E88719AB2E2033F1004943E6 /* RevenueCatUI */; };
 /* End PBXBuildFile section */
@@ -15,9 +21,23 @@
 		E8FAB2782E1EFD7B00403DC9 /* IELTSpeak.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IELTSpeak.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E8C884A02E23BB6400624EFA /* Exceptions for "IELTSpeak" folder in "IELTSpeak" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Info.plist,
+				Info.plist,
+			);
+			target = E8FAB2772E1EFD7B00403DC9 /* IELTSpeak */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E8FAB27A2E1EFD7B00403DC9 /* IELTSpeak */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E8C884A02E23BB6400624EFA /* Exceptions for "IELTSpeak" folder in "IELTSpeak" target */,
+			);
 			path = IELTSpeak;
 			sourceTree = "<group>";
 		};
@@ -30,6 +50,12 @@
 			files = (
 				E88719AC2E2033F1004943E6 /* RevenueCatUI in Frameworks */,
 				E88719AA2E2033F1004943E6 /* RevenueCat in Frameworks */,
+				E82D22A62E22698300F1519A /* Storage in Frameworks */,
+				E82D22A02E22698300F1519A /* Functions in Frameworks */,
+				E81FA3982E23831E002C2386 /* Supabase in Frameworks */,
+				E82D22A42E22698300F1519A /* Realtime in Frameworks */,
+				E82D229E2E22698300F1519A /* Auth in Frameworks */,
+				E82D22A22E22698300F1519A /* PostgREST in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,6 +100,12 @@
 			packageProductDependencies = (
 				E88719A92E2033F1004943E6 /* RevenueCat */,
 				E88719AB2E2033F1004943E6 /* RevenueCatUI */,
+				E82D229D2E22698300F1519A /* Auth */,
+				E82D229F2E22698300F1519A /* Functions */,
+				E82D22A12E22698300F1519A /* PostgREST */,
+				E82D22A32E22698300F1519A /* Realtime */,
+				E82D22A52E22698300F1519A /* Storage */,
+				E81FA3972E23831E002C2386 /* Supabase */,
 			);
 			productName = IELTSpeak;
 			productReference = E8FAB2782E1EFD7B00403DC9 /* IELTSpeak.app */;
@@ -105,6 +137,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E88719A82E2033F1004943E6 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */,
+				E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E8FAB2792E1EFD7B00403DC9 /* Products */;
@@ -268,6 +301,7 @@
 				DEVELOPMENT_TEAM = 828PG3Q6MA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IELTSpeak/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -296,6 +330,7 @@
 				DEVELOPMENT_TEAM = 828PG3Q6MA;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = IELTSpeak/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -338,6 +373,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
 		E88719A82E2033F1004943E6 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios-spm.git";
@@ -349,6 +392,36 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		E81FA3972E23831E002C2386 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+		E82D229D2E22698300F1519A /* Auth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Auth;
+		};
+		E82D229F2E22698300F1519A /* Functions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Functions;
+		};
+		E82D22A12E22698300F1519A /* PostgREST */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = PostgREST;
+		};
+		E82D22A32E22698300F1519A /* Realtime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Realtime;
+		};
+		E82D22A52E22698300F1519A /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82D229C2E22698300F1519A /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Storage;
+		};
 		E88719A92E2033F1004943E6 /* RevenueCat */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E88719A82E2033F1004943E6 /* XCRemoteSwiftPackageReference "purchases-ios-spm" */;

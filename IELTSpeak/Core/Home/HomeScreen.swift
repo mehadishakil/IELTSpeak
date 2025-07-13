@@ -1,9 +1,20 @@
 import SwiftUI
+import Supabase
+
+struct QuestionItem {
+    let order: Int
+    let questionText: String
+    let audioFile: Data
+}
 
 struct HomeScreen: View {
     @State private var isStartingTest = false
     @State private var selectedTestResult: TestResult? = nil
     @State private var showFeedbackScreen = false
+    @State private var showPreparationSheet = false
+    @State private var showTestingView = false
+    @State private var isLoading = false
+    @State private var testQuestions: [[QuestionItem]] = []
     
     let testResults = [
         TestResult(
@@ -141,6 +152,30 @@ struct HomeScreen: View {
                         // Hero Section - Start Test
                         heroSection
                         
+                        NavigationLink(
+                            destination: TestSimulatorScreen(
+                                questions: testQuestions
+                            ),
+                            isActive: $isLoading
+                        ) {
+                            EmptyView()
+                        }
+                        .hidden()
+                        .overlay {
+                            if isLoading {
+                                ZStack {
+                                    Color.black
+                                        .opacity(0.3)
+                                        .ignoresSafeArea()
+                                    
+                                    ProgressView("Preparing test...")
+                                        .padding()
+                                        .background(Color.white)
+                                        .cornerRadius(12)
+                                }
+                            }
+                        }
+                        
                         // Quick Stats
                         quickStatsSection
                         
@@ -204,13 +239,15 @@ struct HomeScreen: View {
     
     private var heroSection: some View {
         VStack(spacing: 20) {
-            // Main CTA Button
+            // CTA button
+//            NavigationLink(destination: TestSimulatorScreen()) {
+//
+//            }
             Button(action: {
-                isStartingTest = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    isStartingTest = false
+                Task {
+                    // await fetchTestQuestions()
                 }
-            }) {
+            }, label: {
                 ZStack {
                     // Gradient background
                     LinearGradient(
@@ -265,12 +302,85 @@ struct HomeScreen: View {
                     }
                     .padding(.vertical, 30)
                 }
-            }
+            })
+            .disabled(isLoading)
             .scaleEffect(isStartingTest ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.2), value: isStartingTest)
             .shadow(color: .blue.opacity(0.3), radius: 20, x: 0, y: 10)
         }
+        
+        
+        
     }
+    
+    func fetchTestQuestions(forPart part: Int, testId: Int ) async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        var part1 : [QuestionItem] = []
+        var part2 : [QuestionItem] = []
+        var part3 : [QuestionItem] = []
+        
+        do {
+            let questions = try await supabase
+                    .from("questions")
+                    .select("*")
+                    .eq("test_id", value: testId)
+                    .eq("part", value: part)
+                    .order("order", ascending: true)
+                    .execute()
+                    .value as! [[String: Any]]
+
+            
+            
+            for question in questions {
+                let questionText = question["question_text"] as? String ?? ""
+                let audioPath = question["audio_url"] as? String ?? ""
+                
+                let part = question["part"] as? Int ?? 0
+                let order = question["order"] as? Int ?? 0
+                let data = try await supabase.storage
+                    .from("audio-question-set")
+                    .download(path: audioPath)
+                
+                if part == 1 {
+                    part1
+                        .append(
+                            QuestionItem(
+                                order: order,
+                                questionText: questionText,
+                                audioFile: data
+                            )
+                        )
+                } else if part == 2 {
+                    part2
+                        .append(
+                            QuestionItem(
+                                order: order,
+                                questionText: questionText,
+                                audioFile: data
+                            )
+                        )
+                } else if part == 3 {
+                    part3
+                        .append(
+                            QuestionItem(
+                                order: order,
+                                questionText: questionText,
+                                audioFile: data
+                            )
+                        )
+                }
+            }
+            
+            
+            
+        } catch {
+            print("Error downloading test: \(error)")
+        }
+        testQuestions = [part1, part2, part3]
+    }
+
     
     private var quickStatsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -374,490 +484,6 @@ struct HomeScreen: View {
     }
 }
 
-struct StatCard: View {
-    let title: String
-    let value: String
-    let subtitle: String
-    let color: Color
-    let icon: String
-    
-    var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
-            
-            Text(subtitle)
-                .font(.caption2)
-                .foregroundColor(.secondary)
-            
-            Text(title)
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-        )
-    }
-}
-
-struct ModernTestCard: View {
-    let result: TestResult
-    let onTap: () -> Void
-    
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 16) {
-                // Score Circle
-                ZStack {
-                    Circle()
-                        .stroke(scoreColor.opacity(0.3), lineWidth: 3)
-                        .frame(width: 50, height: 50)
-                    
-                    Circle()
-                        .trim(from: 0, to: result.bandScore / 9.0)
-                        .stroke(scoreColor, lineWidth: 3)
-                        .frame(width: 50, height: 50)
-                        .rotationEffect(.degrees(-90))
-                    
-                    Text(String(format: "%.1f", result.bandScore))
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(scoreColor)
-                }
-                
-                // Test Info
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(result.date, style: .date)
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    Text(result.date, style: .time)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    HStack(spacing: 12) {
-                        Label(result.duration, systemImage: "clock")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                        
-                        Label("AI Feedback", systemImage: "brain.head.profile")
-                            .font(.caption)
-                            .foregroundColor(.blue)
-                    }
-                }
-                
-                Spacer()
-                
-                // Arrow
-                Image(systemName: "chevron.right")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            .padding(16)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemBackground))
-                    .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-            )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-    
-    private var scoreColor: Color {
-        switch result.bandScore {
-        case 7.0...9.0: return .green
-        case 6.0..<7.0: return .orange
-        default: return .red
-        }
-    }
-}
-
-// MARK: - Feedback Screen
-struct FeedbackScreen: View {
-    let testResult: TestResult
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedTab = 0
-    
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Header
-                headerSection
-                
-                // Tab Selection
-                tabSelector
-                
-                // Content
-                TabView(selection: $selectedTab) {
-                    // AI Feedback Tab
-                    aiFeedbackTab
-                        .tag(0)
-                    
-                    // Conversation Analysis Tab
-                    conversationAnalysisTab
-                        .tag(1)
-                }
-                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            }
-            .background(Color(.systemBackground))
-            .navigationBarHidden(true)
-        }
-    }
-    
-    private var headerSection: some View {
-        VStack(spacing: 16) {
-            // Top bar
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-                
-                Spacer()
-                
-                Text("Test Feedback")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                
-                Spacer()
-                
-                Button(action: {}) {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.title2)
-                        .foregroundColor(.white.opacity(0.8))
-                }
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 44)
-            
-            // Score Display
-            VStack(spacing: 8) {
-                Text("Overall Band Score")
-                    .font(.subheadline)
-                    .foregroundColor(.white.opacity(0.8))
-                
-                Text(String(format: "%.1f", testResult.bandScore))
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
-                
-                Text(testResult.date, style: .date)
-                    .font(.caption)
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            .padding(.bottom, 20)
-        }
-        .background(
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.blue.opacity(0.8),
-                    Color.purple.opacity(0.6)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
-    }
-    
-    private var tabSelector: some View {
-        HStack(spacing: 0) {
-            ForEach(0..<2) { index in
-                Button(action: { selectedTab = index }) {
-                    VStack(spacing: 8) {
-                        Text(index == 0 ? "AI Feedback" : "Conversation")
-                            .font(.subheadline)
-                            .fontWeight(.medium)
-                            .foregroundColor(selectedTab == index ? .blue : .secondary)
-                        
-                        Rectangle()
-                            .fill(selectedTab == index ? Color.blue : Color.clear)
-                            .frame(height: 2)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(.horizontal, 20)
-        .background(Color(.systemBackground))
-    }
-    
-    private var aiFeedbackTab: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                // Part Scores
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Part Scores")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    ForEach(Array(testResult.parts.enumerated()), id: \.offset) { index, score in
-                        HStack {
-                            Text("Part \(index + 1)")
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
-                            
-                            Spacer()
-                            
-                            Text(String(format: "%.1f", score))
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundColor(scoreColor(score))
-                        }
-                        .padding(.vertical, 8)
-                        .padding(.horizontal, 16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(.systemGray6))
-                        )
-                    }
-                }
-                
-                // AI Feedback
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("AI Feedback")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    Text(testResult.overallFeedback)
-                        .font(.body)
-                        .foregroundColor(.primary)
-                        .lineSpacing(4)
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.blue.opacity(0.1))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
-                                )
-                        )
-                }
-                
-                // Recommendations
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("Recommendations")
-                        .font(.headline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        RecommendationRow(icon: "book.fill", text: "Practice advanced vocabulary daily", color: .blue)
-                        RecommendationRow(icon: "waveform", text: "Work on pronunciation clarity", color: .orange)
-                        RecommendationRow(icon: "timer", text: "Reduce speaking hesitations", color: .green)
-                    }
-                }
-                
-                Color.clear.frame(height: 100)
-            }
-            .padding(20)
-        }
-    }
-    
-    private var conversationAnalysisTab: some View {
-        ScrollView {
-            VStack(spacing: 20) {
-                ForEach(testResult.conversations) { conversation in
-                    ConversationCard(conversation: conversation)
-                }
-                
-                Color.clear.frame(height: 100)
-            }
-            .padding(20)
-        }
-    }
-    
-    private func scoreColor(_ score: Double) -> Color {
-        switch score {
-        case 7.0...9.0: return .green
-        case 6.0..<7.0: return .orange
-        default: return .red
-        }
-    }
-}
-
-struct RecommendationRow: View {
-    let icon: String
-    let text: String
-    let color: Color
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundColor(color)
-                .frame(width: 24)
-            
-            Text(text)
-                .font(.subheadline)
-                .foregroundColor(.primary)
-            
-            Spacer()
-        }
-        .padding(.vertical, 8)
-    }
-}
-
-struct ConversationCard: View {
-    let conversation: Conversation
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header
-            HStack {
-                Text("Part \(conversation.part)")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color.blue)
-                    )
-                
-                Spacer()
-                
-                Text("\(conversation.errors.count) error\(conversation.errors.count == 1 ? "" : "s")")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-            }
-            
-            // Question
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Question:")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                Text(conversation.question)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(.systemGray6))
-                    )
-            }
-            
-            // Answer with error highlighting
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Your Answer:")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
-                HighlightedText(text: conversation.answer, errors: conversation.errors)
-                    .padding(12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(Color(.systemGray6))
-                    )
-            }
-            
-            // Errors
-            if !conversation.errors.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Corrections:")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .foregroundColor(.primary)
-                    
-                    ForEach(conversation.errors, id: \.word) { error in
-                        HStack {
-                            Text(error.word)
-                                .font(.subheadline)
-                                .foregroundColor(.red)
-                                .strikethrough()
-                            
-                            Image(systemName: "arrow.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                            
-                            Text(error.correction)
-                                .font(.subheadline)
-                                .foregroundColor(.green)
-                                .fontWeight(.medium)
-                            
-                            Spacer()
-                        }
-                        .padding(.vertical, 4)
-                    }
-                }
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-        )
-    }
-}
-
-struct HighlightedText: View {
-    let text: String
-    let errors: [ConversationError]
-    
-    var body: some View {
-        Text(attributedString)
-            .font(.body)
-            .lineSpacing(4)
-    }
-    
-    private var attributedString: AttributedString {
-        var attributed = AttributedString(text)
-        
-        for error in errors {
-            let startIndex = attributed.index(attributed.startIndex, offsetByCharacters: error.range.location)
-            let endIndex = attributed.index(startIndex, offsetByCharacters: error.range.length)
-
-            
-            attributed[startIndex..<endIndex].foregroundColor = .red
-            attributed[startIndex..<endIndex].backgroundColor = .red.opacity(0.2)
-        }
-        
-        return attributed
-    }
-}
-
-// MARK: - Data Models
-struct TestResult: Identifiable {
-    let id: String
-    let date: Date
-    let bandScore: Double
-    let duration: String
-    let parts: [Double]
-    let overallFeedback: String
-    let conversations: [Conversation]
-}
-
-struct Conversation: Identifiable {
-    let id = UUID()
-    let part: Int
-    let question: String
-    let answer: String
-    let errors: [ConversationError]
-}
-
-struct ConversationError {
-    let word: String
-    let correction: String
-    let range: NSRange
-}
 
 // MARK: - Previews
 struct HomeScreen_Previews: PreviewProvider {
@@ -866,16 +492,442 @@ struct HomeScreen_Previews: PreviewProvider {
     }
 }
 
-struct FeedbackScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        FeedbackScreen(testResult: TestResult(
-            id: "1",
-            date: Date(),
-            bandScore: 7.5,
-            duration: "14 min",
-            parts: [6.5, 7.5, 8.0],
-            overallFeedback: "Excellent fluency and coherence. Your vocabulary range is impressive.",
-            conversations: []
-        ))
-    }
-}
+//
+//import SwiftUI
+//import Supabase // Add this import
+//
+//// Fixed QuestionItem struct
+//struct QuestionItem {
+//    let order: Int
+//    let questionText: String
+//    let audioData: Data // Changed from Audio to Data
+//}
+//
+//// Add missing model definitions
+//struct TestResult: Identifiable {
+//    let id: String
+//    let date: Date
+//    let bandScore: Double
+//    let duration: String
+//    let parts: [Double]
+//    let overallFeedback: String
+//    let conversations: [Conversation]
+//}
+//
+//struct Conversation {
+//    let part: Int
+//    let question: String
+//    let answer: String
+//    let errors: [ConversationError]
+//}
+//
+//struct ConversationError {
+//    let word: String
+//    let correction: String
+//    let range: NSRange
+//}
+//
+//struct HomeScreen: View {
+//    @State private var isStartingTest = false
+//    @State private var selectedTestResult: TestResult? = nil
+//    @State private var showFeedbackScreen = false
+//    @State private var showPreparationSheet = false
+//    @State private var showTestingView = false
+//    @State private var isLoading = false
+//    @State private var downloadedQuestions: [QuestionItem] = []
+//    @State private var testQuestions: [[QuestionItem]] = [] // Store the downloaded questions
+//    @State private var navigateToTest = false
+//    
+//    // Initialize Supabase client (you'll need to add your URL and key)
+//    let supabase = SupabaseClient(
+//        supabaseURL: URL(string: "YOUR_SUPABASE_URL")!,
+//        supabaseKey: "YOUR_SUPABASE_ANON_KEY"
+//    )
+//    
+//    let testResults = [
+//        TestResult(
+//            id: "1",
+//            date: Date().addingTimeInterval(-86400 * 2),
+//            bandScore: 7.5,
+//            duration: "14 min",
+//            parts: [6.5, 7.5, 8.0],
+//            overallFeedback: "Excellent fluency and coherence. Your vocabulary range is impressive, and you demonstrated good grammatical accuracy. Work on reducing minor hesitations in Part 1.",
+//            conversations: [
+//                Conversation(
+//                    part: 1,
+//                    question: "Tell me about your hometown.",
+//                    answer: "I come from a small town called Sylhet in Bangladesh. It's a beatiful place with lots of green hills and tea gardens. The people there are very friendly and hospitable. I've been living there for most of my life, and I really love the peaceful atmosphere.",
+//                    errors: [
+//                        ConversationError(word: "beatiful", correction: "beautiful", range: NSRange(location: 68, length: 8))
+//                    ]
+//                ),
+//                Conversation(
+//                    part: 2,
+//                    question: "Describe a memorable journey you have taken.",
+//                    answer: "I'd like to talk about a trip I took to the mountains last year. It was absolutely breathtaking experience. We hiked for about three hours through dense forests and rocky paths. The view from the top was incredible - we could see the entire valley below us. What made it even more special was that I went with my best friends, and we had such a great time together.",
+//                    errors: [
+//                        ConversationError(word: "breathtaking", correction: "a breathtaking", range: NSRange(location: 75, length: 12))
+//                    ]
+//                )
+//            ]
+//        ),
+//        // ... other test results
+//    ]
+//    
+//    var averageScore: Double {
+//        let total = testResults.reduce(0) { $0 + $1.bandScore }
+//        return testResults.isEmpty ? 0 : total / Double(testResults.count)
+//    }
+//    
+//    var body: some View {
+//        NavigationStack {
+//            ScrollView {
+//                VStack(spacing: 0) {
+//                    // Modern Header with Gradient
+//                    headerSection
+//                    
+//                    // Main Content
+//                    VStack(spacing: 24) {
+//                        // Hero Section - Start Test
+//                        heroSection
+//                        
+//                        // Navigation link for test simulator
+//                        NavigationLink(
+//                            destination: TestSimulatorScreen(questions: testQuestions),
+//                            isActive: $navigateToTest
+//                        ) {
+//                            EmptyView()
+//                        }
+//                        .hidden()
+//                        
+//                        // Loading overlay
+//                        if isLoading {
+//                            ZStack {
+//                                Color.black
+//                                    .opacity(0.3)
+//                                    .ignoresSafeArea()
+//                                
+//                                ProgressView("Preparing test...")
+//                                    .padding()
+//                                    .background(Color.white)
+//                                    .cornerRadius(12)
+//                            }
+//                        }
+//                        
+//                        // Quick Stats
+//                        quickStatsSection
+//                        
+//                        // Recent Tests
+//                        recentTestsSection
+//                    }
+//                    .padding(.horizontal, 20)
+//                    .padding(.top, 20)
+//                    .padding(.bottom, 100)
+//                }
+//            }
+//            .background(
+//                LinearGradient(
+//                    gradient: Gradient(colors: [
+//                        Color.blue.opacity(0.1),
+//                        Color.purple.opacity(0.05),
+//                        Color(.systemBackground)
+//                    ]),
+//                    startPoint: .topLeading,
+//                    endPoint: .bottomTrailing
+//                )
+//            )
+//            .navigationBarHidden(true)
+//            .sheet(isPresented: $showFeedbackScreen) {
+//                if let selectedResult = selectedTestResult {
+//                    FeedbackScreen(testResult: selectedResult)
+//                }
+//            }
+//        }
+//    }
+//    
+//    private var headerSection: some View {
+//        VStack(spacing: 0) {
+//            Color.clear
+//            
+//            // Header content
+//            HStack {
+//                Text("Practice IELTS Speaking")
+//                    .font(.title)
+//                    .fontWeight(.bold)
+//                    .foregroundColor(.white)
+//            }
+//            .padding(.horizontal, 20)
+//            .padding(.bottom, 30)
+//        }
+//        .background(
+//            LinearGradient(
+//                gradient: Gradient(colors: [
+//                    Color.blue.opacity(0.8),
+//                    Color.purple.opacity(0.6)
+//                ]),
+//                startPoint: .topLeading,
+//                endPoint: .bottomTrailing
+//            )
+//        )
+//        .clipShape(
+//            RoundedRectangle(cornerRadius: 0)
+//                .path(in: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 150))
+//        )
+//    }
+//    
+//    private var heroSection: some View {
+//        VStack(spacing: 20) {
+//            // Fixed CTA button
+//            Button(action: {
+//                Task {
+//                    await startTest()
+//                }
+//            }, label: {
+//                ZStack {
+//                    // Gradient background
+//                    LinearGradient(
+//                        gradient: Gradient(colors: [
+//                            Color.blue,
+//                            Color.purple
+//                        ]),
+//                        startPoint: .topLeading,
+//                        endPoint: .bottomTrailing
+//                    )
+//                    .clipShape(RoundedRectangle(cornerRadius: 20))
+//                    
+//                    // Content
+//                    VStack(spacing: 12) {
+//                        // Icon
+//                        ZStack {
+//                            Circle()
+//                                .fill(Color.white.opacity(0.2))
+//                                .frame(width: 60, height: 60)
+//                            
+//                            Image(systemName: "mic.fill")
+//                                .font(.title)
+//                                .foregroundColor(.white)
+//                        }
+//                        
+//                        // Text
+//                        VStack(spacing: 4) {
+//                            Text("Start Speaking Test")
+//                                .font(.title2)
+//                                .fontWeight(.bold)
+//                                .foregroundColor(.white)
+//                            
+//                            Text("Get AI-powered feedback instantly")
+//                                .font(.subheadline)
+//                                .foregroundColor(.white.opacity(0.9))
+//                        }
+//                        
+//                        // Test details
+//                        HStack(spacing: 20) {
+//                            Label("15 min", systemImage: "clock")
+//                                .font(.caption)
+//                                .foregroundColor(.white.opacity(0.8))
+//                            
+//                            Label("3 Parts", systemImage: "list.number")
+//                                .font(.caption)
+//                                .foregroundColor(.white.opacity(0.8))
+//                            
+//                            Label("AI Scoring", systemImage: "brain.head.profile")
+//                                .font(.caption)
+//                                .foregroundColor(.white.opacity(0.8))
+//                        }
+//                    }
+//                    .padding(.vertical, 30)
+//                }
+//            })
+//            .disabled(isLoading)
+//            .scaleEffect(isStartingTest ? 0.95 : 1.0)
+//            .animation(.easeInOut(duration: 0.2), value: isStartingTest)
+//            .shadow(color: .blue.opacity(0.3), radius: 20, x: 0, y: 10)
+//        }
+//    }
+//    
+//    // Fixed function to start test
+//    private func startTest() async {
+//        isStartingTest = true
+//        isLoading = true
+//        
+//        do {
+//            // Download questions for a specific test (you can make testId dynamic)
+//            let questions = try await fetchTestQuestions(testId: 1)
+//            testQuestions = questions
+//            
+//            // Navigate to test simulator
+//            await MainActor.run {
+//                isLoading = false
+//                isStartingTest = false
+//                navigateToTest = true
+//            }
+//        } catch {
+//            await MainActor.run {
+//                isLoading = false
+//                isStartingTest = false
+//                // Handle error - maybe show an alert
+//                print("Failed to start test: \(error)")
+//            }
+//        }
+//    }
+//    
+//    // Fixed fetchTestQuestions function
+//    func fetchTestQuestions(testId: Int) async throws -> [[QuestionItem]] {
+//        do {
+//            let response = try await supabase
+//                .from("questions")
+//                .select("*")
+//                .eq("test_id", value: testId)
+//                .order("order", ascending: true)
+//                .execute()
+//            
+//            guard let questions = response.value as? [[String: Any]] else {
+//                throw NSError(domain: "DataError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid response format"])
+//            }
+//            
+//            var part1: [QuestionItem] = []
+//            var part2: [QuestionItem] = []
+//            var part3: [QuestionItem] = []
+//            
+//            for question in questions {
+//                guard let questionText = question["question_text"] as? String,
+//                      let audioPath = question["audio_url"] as? String,
+//                      let part = question["part"] as? Int,
+//                      let order = question["order"] as? Int else {
+//                    continue
+//                }
+//                
+//                // Download audio data
+//                let audioData = try await supabase.storage
+//                    .from("audio-question-set")
+//                    .download(path: audioPath)
+//                
+//                let questionItem = QuestionItem(
+//                    order: order,
+//                    questionText: questionText,
+//                    audioData: audioData
+//                )
+//                
+//                switch part {
+//                case 1:
+//                    part1.append(questionItem)
+//                case 2:
+//                    part2.append(questionItem)
+//                case 3:
+//                    part3.append(questionItem)
+//                default:
+//                    break
+//                }
+//            }
+//            
+//            // Sort by order
+//            part1.sort { $0.order < $1.order }
+//            part2.sort { $0.order < $1.order }
+//            part3.sort { $0.order < $1.order }
+//            
+//            return [part1, part2, part3]
+//        } catch {
+//            print("Error downloading test: \(error)")
+//            throw error
+//        }
+//    }
+//    
+//    private var quickStatsSection: some View {
+//        VStack(alignment: .leading, spacing: 16) {
+//            Text("Your Progress")
+//                .font(.title3)
+//                .fontWeight(.semibold)
+//                .foregroundColor(.primary)
+//            
+//            HStack(spacing: 16) {
+//                // Average Score
+//                StatCard(
+//                    title: "Average Score",
+//                    value: String(format: "%.1f", averageScore),
+//                    subtitle: "Band Score",
+//                    color: .blue,
+//                    icon: "chart.line.uptrend.xyaxis"
+//                )
+//                
+//                // Total Tests
+//                StatCard(
+//                    title: "Tests Taken",
+//                    value: "\(testResults.count)",
+//                    subtitle: "Total",
+//                    color: .green,
+//                    icon: "checkmark.circle.fill"
+//                )
+//                
+//                // Improvement
+//                StatCard(
+//                    title: "Improvement",
+//                    value: "+1.5",
+//                    subtitle: "This Month",
+//                    color: .orange,
+//                    icon: "arrow.up.circle.fill"
+//                )
+//            }
+//            
+//            ScoreBarChart(
+//                testResults: testResults
+//            )
+//        }
+//    }
+//    
+//    private var recentTestsSection: some View {
+//        VStack(alignment: .leading, spacing: 16) {
+//            HStack {
+//                Text("Recent Tests")
+//                    .font(.title3)
+//                    .fontWeight(.semibold)
+//                    .foregroundColor(.primary)
+//                
+//                Spacer()
+//                
+//                Button("View All") {
+//                    // Handle view all
+//                }
+//                .font(.subheadline)
+//                .fontWeight(.medium)
+//                .foregroundColor(.blue)
+//            }
+//            
+//            if testResults.isEmpty {
+//                emptyStateView
+//            } else {
+//                LazyVStack(spacing: 12) {
+//                    ForEach(testResults) { result in
+//                        ModernTestCard(result: result) {
+//                            selectedTestResult = result
+//                            showFeedbackScreen = true
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    
+//    private var emptyStateView: some View {
+//        VStack(spacing: 16) {
+//            Image(systemName: "waveform.badge.mic")
+//                .font(.system(size: 60))
+//                .foregroundColor(.gray.opacity(0.6))
+//            
+//            Text("No tests yet")
+//                .font(.title3)
+//                .fontWeight(.semibold)
+//                .foregroundColor(.primary)
+//            
+//            Text("Take your first speaking test to get AI feedback and track your progress")
+//                .font(.subheadline)
+//                .foregroundColor(.secondary)
+//                .multilineTextAlignment(.center)
+//        }
+//        .padding(.vertical, 40)
+//        .frame(maxWidth: .infinity)
+//        .background(
+//            RoundedRectangle(cornerRadius: 16)
+//                .fill(Color(.systemGray6))
+//        )
+//    }
+//}
