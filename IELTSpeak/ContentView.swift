@@ -15,8 +15,8 @@ struct ContentView: View {
             SettingsScreen()
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
             
-            ProfileView()
-                .tabItem { Label("Profile", systemImage: "person") }
+//            ProfileView()
+//                .tabItem { Label("Profile", systemImage: "person") }
         }
         .background(.ultraThinMaterial)
         .edgesIgnoringSafeArea(.bottom)
