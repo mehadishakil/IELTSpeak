@@ -11,12 +11,11 @@ struct ContentView: View {
             LessonScreen()
                 .tabItem { Label("Lesson", systemImage: "character.book.closed") }
 
+            LeaderboardView()
+                .tabItem { Label("Leaderboard", systemImage: "chart.xyaxis.line") }
 
             SettingsScreen()
                 .tabItem { Label("Settings", systemImage: "gearshape.fill") }
-            
-//            ProfileView()
-//                .tabItem { Label("Profile", systemImage: "person") }
         }
         .background(.ultraThinMaterial)
         .edgesIgnoringSafeArea(.bottom)

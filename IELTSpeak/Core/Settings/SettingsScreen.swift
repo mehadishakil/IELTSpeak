@@ -710,7 +710,7 @@ struct SettingsScreen: View {
             VStack(spacing: 0) {
                 settingsRow(
                     icon: "bell.fill",
-                    title: "Break Reminders",
+                    title: "Notifications",
                     iconColor: .orange,
                     content: {
                         Toggle("", isOn: $isNotificationEnabled)
