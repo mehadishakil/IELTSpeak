@@ -1,10 +1,3 @@
-//
-//  AuthView.swift
-//  UserManagement
-//
-//  Created by Guilherme Souza on 17/11/23.
-//
-
 import Supabase
 import SwiftUI
 

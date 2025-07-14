@@ -69,8 +69,8 @@ struct FeedbackBoardView: View {
                         Button {
                             //
                         } label: {
-                            VStack(spacing: 6){
-                                Image(systemName: "chevron.up")
+                            VStack(spacing: 4){
+                                Image(systemName: "arrowtriangle.up.fill")
                                 Text("\(post.upvotes)")
                             }
                             .padding(.horizontal, 12)

@@ -7,6 +7,11 @@
 
 import Foundation
 
+struct QuestionItem {
+    let order: Int
+    let questionText: String
+    let audioFile: Data
+}
 
 // MARK: - Data Models
 struct TestResult: Identifiable {
@@ -32,6 +37,17 @@ struct ConversationError {
     let correction: String
     let range: NSRange
 }
+
+struct QuestionRow: Decodable {
+    let id: Int
+    let test_id: Int
+    let part: Int
+    let order: Int
+    let question_text: String
+    let audio_url: String
+    let created_at: String
+}
+
 
 //struct QuestionItem {
 //    let id: Int
