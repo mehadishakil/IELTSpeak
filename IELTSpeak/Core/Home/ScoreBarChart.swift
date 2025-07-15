@@ -18,7 +18,7 @@ struct ScoreBarChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Score History")
-                .font(.headline)
+                .font(.custom("Fredoka-Medium", size: 18))
                 .foregroundColor(.primary)
 
             ScrollView(.horizontal, showsIndicators: true) {
@@ -36,8 +36,8 @@ struct ScoreBarChart: View {
                         .foregroundStyle(barColor)
                         .annotation(position: .top) {
                             Text(String(format: "%.1f", test.bandScore))
-                                .font(.caption2)
-                                .foregroundColor(.primary)
+                                .font(.custom("Fredoka-Regular", size: 12))
+                                .foregroundColor(.secondary)
                         }
                     }
                 }

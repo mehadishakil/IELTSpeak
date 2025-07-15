@@ -145,29 +145,31 @@ struct HomeScreen: View {
                         heroSection
                         
                         
-//                        NavigationLink(
+                        NavigationLink(
 //                            destination: TestSimulatorScreen(
 //                                questions: testQuestions
 //                            ),
 //                            isActive: $isLoading
-//                        ) {
-//                            EmptyView()
-//                        }
-//                        .hidden()
-//                        .overlay {
-//                            if isLoading {
-//                                ZStack {
-//                                    Color.black
-//                                        .opacity(0.3)
-//                                        .ignoresSafeArea()
-//                                    
-//                                    ProgressView("Preparing test...")
-//                                        .padding()
-//                                        .background(Color.white)
-//                                        .cornerRadius(12)
-//                                }
-//                            }
-//                        }
+                            destination: EmptyView()
+                        ) {
+                            EmptyView()
+                        }
+                        .hidden()
+                        .overlay {
+                            if isLoading {
+                                
+                                    
+                                    ProgressView("Preparing test...")
+                                        .frame(
+                                            width: 200,
+                                            height: 200,
+                                            alignment: .center
+                                        )
+                                        .background(Color.white)
+                                        .cornerRadius(12)
+                                
+                            }
+                        }
                         
                         
 
@@ -207,23 +209,22 @@ struct HomeScreen: View {
             // Header content
             HStack {
                 Text("Practice IELTS Speaking")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .font(.custom("Fredoka-Semibold", size: 28))
+                    .foregroundColor(.purple.opacity(0.9))
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 30)
         }
-        .background(
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    Color.blue.opacity(0.8),
-                    Color.purple.opacity(0.6)
-                ]),
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+//        .background(
+//            LinearGradient(
+//                gradient: Gradient(colors: [
+//                    Color.blue.opacity(0.8),
+//                    Color.purple.opacity(0.6)
+//                ]),
+//                startPoint: .topLeading,
+//                endPoint: .bottomTrailing
+//            )
+//        )
         .clipShape(
             RoundedRectangle(cornerRadius: 0)
                 .path(in: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 150))
@@ -278,27 +279,26 @@ struct HomeScreen: View {
                         // Text
                         VStack(spacing: 4) {
                             Text("Start Speaking Test")
-                                .font(.title2)
-                                .fontWeight(.bold)
+                                .font(.custom("Fredoka-SemiBold", size: 24))
                                 .foregroundColor(.white)
                             
                             Text("Get AI-powered feedback instantly")
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.9))
+                                .font(.custom("Fredoka-Medium", size: 16))
+                                .foregroundColor(.white.opacity(0.8))
                         }
                         
                         // Test details
                         HStack(spacing: 20) {
                             Label("15 min", systemImage: "clock")
-                                .font(.caption)
+                                .font(.custom("Fredoka-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.8))
                             
                             Label("3 Parts", systemImage: "list.number")
-                                .font(.caption)
+                                .font(.custom("Fredoka-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.8))
                             
                             Label("AI Scoring", systemImage: "brain.head.profile")
-                                .font(.caption)
+                                .font(.custom("Fredoka-Regular", size: 14))
                                 .foregroundColor(.white.opacity(0.8))
                         }
                     }
@@ -357,8 +357,7 @@ struct HomeScreen: View {
     private var quickStatsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Your Progress")
-                .font(.title3)
-                .fontWeight(.semibold)
+                .font(.custom("Fredoka-Medium", size: 18))
                 .foregroundColor(.primary)
             
             HStack(spacing: 16) {
@@ -402,8 +401,7 @@ struct HomeScreen: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Recent Tests")
-                    .font(.title3)
-                    .fontWeight(.semibold)
+                    .font(.custom("Fredoka-Medium", size: 18))
                     .foregroundColor(.primary)
                 
                 Spacer()
@@ -411,8 +409,7 @@ struct HomeScreen: View {
                 Button("View All") {
                     // Handle view all
                 }
-                .font(.subheadline)
-                .fontWeight(.medium)
+                .font(.custom("Fredoka-Regular", size: 14))
                 .foregroundColor(.blue)
             }
             

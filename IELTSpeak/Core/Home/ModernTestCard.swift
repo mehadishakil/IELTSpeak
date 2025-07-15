@@ -27,28 +27,28 @@ struct ModernTestCard: View {
                         .rotationEffect(.degrees(-90))
                     
                     Text(String(format: "%.1f", result.bandScore))
-                        .font(.headline)
-                        .fontWeight(.bold)
+                        .font(.custom("Fredoka-Medium", size: 18))
                         .foregroundColor(scoreColor)
                 }
                 
                 // Test Info
                 VStack(alignment: .leading, spacing: 4) {
                     Text(result.date, style: .date)
-                        .font(.headline)
-                        .foregroundColor(.primary)
+                        .font(.custom("Fredoka-Medium", size: 20))
+                        .foregroundColor(.primary.opacity(0.8))
                     
                     Text(result.date, style: .time)
-                        .font(.caption)
+                        .font(.custom("Fredoka-Regular", size: 12))
                         .foregroundColor(.secondary)
+                        .padding(.vertical, 2)
                     
                     HStack(spacing: 12) {
                         Label(result.duration, systemImage: "clock")
-                            .font(.caption)
+                            .font(.custom("Fredoka-Regular", size: 12))
                             .foregroundColor(.secondary)
                         
                         Label("AI Feedback", systemImage: "brain.head.profile")
-                            .font(.caption)
+                            .font(.custom("Fredoka-Regular", size: 12))
                             .foregroundColor(.blue)
                     }
                 }
@@ -63,7 +63,8 @@ struct ModernTestCard: View {
             .padding(16)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemBackground))
+                    .stroke(scoreColor.opacity(0.5), lineWidth: 1)
+                    .fill(scoreColor.opacity(0.1))
                     .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
             )
         }

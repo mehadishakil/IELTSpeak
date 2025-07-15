@@ -15,22 +15,27 @@ struct StatCard: View {
     let icon: String
     
     var body: some View {
-        VStack(spacing: 8) {
+        VStack {
             Image(systemName: icon)
                 .font(.title2)
                 .foregroundColor(color)
             
+            Spacer()
+            
             Text(value)
-                .font(.title2)
-                .fontWeight(.bold)
-                .foregroundColor(.primary)
+                .font(.custom("Fredoka-Medium", size: 22))
+                .foregroundColor(.primary.opacity(0.8))
+            
+            Spacer()
             
             Text(subtitle)
-                .font(.caption2)
+                .font(.custom("Fredoka-Regular", size: 10))
                 .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.bottom, 0.2)
             
             Text(title)
-                .font(.caption)
+                .font(.custom("Fredoka-Regular", size: 12))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }
@@ -38,7 +43,8 @@ struct StatCard: View {
         .padding(.vertical, 16)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.systemBackground))
+                .stroke(color.opacity(0.3), lineWidth: 1)
+                .fill(color.opacity(0.1))
                 .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
         )
     }

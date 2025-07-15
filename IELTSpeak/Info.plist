@@ -4,8 +4,11 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
+        <string>Fredoka-Light.ttf</string>
+        <string>Fredoka-Regular.ttf</string>
 		<string>Fredoka-Medium.ttf</string>
-		<string>Fredoka-SemiBold.ttf</string>
+        <string>Fredoka-SemiBold.ttf</string>
+		<string>Fredoka-Bold.ttf</string>
 	</array>
 	<key>GIDClientID</key>
 	<string>986461187914-3ni8i1ncpcgfcr2v7bmjk8scl6g97buk.apps.googleusercontent.com</string>
