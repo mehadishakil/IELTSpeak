@@ -68,7 +68,7 @@ struct HomeScreen: View {
                 let part1Questions = testQuestions[0] ?? []
                 let part2Questions = testQuestions[1] ?? []
                 let part3Questions = testQuestions[2] ?? []
-                // print("\(part1Questions) \(part2Questions) \(part3Questions)")
+                 print("\(part1Questions) ")
             } catch {
                 print("❌ Failed to fetch test: \(error)")
                 isLoading = false
@@ -170,7 +170,8 @@ class TestService {
                 
 //                print(item)
                 
-                parts[row.part, default: []].append(item)
+                let normalizedPart = row.part - 1
+                parts[normalizedPart, default: []].append(item)
             } catch {
                 print("⚠️ Failed to download audio: \(row.audio_url) - \(error.localizedDescription)")
             }

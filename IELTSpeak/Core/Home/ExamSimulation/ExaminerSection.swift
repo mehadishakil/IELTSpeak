@@ -65,7 +65,10 @@ struct ExaminerContent: View {
                 .padding(12)
             
             if isExaminerSpeaking {
-                // WaveformView(data: Array(waveformData.prefix(25)), color: .blue)
+                WaveformView(amplitudes: waveformData, color: .blue)
+                    .frame(height: 50)
+                    .padding(.horizontal)
+                    .transition(.opacity)
             }
             
             Spacer()

@@ -21,7 +21,7 @@ struct StudentSection: View {
             StudentContent(
                 isUserSpeaking: isUserSpeaking,
                 isRecording: isRecording,
-                userWaveformData: userWaveformData
+                waveformData: userWaveformData
             )
         }
     }
@@ -48,7 +48,7 @@ struct StudentHeader: View {
 struct StudentContent: View {
     let isUserSpeaking: Bool
     let isRecording: Bool
-    let userWaveformData: [Double]
+    let waveformData: [Double]
     
     var body: some View {
         VStack {
@@ -64,10 +64,10 @@ struct StudentContent: View {
                 .foregroundColor(.secondary)
             
             if isUserSpeaking || isRecording {
-//                WaveformView(amplitudes: waveformData, color: .blue)
-//                    .frame(height: 50)
-//                    .padding(.horizontal)
-//                    .transition(.opacity)
+                WaveformView(amplitudes: waveformData, color: .blue)
+                    .frame(height: 50)
+                    .padding(.horizontal)
+                    .transition(.opacity)
             }
             
             Spacer()

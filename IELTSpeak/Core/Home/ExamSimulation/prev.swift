@@ -1,19 +1,10 @@
-//
-//  prev.swift
-//  IELTSpeak
-//
-//  Created by Mehadi Hasan on 18/7/25.
-//
-
-
-
 
 import Foundation
 import AVFoundation
 import Combine
-import SwiftUI // Ensure this is imported for @Published if using in a separate file for TestSimulationManager
+import SwiftUI
+import Speech
 
-// MARK: - AudioPlayerManager
 class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     @Published var isPlaying: Bool = false
     @Published var currentAudioDuration: TimeInterval = 0
@@ -133,7 +124,6 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     }
 }
 
-// MARK: - AudioRecorderManager
 class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate {
     @Published var isRecording: Bool = false
     @Published var recordingTime: TimeInterval = 0
@@ -265,7 +255,6 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
     }
 }
 
-// MARK: - SpeechRecognizerManager
 class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDelegate {
     @Published var isRecognizing: Bool = false
     @Published var isSpeechDetected: Bool = false
@@ -439,12 +428,10 @@ class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDel
     }
 }
 
-// MARK: - TestSimulationManager
 class TestSimulationManager: ObservableObject {
     @Published var currentPhase: TestPhase = .preparation
     @Published var currentPart: Int = 1
     @Published var currentQuestionIndex: Int = 0
-
     @Published var isExaminerSpeaking: Bool = false
     @Published var isUserSpeaking: Bool = false
     @Published var isRecording: Bool = false
@@ -461,12 +448,9 @@ class TestSimulationManager: ObservableObject {
     var conversations: [Conversation] = []
     private var currentRecordedAudioURL: URL?
     private var currentQuestionStartTime: Date?
-
     private var preparationTimer: Timer?
     private var part2SpeakingTimer: Timer?
-
     private var questions: [Int: [QuestionItem]]
-
     private var cancellables = Set<AnyCancellable>()
 
     init(questions: [Int: [QuestionItem]]) {
@@ -546,9 +530,11 @@ class TestSimulationManager: ObservableObject {
         preparationTimer?.invalidate()
         print("TestSimulationManager: Cleaned up previous states.")
 
-
         if currentPart == 1 {
+            print("Printing questions -------------------")
+            print(questions[0])
             guard let part1Questions = questions[0], currentQuestionIndex < part1Questions.count else {
+                
                 print("TestSimulationManager: Part 1 finished. Moving to Part 2.")
                 currentPart = 2
                 currentQuestionIndex = 0
@@ -556,11 +542,15 @@ class TestSimulationManager: ObservableObject {
                 return
             }
             let question = part1Questions[currentQuestionIndex]
+            print(question)
+            print("\n")
             currentQuestionText = question.questionText
             print("TestSimulationManager: Part 1, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText)'")
             playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 2.0)
 
         } else if currentPart == 2 {
+            //print("Printing questions -------------------")
+            //print(questions[1])
             guard let part2Questions = questions[1], !part2Questions.isEmpty else {
                 print("TestSimulationManager: Part 2 finished or no questions. Moving to Part 3.")
                 currentPart = 3
@@ -568,7 +558,7 @@ class TestSimulationManager: ObservableObject {
                 startConversationFlow()
                 return
             }
-            let cueCard = part2Questions[0]
+            let cueCard = part2Questions[currentQuestionIndex]
             currentQuestionText = cueCard.questionText
             print("TestSimulationManager: Part 2: Playing cue card audio for '\(currentQuestionText.prefix(30))...'")
             playExaminerQuestion(cueCard.audioFile, part: currentPart, questionText: cueCard.questionText) { [weak self] in
@@ -576,6 +566,7 @@ class TestSimulationManager: ObservableObject {
             }
 
         } else if currentPart == 3 {
+            //print(questions[2])
             guard let part3Questions = questions[2], currentQuestionIndex < part3Questions.count else {
                 print("TestSimulationManager: Part 3 finished. Moving to Processing.")
                 currentPhase = .processing
@@ -772,20 +763,16 @@ class TestSimulationManager: ObservableObject {
     }
 }
 
-import SwiftUI
-import Speech
-
 struct TestSimulatorScreen: View {
-    @StateObject private var testManager: TestSimulationManager // Use StateObject for manager lifecycle
+    @StateObject private var testManager: TestSimulationManager
     @Environment(\.dismiss) private var dismiss
 
-    let questions: [Int: [QuestionItem]] // Passed from the calling view
-
+    let questions: [Int: [QuestionItem]]
+    
     init(questions: [Int: [QuestionItem]]) {
         self.questions = questions
-        // Initialize StateObject AFTER self is initialized
         _testManager = StateObject(wrappedValue: TestSimulationManager(questions: questions))
-        print(questions)
+        //print(questions)
     }
 
     var body: some View {
@@ -804,7 +791,7 @@ struct TestSimulatorScreen: View {
                     switch testManager.currentPhase {
                     case .preparation:
                         TestPreparationView(
-                            showQuestions: .constant(true), // Assuming showQuestions is always true for now
+                            showQuestions: .constant(true),
                             onStartTest: testManager.startTest
                         )
                     case .testing:
@@ -817,8 +804,8 @@ struct TestSimulatorScreen: View {
                             recordingTime: testManager.recordingTime,
                             waveformData: testManager.audioPlayerManager.isPlaying ? generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
                             userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30),
-                            part2PreparationTimeRemaining: testManager.part2PreparationTimeRemaining, // Pass Part 2 specific times
-                            part2SpeakingTimeRemaining: testManager.part2SpeakingTimeRemaining
+//                            part2PreparationTimeRemaining: testManager.part2PreparationTimeRemaining, // Pass Part 2 specific times
+//                            part2SpeakingTimeRemaining: testManager.part2SpeakingTimeRemaining
                         )
                         // No .onAppear here for starting flow, testManager handles it
                         // The flow is started by testManager.startTest()
@@ -875,111 +862,6 @@ struct TestSimulatorScreen: View {
     }
 }
 
-struct ExamTestView: View {
-    let currentPart: Int
-    let currentQuestionText: String
-    let isExaminerSpeaking: Bool
-    let isUserSpeaking: Bool
-    let isRecording: Bool
-    let recordingTime: TimeInterval
-    let waveformData: [Double]
-    let userWaveformData: [Double]
-    let part2PreparationTimeRemaining: TimeInterval
-    let part2SpeakingTimeRemaining: TimeInterval
-
-    var formattedRecordingTime: String {
-        let minutes = Int(recordingTime) / 60
-        let seconds = Int(recordingTime) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-
-    var body: some View {
-        VStack(spacing: 20) {
-            Spacer()
-
-            if currentPart == 2 && part2PreparationTimeRemaining > 0 {
-                VStack {
-                    Text("Preparation Time Remaining:")
-                        .font(.headline)
-                    Text(String(format: "%02d:%02d", Int(part2PreparationTimeRemaining) / 60, Int(part2PreparationTimeRemaining) % 60))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(.accentColor)
-                    ProgressView(value: 60 - part2PreparationTimeRemaining, total: 60)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
-                        .padding(.horizontal)
-                }
-                .transition(.opacity)
-            } else if currentPart == 2 && part2SpeakingTimeRemaining > 0 {
-                VStack {
-                    Text("Speaking Time Remaining (Max 2:00):")
-                        .font(.headline)
-                    Text(String(format: "%02d:%02d", Int(part2SpeakingTimeRemaining) / 60, Int(part2SpeakingTimeRemaining) % 60))
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
-                        .foregroundColor(part2SpeakingTimeRemaining <= 30 ? .red : .accentColor)
-                    ProgressView(value: 120 - part2SpeakingTimeRemaining, total: 120)
-                        .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
-                        .padding(.horizontal)
-                }
-                .transition(.opacity)
-            }
-
-
-            Text("Examiner's Question:")
-                .font(.headline)
-                .foregroundColor(.secondary)
-
-            Text(currentQuestionText)
-                .font(.title2)
-                .fontWeight(.medium)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-                .frame(minHeight: 80) // Give it a fixed minimum height to prevent jumpiness
-
-            if isExaminerSpeaking {
-                WaveformView(amplitudes: waveformData, color: .blue)
-                    .frame(height: 50)
-                    .padding(.horizontal)
-                    .transition(.opacity)
-            } else {
-                Text("Waiting for your response...")
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .opacity(isRecording ? 0 : 1) // Hide if recording starts
-                    .transition(.opacity)
-            }
-
-            Spacer()
-
-            if isRecording {
-                VStack {
-                    Text("Your Response:")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                    Text(formattedRecordingTime)
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .foregroundColor(.green)
-                    WaveformView(amplitudes: userWaveformData, color: .green)
-                        .frame(height: 50)
-                        .padding(.horizontal)
-                }
-                .transition(.opacity) // Animate appearance
-            } else {
-                Image(systemName: "mic.fill")
-                    .font(.largeTitle)
-                    .foregroundColor(.gray.opacity(0.5))
-                    .frame(height: 50)
-                    .padding(.horizontal)
-            }
-
-            Spacer()
-        }
-    }
-}
-//
-//// Simple WaveformView (can be enhanced)
 struct WaveformView: View {
     let amplitudes: [Double]
     let color: Color
@@ -1031,3 +913,111 @@ struct TestSimulatorScreen_Previews: PreviewProvider {
             .environment(\.colorScheme, .light) // Example for light mode
     }
 }
+
+
+
+
+//struct ExamTestView: View {
+//    let currentPart: Int
+//    let currentQuestionText: String
+//    let isExaminerSpeaking: Bool
+//    let isUserSpeaking: Bool
+//    let isRecording: Bool
+//    let recordingTime: TimeInterval
+//    let waveformData: [Double]
+//    let userWaveformData: [Double]
+//    let part2PreparationTimeRemaining: TimeInterval
+//    let part2SpeakingTimeRemaining: TimeInterval
+//
+//    var formattedRecordingTime: String {
+//        let minutes = Int(recordingTime) / 60
+//        let seconds = Int(recordingTime) % 60
+//        return String(format: "%02d:%02d", minutes, seconds)
+//    }
+//
+//    var body: some View {
+//        VStack(spacing: 20) {
+//            Spacer()
+//
+//            if currentPart == 2 && part2PreparationTimeRemaining > 0 {
+//                VStack {
+//                    Text("Preparation Time Remaining:")
+//                        .font(.headline)
+//                    Text(String(format: "%02d:%02d", Int(part2PreparationTimeRemaining) / 60, Int(part2PreparationTimeRemaining) % 60))
+//                        .font(.largeTitle)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(.accentColor)
+//                    ProgressView(value: 60 - part2PreparationTimeRemaining, total: 60)
+//                        .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
+//                        .padding(.horizontal)
+//                }
+//                .transition(.opacity)
+//            } else if currentPart == 2 && part2SpeakingTimeRemaining > 0 {
+//                VStack {
+//                    Text("Speaking Time Remaining (Max 2:00):")
+//                        .font(.headline)
+//                    Text(String(format: "%02d:%02d", Int(part2SpeakingTimeRemaining) / 60, Int(part2SpeakingTimeRemaining) % 60))
+//                        .font(.largeTitle)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(part2SpeakingTimeRemaining <= 30 ? .red : .accentColor)
+//                    ProgressView(value: 120 - part2SpeakingTimeRemaining, total: 120)
+//                        .progressViewStyle(LinearProgressViewStyle(tint: .accentColor))
+//                        .padding(.horizontal)
+//                }
+//                .transition(.opacity)
+//            }
+//
+//
+//            Text("Examiner's Question:")
+//                .font(.headline)
+//                .foregroundColor(.secondary)
+//
+//            Text(currentQuestionText)
+//                .font(.title2)
+//                .fontWeight(.medium)
+//                .multilineTextAlignment(.center)
+//                .padding(.horizontal)
+//                .frame(minHeight: 80) // Give it a fixed minimum height to prevent jumpiness
+//
+//            if isExaminerSpeaking {
+//                WaveformView(amplitudes: waveformData, color: .blue)
+//                    .frame(height: 50)
+//                    .padding(.horizontal)
+//                    .transition(.opacity)
+//            } else {
+//                Text("Waiting for your response...")
+//                    .font(.caption)
+//                    .foregroundColor(.secondary)
+//                    .opacity(isRecording ? 0 : 1) // Hide if recording starts
+//                    .transition(.opacity)
+//            }
+//
+//            Spacer()
+//
+//            if isRecording {
+//                VStack {
+//                    Text("Your Response:")
+//                        .font(.headline)
+//                        .foregroundColor(.secondary)
+//                    Text(formattedRecordingTime)
+//                        .font(.title)
+//                        .fontWeight(.bold)
+//                        .foregroundColor(.green)
+//                    WaveformView(amplitudes: userWaveformData, color: .green)
+//                        .frame(height: 50)
+//                        .padding(.horizontal)
+//                }
+//                .transition(.opacity) // Animate appearance
+//            } else {
+//                Image(systemName: "mic.fill")
+//                    .font(.largeTitle)
+//                    .foregroundColor(.gray.opacity(0.5))
+//                    .frame(height: 50)
+//                    .padding(.horizontal)
+//            }
+//
+//            Spacer()
+//        }
+//    }
+//}
+
