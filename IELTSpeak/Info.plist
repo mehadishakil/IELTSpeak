@@ -33,5 +33,9 @@
 			</array>
 		</dict>
 	</array>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app needs access to your microphone for recording your speaking test answers.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>This app uses speech recognition to detect when you finish speaking during the test.</string>
 </dict>
 </plist>

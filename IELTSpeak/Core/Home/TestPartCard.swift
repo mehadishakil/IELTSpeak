@@ -7,22 +7,6 @@
 
 import SwiftUI
 
-struct TestPart {
-    let part: Int
-    let title: String
-    let duration: String
-    let questions: [String]
-}
-
-
-enum TestPhase {
-    case preparation
-    case testing
-    case processing
-    case completed
-}
-
-
 struct TestPartCard: View {
     let testPart: TestPart
     

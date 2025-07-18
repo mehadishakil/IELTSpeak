@@ -8,6 +8,7 @@
 import Foundation
 
 struct QuestionItem {
+    let part: Int
     let order: Int
     let questionText: String
     let audioFile: Data
@@ -48,6 +49,20 @@ struct QuestionRow: Decodable {
     let created_at: String
 }
 
+struct TestPart {
+    let part: Int
+    let title: String
+    let duration: String
+    let questions: [String]
+}
+
+
+enum TestPhase {
+    case preparation
+    case testing
+    case processing
+    case completed
+}
 
 //struct QuestionItem {
 //    let id: Int

@@ -25,7 +25,6 @@
 		E8C884A02E23BB6400624EFA /* Exceptions for "IELTSpeak" folder in "IELTSpeak" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Core/Info.plist,
 				Info.plist,
 			);
 			target = E8FAB2772E1EFD7B00403DC9 /* IELTSpeak */;
