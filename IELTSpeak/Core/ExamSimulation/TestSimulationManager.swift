@@ -21,9 +21,10 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
 
     private func setupAudioSession() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback, mode: .default)
+            // Use .playAndRecord to be compatible with recording
+            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
             try AVAudioSession.sharedInstance().setActive(true)
-            print("AudioPlayerManager: AVAudioSession set to playback and activated.")
+            print("AudioPlayerManager: AVAudioSession set to playAndRecord and activated.")
         } catch {
             print("AudioPlayerManager: Failed to set up audio session for playback: \(error.localizedDescription)")
         }
@@ -280,9 +281,10 @@ class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDel
     private func setupAudioSessionForSpeechRecognition() throws {
         let audioSession = AVAudioSession.sharedInstance()
         do {
-            try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-            print("SpeechRecognizerManager: AVAudioSession set to record and activated for speech recognition.")
+            // Use .playAndRecord instead of .record to maintain compatibility with recording
+            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+            try audioSession.setActive(true)
+            print("SpeechRecognizerManager: AVAudioSession set to playAndRecord and activated for speech recognition.")
         } catch {
             print("SpeechRecognizerManager: Audio session setup failed for speech recognition: \(error.localizedDescription)")
             throw SpeechRecognizerError.audioSessionSetupFailed(error.localizedDescription)
@@ -297,7 +299,11 @@ class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDel
         guard isSpeechRecognitionAvailable() else {
             throw SpeechRecognizerError.notAvailable
         }
-        guard error == nil else {
+        
+        // Check authorization status more carefully
+        let authStatus = SFSpeechRecognizer.authorizationStatus()
+        guard authStatus == .authorized else {
+            print("SpeechRecognizerManager: Speech recognition not authorized. Status: \(authStatus.rawValue)")
             throw SpeechRecognizerError.authorizationDenied
         }
 
@@ -389,17 +395,21 @@ class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDel
         isSpeechDetected = false
         print("SpeechRecognizerManager: Speech recognition resources cleared.")
 
+        // DON'T deactivate the audio session - let the AudioRecorderManager handle it
+        // This was causing the "authorization denied" errors for subsequent questions
+        /*
         do {
             try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
             print("SpeechRecognizerManager: AVAudioSession deactivated.")
         } catch {
             print("SpeechRecognizerManager: Failed to deactivate audio session: \(error.localizedDescription)")
         }
+        */
     }
 
     // MARK: - SFSpeechRecognizerDelegate
-    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidRecognize: Bool) {
-        if !availabilityDidRecognize {
+    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChangeTo available: Bool) {
+        if !available {
             self.error = "Speech recognition is not currently available."
             print("SpeechRecognizerManager: Speech recognizer availability changed: NOT available.")
         } else {
@@ -483,13 +493,18 @@ class TestSimulationManager: ObservableObject {
             }
             .store(in: &cancellables)
         
+        // REMOVE OR COMMENT OUT THIS PROBLEMATIC SUBSCRIPTION
+        // This subscription might be interfering with the proper flow
+        /*
         audioPlayerManager.$isPlaying
             .filter { !$0 && self.isExaminerSpeaking }
             .sink { [weak self] _ in
                 if self?.errorMessage == nil {
+                    // This empty block was doing nothing anyway
                 }
             }
             .store(in: &cancellables)
+        */
     }
 
     func startTest() {
@@ -585,26 +600,34 @@ class TestSimulationManager: ObservableObject {
 
     private func playExaminerQuestion(_ audioData: Data, part: Int, questionText: String, silenceDuration: TimeInterval = 2.0, completion: (() -> Void)? = nil) {
         
+        // Create a local cancellable that will NOT be stored in the persistent cancellables set
         var audioPlaybackCancellable: AnyCancellable?
         
         audioPlaybackCancellable = audioPlayerManager.$isPlaying
-            .filter { !$0 }
-            .prefix(1)
+            .filter { !$0 } // Wait for isPlaying to become false
+            .prefix(1) // Only take the first emission
             .sink { [weak self] _ in
                 guard let self = self else { return }
                 print("TestSimulationManager: Examiner audio finished or failed to play. isPlaying is now false. Current Part: \(self.currentPart)")
                 
+                // Call completion first if provided
                 completion?()
 
+                // Only start user response recording if not in Part 2 preparation phase
                 if self.currentPart != 2 || (self.currentPart == 2 && self.part2PreparationTimeRemaining <= 0) {
                     print("TestSimulationManager: Starting user response recording.")
                     self.startUserResponseRecording(silenceDuration: silenceDuration, part: part, questionText: questionText)
                 }
                 
+                // Clean up the cancellable immediately after use
                 audioPlaybackCancellable?.cancel()
                 audioPlaybackCancellable = nil
             }
         
+        // DO NOT store in cancellables - let it be managed locally
+        // audioPlaybackCancellable?.store(in: &cancellables) // REMOVE THIS LINE
+        
+        // Start playing the audio
         audioPlayerManager.playAudio(from: audioData)
     }
 
@@ -725,30 +748,47 @@ class TestSimulationManager: ObservableObject {
     }
 
     private func nextQuestionOrPart() {
+        // Clean up all timers and audio operations
         preparationTimer?.invalidate()
+        preparationTimer = nil
         part2SpeakingTimer?.invalidate()
+        part2SpeakingTimer = nil
+        
+        // Stop any ongoing audio operations
+        audioPlayerManager.stopAudio()
+        audioRecorderManager.stopRecording()
+        speechRecognizerManager.stopSpeechRecognition()
         
         if currentPart == 1 {
             currentQuestionIndex += 1
             if currentQuestionIndex < (questions[0]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 1. Index: \(currentQuestionIndex)")
-                startConversationFlow()
+                // Add a small delay to ensure clean state transition
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.startConversationFlow()
+                }
             } else {
                 print("TestSimulationManager: All Part 1 questions covered. Initiating Part 2 transition.")
                 currentPart = 2
                 currentQuestionIndex = 0
-                startConversationFlow()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.startConversationFlow()
+                }
             }
         } else if currentPart == 2 {
             print("TestSimulationManager: Moving from Part 2 to Part 3.")
             currentPart = 3
             currentQuestionIndex = 0
-            startConversationFlow()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.startConversationFlow()
+            }
         } else if currentPart == 3 {
             currentQuestionIndex += 1
             if currentQuestionIndex < (questions[2]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 3. Index: \(currentQuestionIndex)")
-                startConversationFlow()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.startConversationFlow()
+                }
             } else {
                 print("TestSimulationManager: All Part 3 questions covered. Initiating test finalization.")
                 currentPhase = .processing
@@ -837,8 +877,7 @@ struct TestSimulatorScreen: View {
         .toolbar(.hidden, for: .tabBar)
     }
 
-    // MARK: - Waveform Generation Helpers (moved from TestSimulatorScreen)
-    // These now use the manager's published properties
+    
     private func generateVisualWaveformData(for currentTime: TimeInterval, duration: TimeInterval, isSpeaking: Bool) -> [Double] {
         guard isSpeaking && duration > 0 else { return Array(repeating: 0.0, count: 50) }
         let progress = currentTime / duration
@@ -846,9 +885,9 @@ struct TestSimulatorScreen: View {
         var data = Array(repeating: 0.0, count: 50)
         for i in 0..<50 {
             if i < activeBarCount {
-                data[i] = Double.random(in: 0.3...1.0) // Simulates active sound
+                data[i] = Double.random(in: 0.3...1.0)
             } else {
-                data[i] = 0.1 // Simulates background or silence
+                data[i] = 0.1
             }
         }
         return data
@@ -856,9 +895,8 @@ struct TestSimulatorScreen: View {
 
     private func generateUserVisualWaveformData(power: Float) -> [Double] {
         var data = Array(repeating: 0.0, count: 30)
-        let normalizedPower = max(0.0, min(1.0, power)) // Clamp between 0 and 1
+        let normalizedPower = max(0.0, min(1.0, power))
         for i in 0..<30 {
-            // Scale the power to a visual range for the bars
             data[i] = Double(normalizedPower) * Double.random(in: 0.5...1.0)
         }
         return data
@@ -916,6 +954,7 @@ struct TestSimulatorScreen_Previews: PreviewProvider {
             .environment(\.colorScheme, .light) // Example for light mode
     }
 }
+
 
 
 
