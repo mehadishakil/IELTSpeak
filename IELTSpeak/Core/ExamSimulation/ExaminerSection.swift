@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-// MARK: - Testing Components
 struct ExaminerSection: View {
     let currentQuestionText: String
     let isExaminerSpeaking: Bool

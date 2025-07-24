@@ -8,7 +8,6 @@
 import SwiftUI
 import AVFoundation
 
-// MARK: - Preparation View
 struct TestPreparationView: View {
     @Binding var showQuestions: Bool
     let onStartTest: () -> Void

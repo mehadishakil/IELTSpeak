@@ -1,6 +1,5 @@
 import SwiftUI
 
-// MARK: - Testing View
 struct ExamTestView: View {
     let currentPart: Int
     let currentQuestionText: String

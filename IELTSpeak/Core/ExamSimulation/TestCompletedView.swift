@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Completed View
 struct TestCompletedView: View {
     let onViewResults: () -> Void
     

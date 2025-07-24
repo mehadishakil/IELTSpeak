@@ -12,7 +12,6 @@ struct ConversationCard: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
             HStack {
                 Text("Part \(conversation.part)")
                     .font(.headline)

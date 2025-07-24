@@ -7,8 +7,6 @@
 
 import SwiftUI
 
-
-// MARK: - Reusable Components
 struct AIAvatarView: View {
     let isActive: Bool
     let color: Color

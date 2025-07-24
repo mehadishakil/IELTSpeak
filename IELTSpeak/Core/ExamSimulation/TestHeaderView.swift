@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Header Component
 struct TestHeaderView: View {
     let currentPhase: TestPhase
     let currentPart: Int

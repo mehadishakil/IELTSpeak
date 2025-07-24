@@ -7,7 +7,6 @@
 
 import SwiftUI
 
-// MARK: - Processing View
 struct TestProcessingView: View {
     @Binding var isProcessing: Bool
     
