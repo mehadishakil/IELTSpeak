@@ -12,14 +12,16 @@ struct TestResult: Identifiable {
     let date: Date
     let bandScore: Double
     let duration: String
-    let parts: [Double]
+    let criteriaScores: [String: Double] // Updated from modules array
     let overallFeedback: String
     let conversations: [Conversation]
 }
 
+
 struct Conversation: Identifiable {
     let id = UUID()
     let part: Int
+    let order: Int
     let question: String
     let answer: String
     let errors: [ConversationError]

@@ -715,7 +715,7 @@ class TestSimulationManager: ObservableObject {
                 print("TestSimulationManager: Part 2: 2-minute speaking limit reached. Stopping recording.")
                 self.part2SpeakingTimer?.invalidate()
                 self.part2SpeakingTimer = nil
-                self.stopUserResponseAndSave(part: self.currentPart, questionText: self.currentQuestionText)
+                self.stopUserResponseAndSave(part: self.currentPart, order: self.currentQuestionIndex, questionText: self.currentQuestionText)
                 print("TestSimulationManager: SIMULATING PROMPT: Thank you, that's enough.")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                     self.nextQuestionOrPart()
@@ -743,20 +743,35 @@ class TestSimulationManager: ObservableObject {
                     if isPart2 {
                         if self.recordingTime >= 60 && self.recordingTime < 120 {
                             print("TestSimulationManager: Part 2: User stopped speaking after 1 min, before 2 min. Proceeding.")
-                            self.stopUserResponseAndSave(part: part, questionText: questionText, transcript: transcript)
+                            self.stopUserResponseAndSave(
+                                part: part,
+                                order: currentQuestionIndex,
+                                questionText: questionText,
+                                transcript: transcript
+                            )
                             self.part2SpeakingTimer?.invalidate()
                             self.part2SpeakingTimer = nil
                             self.nextQuestionOrPart()
                         } else if self.recordingTime < 60 {
                             print("TestSimulationManager: Part 2: User stopped speaking before 1 minute. Saving and proceeding.")
-                            self.stopUserResponseAndSave(part: part, questionText: questionText, transcript: transcript)
+                            self.stopUserResponseAndSave(
+                                part: part,
+                                order: currentQuestionIndex,
+                                questionText: questionText,
+                                transcript: transcript
+                            )
                             self.part2SpeakingTimer?.invalidate()
                             self.part2SpeakingTimer = nil
                             self.nextQuestionOrPart()
                         }
                     } else {
                         print("TestSimulationManager: Part \(part): User stopped speaking. Saving and proceeding.")
-                        self.stopUserResponseAndSave(part: part, questionText: questionText, transcript: transcript)
+                        self.stopUserResponseAndSave(
+                            part: part,
+                            order: currentQuestionIndex,
+                            questionText: questionText,
+                            transcript: transcript
+                        )
                         self.nextQuestionOrPart()
                     }
                 }
@@ -770,7 +785,7 @@ class TestSimulationManager: ObservableObject {
         }
     }
 
-    private func stopUserResponseAndSave(part: Int, questionText: String, transcript: String = "") {
+    private func stopUserResponseAndSave(part: Int, order: Int, questionText: String, transcript: String = "") {
         let recordedURL = audioRecorderManager.stopRecording()
         speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
 
@@ -779,6 +794,7 @@ class TestSimulationManager: ObservableObject {
         DispatchQueue.global(qos: .background).async { [weak self] in
             let newConversation = Conversation(
                 part: part,
+                order: order,
                 question: questionText,
                 answer: answerText,
                 errors: []

@@ -14,6 +14,7 @@ struct HighlightedText: View {
     var body: some View {
         Text(attributedString)
             .font(.body)
+            .fontDesign(.rounded)
             .lineSpacing(4)
     }
     
