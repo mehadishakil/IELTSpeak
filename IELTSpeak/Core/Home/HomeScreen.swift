@@ -9,6 +9,7 @@ struct HomeScreen: View {
     @State private var showTestingView = false
     @State private var isLoading = false
     @State private var testQuestions: [Int: [QuestionItem]] = [:]
+    @State private var navigationTrigger = false
     
     var averageScore: Double {
         let total = testResults.reduce(0) { $0 + $1.bandScore }
@@ -30,7 +31,8 @@ struct HomeScreen: View {
                         TestNavigationOverlay(
                             isLoading: isLoading,
                             testQuestions: testQuestions,
-                            showTestingView: $showTestingView
+                            showTestingView: $showTestingView,
+                            navigationTrigger: $navigationTrigger
                         )
                         
                         QuickStatsSection(
@@ -57,30 +59,72 @@ struct HomeScreen: View {
         }
     }
     
+//    private func startTest() {
+//        isLoading = true
+//        Task {
+//            do {
+//                testQuestions = try await TestService.shared.fetchTestQuestions(testId: 1)
+//                isLoading = false
+//                showTestingView = true
+//                
+//                let part1Questions = testQuestions[0] ?? []
+//                let part2Questions = testQuestions[1] ?? []
+//                let part3Questions = testQuestions[2] ?? []
+//                 print("\(part1Questions) \(part2Questions) \(part3Questions)")
+//            } catch {
+//                print("❌ Failed to fetch test: \(error)")
+//                isLoading = false
+//            }
+//        }
+//    }
+//    
+//    private func selectTest(_ result: TestResult) {
+//        selectedTestResult = result
+//        showFeedbackScreen = true
+//    }
     private func startTest() {
-        isLoading = true
-        Task {
-            do {
-                testQuestions = try await TestService.shared.fetchTestQuestions(testId: 1)
-                isLoading = false
-                showTestingView = true
-                
-                let part1Questions = testQuestions[0] ?? []
-                let part2Questions = testQuestions[1] ?? []
-                let part3Questions = testQuestions[2] ?? []
-                 print("\(part1Questions) ")
-            } catch {
-                print("❌ Failed to fetch test: \(error)")
-                isLoading = false
+            print("HomeScreen: Start test button pressed")
+            isLoading = true
+            testQuestions = [:] // Clear previous questions
+            navigationTrigger = false // Reset navigation trigger
+            
+            Task {
+                do {
+                    print("HomeScreen: Fetching test questions...")
+                    testQuestions = try await TestService.shared.fetchTestQuestions(testId: 1)
+                    
+                    print("HomeScreen: Questions fetched successfully:")
+                    for (part, items) in testQuestions {
+                        print("Part \(part): \(items.count) questions")
+                    }
+                    
+                    await MainActor.run {
+                        isLoading = false
+                        
+                        // Ensure we have questions before navigating
+                        if !testQuestions.isEmpty {
+                            showTestingView = true
+                            navigationTrigger = true
+                            print("HomeScreen: Navigation triggered with \(testQuestions.count) question parts")
+                        } else {
+                            print("HomeScreen: ERROR - No questions fetched!")
+                        }
+                    }
+                } catch {
+                    print("❌ HomeScreen: Failed to fetch test: \(error)")
+                    await MainActor.run {
+                        isLoading = false
+                    }
+                }
             }
         }
-    }
-    
-    private func selectTest(_ result: TestResult) {
-        selectedTestResult = result
-        showFeedbackScreen = true
-    }
+        
+        private func selectTest(_ result: TestResult) {
+            selectedTestResult = result
+            showFeedbackScreen = true
+        }
 }
+
 
 
 
@@ -101,12 +145,11 @@ struct TestNavigationOverlay: View {
     let isLoading: Bool
     let testQuestions: [Int: [QuestionItem]]
     @Binding var showTestingView: Bool
+    @Binding var navigationTrigger: Bool
     
     var body: some View {
         NavigationLink(
-            destination: TestSimulatorScreen(
-                questions: testQuestions
-            ),
+            destination: destinationView,
             isActive: $showTestingView
         ) {
             EmptyView()
@@ -116,6 +159,19 @@ struct TestNavigationOverlay: View {
             if isLoading {
                 LoadingOverlay()
             }
+        }
+    }
+    
+    @ViewBuilder
+    private var destinationView: some View {
+        if navigationTrigger && !testQuestions.isEmpty {
+            TestSimulatorScreen(questions: testQuestions)
+        } else {
+            // Fallback view - this shouldn't happen if everything works correctly
+            Text("Loading test...")
+                .onAppear {
+                    print("TestNavigationOverlay: Fallback view appeared - this indicates an issue")
+                }
         }
     }
 }

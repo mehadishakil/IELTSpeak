@@ -465,6 +465,15 @@ class TestSimulationManager: ObservableObject {
 
     init(questions: [Int: [QuestionItem]]) {
         self.questions = questions
+        
+        print("TestSimulationManager Init - Questions structure:")
+                for (part, items) in questions {
+                    print("Part \(part): \(items.count) questions")
+                    for (index, item) in items.enumerated() {
+                        print("  Q\(index + 1): \(item.questionText.prefix(50))...")
+                    }
+                }
+        
         setupBindings()
     }
 
@@ -508,18 +517,21 @@ class TestSimulationManager: ObservableObject {
     }
 
     func startTest() {
-        currentPhase = .testing
-        requestAudioAndSpeechPermissions { [weak self] success in
-            if success {
-                print("TestSimulationManager: Permissions granted. Starting conversation flow.")
-                self?.startConversationFlow()
-            } else {
-                self?.errorMessage = "Microphone and Speech Recognition permissions are required to start the test. Please enable them in Settings."
-                self?.currentPhase = .preparation
-                print("TestSimulationManager: Permissions denied. Test cannot start.")
+            print("TestSimulationManager: startTest() called")
+            print("Current questions keys: \(Array(questions.keys).sorted())")
+            
+            currentPhase = .testing
+            requestAudioAndSpeechPermissions { [weak self] success in
+                if success {
+                    print("TestSimulationManager: Permissions granted. Starting conversation flow.")
+                    self?.startConversationFlow()
+                } else {
+                    self?.errorMessage = "Microphone and Speech Recognition permissions are required to start the test. Please enable them in Settings."
+                    self?.currentPhase = .preparation
+                    print("TestSimulationManager: Permissions denied. Test cannot start.")
+                }
             }
         }
-    }
 
     private func requestAudioAndSpeechPermissions(completion: @escaping (Bool) -> Void) {
         AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
@@ -536,67 +548,103 @@ class TestSimulationManager: ObservableObject {
     }
 
     func startConversationFlow() {
-        guard currentPhase == .testing else { return }
-
-        audioRecorderManager.stopRecording()
-        speechRecognizerManager.stopSpeechRecognition()
-        audioPlayerManager.stopAudio()
-        part2SpeakingTimer?.invalidate()
-        preparationTimer?.invalidate()
-        print("TestSimulationManager: Cleaned up previous states.")
-
-        if currentPart == 1 {
-            print("Printing questions -------------------")
-            print(questions[0])
-            guard let part1Questions = questions[0], currentQuestionIndex < part1Questions.count else {
-                
-                print("TestSimulationManager: Part 1 finished. Moving to Part 2.")
-                currentPart = 2
-                currentQuestionIndex = 0
-                startConversationFlow()
+            print("TestSimulationManager: startConversationFlow() called")
+            print("Current phase: \(currentPhase), part: \(currentPart), questionIndex: \(currentQuestionIndex)")
+            print("Available question parts: \(Array(questions.keys).sorted())")
+            
+            guard currentPhase == .testing else {
+                print("TestSimulationManager: Not in testing phase, returning")
                 return
             }
-            let question = part1Questions[currentQuestionIndex]
-            print(question)
-            print("\n")
-            currentQuestionText = question.questionText
-            print("TestSimulationManager: Part 1, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText)'")
-            playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 2.0)
 
-        } else if currentPart == 2 {
-            //print("Printing questions -------------------")
-            //print(questions[1])
-            guard let part2Questions = questions[1], !part2Questions.isEmpty else {
-                print("TestSimulationManager: Part 2 finished or no questions. Moving to Part 3.")
-                currentPart = 3
-                currentQuestionIndex = 0
-                startConversationFlow()
-                return
-            }
-            let cueCard = part2Questions[currentQuestionIndex]
-            currentQuestionText = cueCard.questionText
-            print("TestSimulationManager: Part 2: Playing cue card audio for '\(currentQuestionText.prefix(30))...'")
-            playExaminerQuestion(cueCard.audioFile, part: currentPart, questionText: cueCard.questionText) { [weak self] in
-                self?.startPart2Preparation()
-            }
+            audioRecorderManager.stopRecording()
+            speechRecognizerManager.stopSpeechRecognition()
+            audioPlayerManager.stopAudio()
+            part2SpeakingTimer?.invalidate()
+            preparationTimer?.invalidate()
+            print("TestSimulationManager: Cleaned up previous states.")
 
-        } else if currentPart == 3 {
-            //print(questions[2])
-            guard let part3Questions = questions[2], currentQuestionIndex < part3Questions.count else {
-                print("TestSimulationManager: Part 3 finished. Moving to Processing.")
+            if currentPart == 1 {
+                print("Starting Part 1 - Questions available:")
+                if let part1Questions = questions[0] {
+                    print("Part 1 has \(part1Questions.count) questions")
+                    for (index, question) in part1Questions.enumerated() {
+                        print("  Q\(index + 1): \(question.questionText.prefix(30))...")
+                    }
+                    
+                    guard currentQuestionIndex < part1Questions.count else {
+                        print("TestSimulationManager: Part 1 finished. Moving to Part 2.")
+                        currentPart = 2
+                        currentQuestionIndex = 0
+                        startConversationFlow()
+                        return
+                    }
+                    
+                    let question = part1Questions[currentQuestionIndex]
+                    currentQuestionText = question.questionText
+                    print("TestSimulationManager: Part 1, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText)'")
+                    playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 2.0)
+                } else {
+                    print("TestSimulationManager: ERROR - No Part 1 questions found!")
+                    print("Available keys in questions dictionary: \(Array(questions.keys))")
+                    errorMessage = "No Part 1 questions available"
+                    currentPhase = .processing
+                    return
+                }
+
+            } else if currentPart == 2 {
+                print("Starting Part 2 - Questions available:")
+                if let part2Questions = questions[1] {
+                    print("Part 2 has \(part2Questions.count) questions")
+                    
+                    guard !part2Questions.isEmpty else {
+                        print("TestSimulationManager: Part 2 finished or no questions. Moving to Part 3.")
+                        currentPart = 3
+                        currentQuestionIndex = 0
+                        startConversationFlow()
+                        return
+                    }
+                    
+                    let cueCard = part2Questions[currentQuestionIndex]
+                    currentQuestionText = cueCard.questionText
+                    print("TestSimulationManager: Part 2: Playing cue card audio for '\(currentQuestionText.prefix(30))...'")
+                    playExaminerQuestion(cueCard.audioFile, part: currentPart, questionText: cueCard.questionText) { [weak self] in
+                        self?.startPart2Preparation()
+                    }
+                } else {
+                    print("TestSimulationManager: ERROR - No Part 2 questions found!")
+                    currentPart = 3
+                    currentQuestionIndex = 0
+                    startConversationFlow()
+                    return
+                }
+
+            } else if currentPart == 3 {
+                print("Starting Part 3 - Questions available:")
+                if let part3Questions = questions[2] {
+                    print("Part 3 has \(part3Questions.count) questions")
+                    
+                    guard currentQuestionIndex < part3Questions.count else {
+                        print("TestSimulationManager: Part 3 finished. Moving to Processing.")
+                        currentPhase = .processing
+                        return
+                    }
+                    
+                    let question = part3Questions[currentQuestionIndex]
+                    currentQuestionText = question.questionText
+                    print("TestSimulationManager: Part 3, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText.prefix(30))...'")
+                    playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 3.5)
+                } else {
+                    print("TestSimulationManager: ERROR - No Part 3 questions found!")
+                    currentPhase = .processing
+                    return
+                }
+
+            } else {
+                print("TestSimulationManager: Test flow completed or invalid part. Finalizing.")
                 currentPhase = .processing
-                return
             }
-            let question = part3Questions[currentQuestionIndex]
-            currentQuestionText = question.questionText
-            print("TestSimulationManager: Part 3, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText.prefix(30))...'")
-            playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 3.5)
-
-        } else {
-            print("TestSimulationManager: Test flow completed or invalid part. Finalizing.")
-            currentPhase = .processing
         }
-    }
 
     private func playExaminerQuestion(_ audioData: Data, part: Int, questionText: String, silenceDuration: TimeInterval = 2.0, completion: (() -> Void)? = nil) {
         
@@ -809,13 +857,12 @@ class TestSimulationManager: ObservableObject {
 struct TestSimulatorScreen: View {
     @StateObject private var testManager: TestSimulationManager
     @Environment(\.dismiss) private var dismiss
-
+    @State private var showQuestions = true
     let questions: [Int: [QuestionItem]]
     
     init(questions: [Int: [QuestionItem]]) {
         self.questions = questions
         _testManager = StateObject(wrappedValue: TestSimulationManager(questions: questions))
-        //print(questions)
     }
 
     var body: some View {
@@ -834,7 +881,6 @@ struct TestSimulatorScreen: View {
                     switch testManager.currentPhase {
                     case .preparation:
                         TestPreparationView(
-                            showQuestions: .constant(true),
                             onStartTest: testManager.startTest
                         )
                     case .testing:
@@ -920,6 +966,13 @@ struct WaveformView: View {
 }
 
 
+
+
+
+
+
+
+
 // MARK: - Preview
 struct TestSimulatorScreen_Previews: PreviewProvider {
     static var previews: some View {
@@ -954,7 +1007,4 @@ struct TestSimulatorScreen_Previews: PreviewProvider {
             .environment(\.colorScheme, .light) // Example for light mode
     }
 }
-
-
-
 

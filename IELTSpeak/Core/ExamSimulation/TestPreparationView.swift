@@ -9,7 +9,6 @@ import SwiftUI
 import AVFoundation
 
 struct TestPreparationView: View {
-    @Binding var showQuestions: Bool
     let onStartTest: () -> Void
     @State private var showMicDeniedAlert = false
     
@@ -18,7 +17,7 @@ struct TestPreparationView: View {
             VStack(spacing: 30) {
                 PreparationHeaderSection()
                 
-                QuestionDisplayToggle(showQuestions: $showQuestions)
+                QuestionDisplayToggle()
                 
                 TestPartsOverview()
                 
@@ -68,37 +67,49 @@ struct PreparationHeaderSection: View {
     }
 }
 
+import SwiftUI
+
 struct QuestionDisplayToggle: View {
-    @Binding var showQuestions: Bool
-    
+    @AppStorage("showQuestionsSetting") var showQuestions: Bool = true
+
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Display Questions During Test")
-                    .font(.headline)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.primary)
-                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Show Questions During Test")
+                        .font(.system(.headline, weight: .semibold))
+
+                    Text("You can choose to see or hide the questions while taking the test.")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
                 Spacer()
-                
+
                 Toggle("", isOn: $showQuestions)
                     .labelsHidden()
+                    .tint(.blue)
             }
-            .padding(.horizontal, 20)
-            
-            Text(showQuestions ? "Questions will be shown on screen during the test" : "Questions will be hidden - listen carefully to the examiner")
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .padding(.horizontal, 20)
+
+            HStack(spacing: 8) {
+                Image(systemName: showQuestions ? "eye.fill" : "eye.slash.fill")
+                    .foregroundColor(showQuestions ? .blue : .gray)
+
+                Text(showQuestions ? "Questions will be displayed on screen." : "Questions will be hidden. Listen carefully.")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
         }
-        .padding(.vertical, 16)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .fill(Color(.systemGray6))
         )
-        .padding(.horizontal, 20)
+        .padding(.horizontal)
     }
 }
+
 
 struct TestPartsOverview: View {
     var body: some View {
@@ -164,7 +175,7 @@ struct StartTestButton: View {
 }
 
 #Preview(body: {
-    TestPreparationView(showQuestions: .constant(true)){
+    TestPreparationView(){
         
     }
 })

@@ -1,10 +1,3 @@
-//
-//  models.swift
-//  IELTSpeak
-//
-//  Created by Mehadi Hasan on 13/7/25.
-//
-
 import Foundation
 
 struct QuestionItem {
@@ -14,7 +7,6 @@ struct QuestionItem {
     let audioFile: Data
 }
 
-// MARK: - Data Models
 struct TestResult: Identifiable {
     let id: String
     let date: Date
@@ -63,11 +55,3 @@ enum TestPhase {
     case processing
     case completed
 }
-
-//struct QuestionItem {
-//    let id: Int
-//    let part: Int
-//    let order: Int
-//    let questionText: String
-//    let audioFile: Audio
-//}

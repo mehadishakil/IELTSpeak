@@ -46,6 +46,7 @@ struct ExaminerContent: View {
     let currentQuestionText: String
     let isExaminerSpeaking: Bool
     let waveformData: [Double]
+    @AppStorage("showQuestionsSetting") var showQuestions: Bool = true
     
     var body: some View {
         VStack {
@@ -56,11 +57,13 @@ struct ExaminerContent: View {
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
             
-            Text(currentQuestionText)
-                .font(.body)
-                .fontWeight(.medium)
-                .multilineTextAlignment(.center)
-                .padding(12)
+            if showQuestions {
+                Text(currentQuestionText)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .multilineTextAlignment(.center)
+                    .padding(12)
+            }
             
             if isExaminerSpeaking {
                 WaveformView(amplitudes: waveformData, color: .blue)
