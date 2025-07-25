@@ -39,7 +39,7 @@ struct FeedbackBoardView: View {
     ]
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             List(posts) { post in
                 VStack(alignment: .leading, spacing: 6) {
                     Text(post.title)

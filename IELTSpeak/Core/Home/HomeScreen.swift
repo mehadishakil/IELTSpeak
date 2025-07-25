@@ -40,6 +40,8 @@ struct HomeScreen: View {
                             testResults: testResults
                         )
                         
+                        InformationSection()
+                        
                         RecentTestsSection(
                             testResults: testResults,
                             onTestSelected: selectTest
@@ -125,7 +127,90 @@ struct HomeScreen: View {
         }
 }
 
-
+//struct BandDescriptorsNavigationCard: View {
+//    @State private var showBandDescriptors = false
+//    
+//    var body: some View {
+//        Button(action: {
+//            showBandDescriptors = true
+//        }) {
+//            HStack(spacing: 16) {
+//                // Icon Section
+//                ZStack {
+//                    Circle()
+//                        .fill(
+//                            LinearGradient(
+//                                colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
+//                                startPoint: .topLeading,
+//                                endPoint: .bottomTrailing
+//                            )
+//                        )
+//                        .frame(width: 50, height: 50)
+//                    
+//                    Image(systemName: "chart.bar.doc.horizontal")
+//                        .font(.title2)
+//                        .foregroundColor(.white)
+//                        .fontWeight(.semibold)
+//                }
+//                
+//                // Content Section
+//                VStack(alignment: .leading, spacing: 4) {
+//                    Text("Band Descriptors")
+//                        .font(.custom("Fredoka-Medium", size: 18))
+//                        .foregroundColor(.primary)
+//                    
+//                    Text("Learn about IELTS scoring criteria")
+//                        .font(.custom("Fredoka-Regular", size: 14))
+//                        .foregroundColor(.secondary)
+//                        .multilineTextAlignment(.leading)
+//                }
+//                
+//                Spacer()
+//                
+//                // Arrow Icon
+//                Image(systemName: "chevron.right")
+//                    .font(.caption)
+//                    .foregroundColor(.secondary)
+//                    .fontWeight(.semibold)
+//            }
+//            .padding(20)
+//            .background(
+//                RoundedRectangle(cornerRadius: 16)
+//                    .fill(Color(UIColor.secondarySystemBackground))
+//                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+//            )
+//        }
+//        .buttonStyle(PlainButtonStyle())
+//        .scaleEffect(showBandDescriptors ? 0.98 : 1.0)
+//        .animation(.easeInOut(duration: 0.1), value: showBandDescriptors)
+//        .sheet(isPresented: $showBandDescriptors) {
+//            IELTSSpeakingBandDescriptorsView()
+//        }
+//    }
+//}
+//
+//// MARK: - Information Section
+//struct InformationSection: View {
+//    var body: some View {
+//        VStack(alignment: .leading, spacing: 16) {
+//            HStack {
+//                Text("Information")
+//                    .font(.custom("Fredoka-Medium", size: 20))
+//                    .foregroundColor(.primary)
+//                
+//                Spacer()
+//            }
+//            
+//            VStack(spacing: 12) {
+//                BandDescriptorsNavigationCard()
+//                
+//                // You can add more information cards here in the future
+//                // ExamTipsCard()
+//                // StudyGuideCard()
+//            }
+//        }
+//    }
+//}
 
 
 // MARK: - Test Detail Label
