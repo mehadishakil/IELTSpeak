@@ -1,0 +1,3167 @@
+{
+  "categories": [
+    {
+      "id": "vocabulary",
+      "title": "Vocabulary",
+      "description": "Build your word bank with essential IELTS vocabulary",
+      "icon": "book.fill",
+      "colorHex": "#4DAFFF",
+      "lessonCount": 150,
+      "illustration": "\ud83d\udc68\u200d\ud83c\udfeb"
+    },
+    {
+      "id": "idioms",
+      "title": "Idioms",
+      "description": "Master common idioms to sound more natural",
+      "icon": "quote.bubble.fill",
+      "colorHex": "#4DCCB3",
+      "lessonCount": 120,
+      "illustration": "\ud83c\udfc4\u200d\u2642\ufe0f"
+    },
+    {
+      "id": "phrasal-verbs",
+      "title": "Phrasal Verbs",
+      "description": "Learn essential phrasal verbs for fluent speech",
+      "icon": "arrow.triangle.2.circlepath",
+      "colorHex": "#FF99B3",
+      "lessonCount": 200,
+      "illustration": "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66"
+    },
+    {
+      "id": "sample-answers",
+      "title": "Sample Answers",
+      "description": "Study high-scoring IELTS speaking responses",
+      "icon": "mic.fill",
+      "colorHex": "#FF804D",
+      "lessonCount": 150,
+      "illustration": "\ud83c\udf7d\ufe0f"
+    },
+    {
+      "id": "pronunciation",
+      "title": "Pronunciation",
+      "description": "Perfect your pronunciation and intonation",
+      "icon": "waveform",
+      "colorHex": "#9966E6",
+      "lessonCount": 100,
+      "illustration": "\u2708\ufe0f"
+    }
+  ],
+  "subcategories": [
+    {
+      "id": "academic-vocabulary",
+      "categoryId": "vocabulary",
+      "title": "Academic Words",
+      "description": "Essential vocabulary for academic contexts",
+      "itemCount": 150,
+      "colorHex": "#4DAFFF",
+      "order": 1
+    },
+    {
+      "id": "business-vocabulary",
+      "categoryId": "vocabulary",
+      "title": "Business English",
+      "description": "Professional vocabulary for workplace",
+      "itemCount": 120,
+      "colorHex": "#66B3FF",
+      "order": 2
+    },
+    {
+      "id": "travel-vocabulary",
+      "categoryId": "vocabulary",
+      "title": "Travel Vocabulary",
+      "description": "Words for travel and tourism",
+      "itemCount": 90,
+      "colorHex": "#80C2FF",
+      "order": 3
+    },
+    {
+      "id": "common-idioms",
+      "categoryId": "idioms",
+      "title": "Common Idioms",
+      "description": "Everyday idiomatic expressions",
+      "itemCount": 100,
+      "colorHex": "#4DCCB3",
+      "order": 1
+    },
+    {
+      "id": "business-idioms",
+      "categoryId": "idioms",
+      "title": "Business Idioms",
+      "description": "Professional idiomatic expressions",
+      "itemCount": 80,
+      "colorHex": "#66D9C6",
+      "order": 2
+    },
+    {
+      "id": "basic-phrasal-verbs",
+      "categoryId": "phrasal-verbs",
+      "title": "Basic Phrasal Verbs",
+      "description": "Essential phrasal verbs for daily use",
+      "itemCount": 120,
+      "colorHex": "#FF99B3",
+      "order": 1
+    },
+    {
+      "id": "advanced-phrasal-verbs",
+      "categoryId": "phrasal-verbs",
+      "title": "Advanced Phrasal Verbs",
+      "description": "Complex phrasal verbs for fluency",
+      "itemCount": 100,
+      "colorHex": "#FFB3CC",
+      "order": 2
+    }
+  ],
+  "vocabularyItems": [
+    {
+      "id": "vocab-001",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Analyze",
+      "definition": "To examine something in detail in order to understand it better or to find important elements",
+      "example": "Scientists analyze data to discover patterns and draw conclusions.",
+      "difficulty": "Intermediate",
+      "audioFileName": "analyze.mp3",
+      "order": 1
+    },
+    {
+      "id": "vocab-002",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Hypothesis",
+      "definition": "A proposed explanation for a phenomenon that can be tested",
+      "example": "The researcher formed a hypothesis about the relationship between sleep and memory.",
+      "difficulty": "Advanced",
+      "audioFileName": "hypothesis.mp3",
+      "order": 2
+    },
+    {
+      "id": "vocab-003",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Synthesize",
+      "definition": "To combine different ideas, influences, or objects into a coherent whole",
+      "example": "Students must synthesize information from multiple sources for their research paper.",
+      "difficulty": "Advanced",
+      "audioFileName": "synthesize.mp3",
+      "order": 3
+    },
+    {
+      "id": "vocab-004",
+      "subcategoryId": "business-vocabulary",
+      "word": "Negotiate",
+      "definition": "To discuss something with someone in order to reach an agreement",
+      "example": "The companies will negotiate the terms of the contract next week.",
+      "difficulty": "Intermediate",
+      "audioFileName": "negotiate.mp3",
+      "order": 1
+    },
+    {
+      "id": "vocab-005",
+      "subcategoryId": "business-vocabulary",
+      "word": "Revenue",
+      "definition": "The total amount of income generated by a business",
+      "example": "The company's revenue increased by 15% this quarter.",
+      "difficulty": "Intermediate",
+      "audioFileName": "revenue.mp3",
+      "order": 2
+    },
+    {
+      "id": "vocab-005",
+      "subcategoryId": "travel-vocabulary",
+      "word": "Vehicle",
+      "definition": "The total amount of income generated by a business",
+      "example": "The company's revenue increased by 15% this quarter.",
+      "difficulty": "Intermediate",
+      "audioFileName": "revenue.mp3",
+      "order": 1
+    },
+    {
+      "id": "vocab-006",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word6",
+      "definition": "A definition of word 6.",
+      "example": "This is how you use word 6 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word6.mp3",
+      "order": 6
+    },
+    {
+      "id": "vocab-007",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word7",
+      "definition": "A definition of word 7.",
+      "example": "This is how you use word 7 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word7.mp3",
+      "order": 7
+    },
+    {
+      "id": "vocab-008",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word8",
+      "definition": "A definition of word 8.",
+      "example": "This is how you use word 8 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word8.mp3",
+      "order": 8
+    },
+    {
+      "id": "vocab-009",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word9",
+      "definition": "A definition of word 9.",
+      "example": "This is how you use word 9 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word9.mp3",
+      "order": 9
+    },
+    {
+      "id": "vocab-010",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word10",
+      "definition": "A definition of word 10.",
+      "example": "This is how you use word 10 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word10.mp3",
+      "order": 10
+    },
+    {
+      "id": "vocab-011",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word11",
+      "definition": "A definition of word 11.",
+      "example": "This is how you use word 11 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word11.mp3",
+      "order": 11
+    },
+    {
+      "id": "vocab-012",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word12",
+      "definition": "A definition of word 12.",
+      "example": "This is how you use word 12 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word12.mp3",
+      "order": 12
+    },
+    {
+      "id": "vocab-013",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word13",
+      "definition": "A definition of word 13.",
+      "example": "This is how you use word 13 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word13.mp3",
+      "order": 13
+    },
+    {
+      "id": "vocab-014",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word14",
+      "definition": "A definition of word 14.",
+      "example": "This is how you use word 14 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word14.mp3",
+      "order": 14
+    },
+    {
+      "id": "vocab-015",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word15",
+      "definition": "A definition of word 15.",
+      "example": "This is how you use word 15 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word15.mp3",
+      "order": 15
+    },
+    {
+      "id": "vocab-016",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word16",
+      "definition": "A definition of word 16.",
+      "example": "This is how you use word 16 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word16.mp3",
+      "order": 16
+    },
+    {
+      "id": "vocab-017",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word17",
+      "definition": "A definition of word 17.",
+      "example": "This is how you use word 17 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word17.mp3",
+      "order": 17
+    },
+    {
+      "id": "vocab-018",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word18",
+      "definition": "A definition of word 18.",
+      "example": "This is how you use word 18 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word18.mp3",
+      "order": 18
+    },
+    {
+      "id": "vocab-019",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word19",
+      "definition": "A definition of word 19.",
+      "example": "This is how you use word 19 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word19.mp3",
+      "order": 19
+    },
+    {
+      "id": "vocab-020",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word20",
+      "definition": "A definition of word 20.",
+      "example": "This is how you use word 20 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word20.mp3",
+      "order": 20
+    },
+    {
+      "id": "vocab-021",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word21",
+      "definition": "A definition of word 21.",
+      "example": "This is how you use word 21 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word21.mp3",
+      "order": 21
+    },
+    {
+      "id": "vocab-022",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word22",
+      "definition": "A definition of word 22.",
+      "example": "This is how you use word 22 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word22.mp3",
+      "order": 22
+    },
+    {
+      "id": "vocab-023",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word23",
+      "definition": "A definition of word 23.",
+      "example": "This is how you use word 23 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word23.mp3",
+      "order": 23
+    },
+    {
+      "id": "vocab-024",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word24",
+      "definition": "A definition of word 24.",
+      "example": "This is how you use word 24 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word24.mp3",
+      "order": 24
+    },
+    {
+      "id": "vocab-025",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word25",
+      "definition": "A definition of word 25.",
+      "example": "This is how you use word 25 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word25.mp3",
+      "order": 25
+    },
+    {
+      "id": "vocab-026",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word26",
+      "definition": "A definition of word 26.",
+      "example": "This is how you use word 26 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word26.mp3",
+      "order": 26
+    },
+    {
+      "id": "vocab-027",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word27",
+      "definition": "A definition of word 27.",
+      "example": "This is how you use word 27 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word27.mp3",
+      "order": 27
+    },
+    {
+      "id": "vocab-028",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word28",
+      "definition": "A definition of word 28.",
+      "example": "This is how you use word 28 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word28.mp3",
+      "order": 28
+    },
+    {
+      "id": "vocab-029",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word29",
+      "definition": "A definition of word 29.",
+      "example": "This is how you use word 29 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word29.mp3",
+      "order": 29
+    },
+    {
+      "id": "vocab-030",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word30",
+      "definition": "A definition of word 30.",
+      "example": "This is how you use word 30 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word30.mp3",
+      "order": 30
+    },
+    {
+      "id": "vocab-031",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word31",
+      "definition": "A definition of word 31.",
+      "example": "This is how you use word 31 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word31.mp3",
+      "order": 31
+    },
+    {
+      "id": "vocab-032",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word32",
+      "definition": "A definition of word 32.",
+      "example": "This is how you use word 32 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word32.mp3",
+      "order": 32
+    },
+    {
+      "id": "vocab-033",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word33",
+      "definition": "A definition of word 33.",
+      "example": "This is how you use word 33 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word33.mp3",
+      "order": 33
+    },
+    {
+      "id": "vocab-034",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word34",
+      "definition": "A definition of word 34.",
+      "example": "This is how you use word 34 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word34.mp3",
+      "order": 34
+    },
+    {
+      "id": "vocab-035",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word35",
+      "definition": "A definition of word 35.",
+      "example": "This is how you use word 35 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word35.mp3",
+      "order": 35
+    },
+    {
+      "id": "vocab-036",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word36",
+      "definition": "A definition of word 36.",
+      "example": "This is how you use word 36 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word36.mp3",
+      "order": 36
+    },
+    {
+      "id": "vocab-037",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word37",
+      "definition": "A definition of word 37.",
+      "example": "This is how you use word 37 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word37.mp3",
+      "order": 37
+    },
+    {
+      "id": "vocab-038",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word38",
+      "definition": "A definition of word 38.",
+      "example": "This is how you use word 38 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word38.mp3",
+      "order": 38
+    },
+    {
+      "id": "vocab-039",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word39",
+      "definition": "A definition of word 39.",
+      "example": "This is how you use word 39 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word39.mp3",
+      "order": 39
+    },
+    {
+      "id": "vocab-040",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word40",
+      "definition": "A definition of word 40.",
+      "example": "This is how you use word 40 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word40.mp3",
+      "order": 40
+    },
+    {
+      "id": "vocab-041",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word41",
+      "definition": "A definition of word 41.",
+      "example": "This is how you use word 41 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word41.mp3",
+      "order": 41
+    },
+    {
+      "id": "vocab-042",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word42",
+      "definition": "A definition of word 42.",
+      "example": "This is how you use word 42 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word42.mp3",
+      "order": 42
+    },
+    {
+      "id": "vocab-043",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word43",
+      "definition": "A definition of word 43.",
+      "example": "This is how you use word 43 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word43.mp3",
+      "order": 43
+    },
+    {
+      "id": "vocab-044",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word44",
+      "definition": "A definition of word 44.",
+      "example": "This is how you use word 44 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word44.mp3",
+      "order": 44
+    },
+    {
+      "id": "vocab-045",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word45",
+      "definition": "A definition of word 45.",
+      "example": "This is how you use word 45 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word45.mp3",
+      "order": 45
+    },
+    {
+      "id": "vocab-046",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word46",
+      "definition": "A definition of word 46.",
+      "example": "This is how you use word 46 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word46.mp3",
+      "order": 46
+    },
+    {
+      "id": "vocab-047",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word47",
+      "definition": "A definition of word 47.",
+      "example": "This is how you use word 47 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word47.mp3",
+      "order": 47
+    },
+    {
+      "id": "vocab-048",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word48",
+      "definition": "A definition of word 48.",
+      "example": "This is how you use word 48 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word48.mp3",
+      "order": 48
+    },
+    {
+      "id": "vocab-049",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word49",
+      "definition": "A definition of word 49.",
+      "example": "This is how you use word 49 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word49.mp3",
+      "order": 49
+    },
+    {
+      "id": "vocab-050",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word50",
+      "definition": "A definition of word 50.",
+      "example": "This is how you use word 50 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word50.mp3",
+      "order": 50
+    },
+    {
+      "id": "vocab-051",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word51",
+      "definition": "A definition of word 51.",
+      "example": "This is how you use word 51 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word51.mp3",
+      "order": 51
+    },
+    {
+      "id": "vocab-052",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word52",
+      "definition": "A definition of word 52.",
+      "example": "This is how you use word 52 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word52.mp3",
+      "order": 52
+    },
+    {
+      "id": "vocab-053",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word53",
+      "definition": "A definition of word 53.",
+      "example": "This is how you use word 53 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word53.mp3",
+      "order": 53
+    },
+    {
+      "id": "vocab-054",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word54",
+      "definition": "A definition of word 54.",
+      "example": "This is how you use word 54 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word54.mp3",
+      "order": 54
+    },
+    {
+      "id": "vocab-055",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word55",
+      "definition": "A definition of word 55.",
+      "example": "This is how you use word 55 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word55.mp3",
+      "order": 55
+    },
+    {
+      "id": "vocab-056",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word56",
+      "definition": "A definition of word 56.",
+      "example": "This is how you use word 56 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word56.mp3",
+      "order": 56
+    },
+    {
+      "id": "vocab-057",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word57",
+      "definition": "A definition of word 57.",
+      "example": "This is how you use word 57 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word57.mp3",
+      "order": 57
+    },
+    {
+      "id": "vocab-058",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word58",
+      "definition": "A definition of word 58.",
+      "example": "This is how you use word 58 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word58.mp3",
+      "order": 58
+    },
+    {
+      "id": "vocab-059",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word59",
+      "definition": "A definition of word 59.",
+      "example": "This is how you use word 59 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word59.mp3",
+      "order": 59
+    },
+    {
+      "id": "vocab-060",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word60",
+      "definition": "A definition of word 60.",
+      "example": "This is how you use word 60 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word60.mp3",
+      "order": 60
+    },
+    {
+      "id": "vocab-061",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word61",
+      "definition": "A definition of word 61.",
+      "example": "This is how you use word 61 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word61.mp3",
+      "order": 61
+    },
+    {
+      "id": "vocab-062",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word62",
+      "definition": "A definition of word 62.",
+      "example": "This is how you use word 62 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word62.mp3",
+      "order": 62
+    },
+    {
+      "id": "vocab-063",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word63",
+      "definition": "A definition of word 63.",
+      "example": "This is how you use word 63 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word63.mp3",
+      "order": 63
+    },
+    {
+      "id": "vocab-064",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word64",
+      "definition": "A definition of word 64.",
+      "example": "This is how you use word 64 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word64.mp3",
+      "order": 64
+    },
+    {
+      "id": "vocab-065",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word65",
+      "definition": "A definition of word 65.",
+      "example": "This is how you use word 65 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word65.mp3",
+      "order": 65
+    },
+    {
+      "id": "vocab-066",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word66",
+      "definition": "A definition of word 66.",
+      "example": "This is how you use word 66 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word66.mp3",
+      "order": 66
+    },
+    {
+      "id": "vocab-067",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word67",
+      "definition": "A definition of word 67.",
+      "example": "This is how you use word 67 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word67.mp3",
+      "order": 67
+    },
+    {
+      "id": "vocab-068",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word68",
+      "definition": "A definition of word 68.",
+      "example": "This is how you use word 68 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word68.mp3",
+      "order": 68
+    },
+    {
+      "id": "vocab-069",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word69",
+      "definition": "A definition of word 69.",
+      "example": "This is how you use word 69 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word69.mp3",
+      "order": 69
+    },
+    {
+      "id": "vocab-070",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word70",
+      "definition": "A definition of word 70.",
+      "example": "This is how you use word 70 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word70.mp3",
+      "order": 70
+    },
+    {
+      "id": "vocab-071",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word71",
+      "definition": "A definition of word 71.",
+      "example": "This is how you use word 71 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word71.mp3",
+      "order": 71
+    },
+    {
+      "id": "vocab-072",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word72",
+      "definition": "A definition of word 72.",
+      "example": "This is how you use word 72 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word72.mp3",
+      "order": 72
+    },
+    {
+      "id": "vocab-073",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word73",
+      "definition": "A definition of word 73.",
+      "example": "This is how you use word 73 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word73.mp3",
+      "order": 73
+    },
+    {
+      "id": "vocab-074",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word74",
+      "definition": "A definition of word 74.",
+      "example": "This is how you use word 74 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word74.mp3",
+      "order": 74
+    },
+    {
+      "id": "vocab-075",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word75",
+      "definition": "A definition of word 75.",
+      "example": "This is how you use word 75 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word75.mp3",
+      "order": 75
+    },
+    {
+      "id": "vocab-076",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word76",
+      "definition": "A definition of word 76.",
+      "example": "This is how you use word 76 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word76.mp3",
+      "order": 76
+    },
+    {
+      "id": "vocab-077",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word77",
+      "definition": "A definition of word 77.",
+      "example": "This is how you use word 77 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word77.mp3",
+      "order": 77
+    },
+    {
+      "id": "vocab-078",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word78",
+      "definition": "A definition of word 78.",
+      "example": "This is how you use word 78 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word78.mp3",
+      "order": 78
+    },
+    {
+      "id": "vocab-079",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word79",
+      "definition": "A definition of word 79.",
+      "example": "This is how you use word 79 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word79.mp3",
+      "order": 79
+    },
+    {
+      "id": "vocab-080",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word80",
+      "definition": "A definition of word 80.",
+      "example": "This is how you use word 80 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word80.mp3",
+      "order": 80
+    },
+    {
+      "id": "vocab-081",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word81",
+      "definition": "A definition of word 81.",
+      "example": "This is how you use word 81 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word81.mp3",
+      "order": 81
+    },
+    {
+      "id": "vocab-082",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word82",
+      "definition": "A definition of word 82.",
+      "example": "This is how you use word 82 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word82.mp3",
+      "order": 82
+    },
+    {
+      "id": "vocab-083",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word83",
+      "definition": "A definition of word 83.",
+      "example": "This is how you use word 83 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word83.mp3",
+      "order": 83
+    },
+    {
+      "id": "vocab-084",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word84",
+      "definition": "A definition of word 84.",
+      "example": "This is how you use word 84 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word84.mp3",
+      "order": 84
+    },
+    {
+      "id": "vocab-085",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word85",
+      "definition": "A definition of word 85.",
+      "example": "This is how you use word 85 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word85.mp3",
+      "order": 85
+    },
+    {
+      "id": "vocab-086",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word86",
+      "definition": "A definition of word 86.",
+      "example": "This is how you use word 86 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word86.mp3",
+      "order": 86
+    },
+    {
+      "id": "vocab-087",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word87",
+      "definition": "A definition of word 87.",
+      "example": "This is how you use word 87 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word87.mp3",
+      "order": 87
+    },
+    {
+      "id": "vocab-088",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word88",
+      "definition": "A definition of word 88.",
+      "example": "This is how you use word 88 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word88.mp3",
+      "order": 88
+    },
+    {
+      "id": "vocab-089",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word89",
+      "definition": "A definition of word 89.",
+      "example": "This is how you use word 89 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word89.mp3",
+      "order": 89
+    },
+    {
+      "id": "vocab-090",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word90",
+      "definition": "A definition of word 90.",
+      "example": "This is how you use word 90 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word90.mp3",
+      "order": 90
+    },
+    {
+      "id": "vocab-091",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word91",
+      "definition": "A definition of word 91.",
+      "example": "This is how you use word 91 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word91.mp3",
+      "order": 91
+    },
+    {
+      "id": "vocab-092",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word92",
+      "definition": "A definition of word 92.",
+      "example": "This is how you use word 92 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word92.mp3",
+      "order": 92
+    },
+    {
+      "id": "vocab-093",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word93",
+      "definition": "A definition of word 93.",
+      "example": "This is how you use word 93 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word93.mp3",
+      "order": 93
+    },
+    {
+      "id": "vocab-094",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word94",
+      "definition": "A definition of word 94.",
+      "example": "This is how you use word 94 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word94.mp3",
+      "order": 94
+    },
+    {
+      "id": "vocab-095",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word95",
+      "definition": "A definition of word 95.",
+      "example": "This is how you use word 95 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word95.mp3",
+      "order": 95
+    },
+    {
+      "id": "vocab-096",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word96",
+      "definition": "A definition of word 96.",
+      "example": "This is how you use word 96 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word96.mp3",
+      "order": 96
+    },
+    {
+      "id": "vocab-097",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word97",
+      "definition": "A definition of word 97.",
+      "example": "This is how you use word 97 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word97.mp3",
+      "order": 97
+    },
+    {
+      "id": "vocab-098",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word98",
+      "definition": "A definition of word 98.",
+      "example": "This is how you use word 98 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word98.mp3",
+      "order": 98
+    },
+    {
+      "id": "vocab-099",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word99",
+      "definition": "A definition of word 99.",
+      "example": "This is how you use word 99 in a sentence.",
+      "difficulty": "Easy",
+      "audioFileName": "word99.mp3",
+      "order": 99
+    },
+    {
+      "id": "vocab-100",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word100",
+      "definition": "A definition of word 100.",
+      "example": "This is how you use word 100 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word100.mp3",
+      "order": 100
+    },
+    {
+      "id": "vocab-101",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word101",
+      "definition": "A definition of word 101.",
+      "example": "This is how you use word 101 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word101.mp3",
+      "order": 101
+    },
+    {
+      "id": "vocab-102",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word102",
+      "definition": "A definition of word 102.",
+      "example": "This is how you use word 102 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word102.mp3",
+      "order": 102
+    },
+    {
+      "id": "vocab-103",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word103",
+      "definition": "A definition of word 103.",
+      "example": "This is how you use word 103 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word103.mp3",
+      "order": 103
+    },
+    {
+      "id": "vocab-104",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word104",
+      "definition": "A definition of word 104.",
+      "example": "This is how you use word 104 in a sentence.",
+      "difficulty": "Intermediate",
+      "audioFileName": "word104.mp3",
+      "order": 104
+    },
+    {
+      "id": "vocab-105",
+      "subcategoryId": "academic-vocabulary",
+      "word": "Word105",
+      "definition": "A definition of word 105.",
+      "example": "This is how you use word 105 in a sentence.",
+      "difficulty": "Advanced",
+      "audioFileName": "word105.mp3",
+      "order": 105
+    }
+  ],
+  "idiomItems": [
+    {
+      "id": "idiom-001",
+      "subcategoryId": "common-idioms",
+      "idiom": "Break the ice",
+      "meaning": "To start a conversation or make people feel comfortable in a social situation",
+      "example": "He told a funny joke to break the ice at the party.",
+      "difficulty": "Easy",
+      "order": 1
+    },
+    {
+      "id": "idiom-002",
+      "subcategoryId": "common-idioms",
+      "idiom": "Hit the books",
+      "meaning": "To study hard or intensively",
+      "example": "I need to hit the books if I want to pass the IELTS exam.",
+      "difficulty": "Easy",
+      "order": 2
+    },
+    {
+      "id": "idiom-003",
+      "subcategoryId": "common-idioms",
+      "idiom": "Piece of cake",
+      "meaning": "Something that is very easy to do",
+      "example": "The math test was a piece of cake for her.",
+      "difficulty": "Easy",
+      "order": 3
+    },
+    {
+      "id": "idiom-004",
+      "subcategoryId": "business-idioms",
+      "idiom": "Think outside the box",
+      "meaning": "To think creatively and consider new, unconventional ideas",
+      "example": "We need to think outside the box to solve this marketing challenge.",
+      "difficulty": "Intermediate",
+      "order": 1
+    },
+    {
+      "id": "idiom-005",
+      "subcategoryId": "business-idioms",
+      "idiom": "Cut corners",
+      "meaning": "To do something in the cheapest or easiest way, often resulting in lower quality",
+      "example": "The company shouldn't cut corners when it comes to safety measures.",
+      "difficulty": "Intermediate",
+      "order": 2
+    },
+    {
+      "id": "idiom-006",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 6",
+      "meaning": "This is the meaning of idiom 6.",
+      "example": "Here is an example of idiom 6 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 6
+    },
+    {
+      "id": "idiom-007",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 7",
+      "meaning": "This is the meaning of idiom 7.",
+      "example": "Here is an example of idiom 7 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 7
+    },
+    {
+      "id": "idiom-008",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 8",
+      "meaning": "This is the meaning of idiom 8.",
+      "example": "Here is an example of idiom 8 in a sentence.",
+      "difficulty": "Easy",
+      "order": 8
+    },
+    {
+      "id": "idiom-009",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 9",
+      "meaning": "This is the meaning of idiom 9.",
+      "example": "Here is an example of idiom 9 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 9
+    },
+    {
+      "id": "idiom-010",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 10",
+      "meaning": "This is the meaning of idiom 10.",
+      "example": "Here is an example of idiom 10 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 10
+    },
+    {
+      "id": "idiom-011",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 11",
+      "meaning": "This is the meaning of idiom 11.",
+      "example": "Here is an example of idiom 11 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 11
+    },
+    {
+      "id": "idiom-012",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 12",
+      "meaning": "This is the meaning of idiom 12.",
+      "example": "Here is an example of idiom 12 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 12
+    },
+    {
+      "id": "idiom-013",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 13",
+      "meaning": "This is the meaning of idiom 13.",
+      "example": "Here is an example of idiom 13 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 13
+    },
+    {
+      "id": "idiom-014",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 14",
+      "meaning": "This is the meaning of idiom 14.",
+      "example": "Here is an example of idiom 14 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 14
+    },
+    {
+      "id": "idiom-015",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 15",
+      "meaning": "This is the meaning of idiom 15.",
+      "example": "Here is an example of idiom 15 in a sentence.",
+      "difficulty": "Easy",
+      "order": 15
+    },
+    {
+      "id": "idiom-016",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 16",
+      "meaning": "This is the meaning of idiom 16.",
+      "example": "Here is an example of idiom 16 in a sentence.",
+      "difficulty": "Easy",
+      "order": 16
+    },
+    {
+      "id": "idiom-017",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 17",
+      "meaning": "This is the meaning of idiom 17.",
+      "example": "Here is an example of idiom 17 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 17
+    },
+    {
+      "id": "idiom-018",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 18",
+      "meaning": "This is the meaning of idiom 18.",
+      "example": "Here is an example of idiom 18 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 18
+    },
+    {
+      "id": "idiom-019",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 19",
+      "meaning": "This is the meaning of idiom 19.",
+      "example": "Here is an example of idiom 19 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 19
+    },
+    {
+      "id": "idiom-020",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 20",
+      "meaning": "This is the meaning of idiom 20.",
+      "example": "Here is an example of idiom 20 in a sentence.",
+      "difficulty": "Easy",
+      "order": 20
+    },
+    {
+      "id": "idiom-021",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 21",
+      "meaning": "This is the meaning of idiom 21.",
+      "example": "Here is an example of idiom 21 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 21
+    },
+    {
+      "id": "idiom-022",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 22",
+      "meaning": "This is the meaning of idiom 22.",
+      "example": "Here is an example of idiom 22 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 22
+    },
+    {
+      "id": "idiom-023",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 23",
+      "meaning": "This is the meaning of idiom 23.",
+      "example": "Here is an example of idiom 23 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 23
+    },
+    {
+      "id": "idiom-024",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 24",
+      "meaning": "This is the meaning of idiom 24.",
+      "example": "Here is an example of idiom 24 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 24
+    },
+    {
+      "id": "idiom-025",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 25",
+      "meaning": "This is the meaning of idiom 25.",
+      "example": "Here is an example of idiom 25 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 25
+    },
+    {
+      "id": "idiom-026",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 26",
+      "meaning": "This is the meaning of idiom 26.",
+      "example": "Here is an example of idiom 26 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 26
+    },
+    {
+      "id": "idiom-027",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 27",
+      "meaning": "This is the meaning of idiom 27.",
+      "example": "Here is an example of idiom 27 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 27
+    },
+    {
+      "id": "idiom-028",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 28",
+      "meaning": "This is the meaning of idiom 28.",
+      "example": "Here is an example of idiom 28 in a sentence.",
+      "difficulty": "Easy",
+      "order": 28
+    },
+    {
+      "id": "idiom-029",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 29",
+      "meaning": "This is the meaning of idiom 29.",
+      "example": "Here is an example of idiom 29 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 29
+    },
+    {
+      "id": "idiom-030",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 30",
+      "meaning": "This is the meaning of idiom 30.",
+      "example": "Here is an example of idiom 30 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 30
+    },
+    {
+      "id": "idiom-031",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 31",
+      "meaning": "This is the meaning of idiom 31.",
+      "example": "Here is an example of idiom 31 in a sentence.",
+      "difficulty": "Easy",
+      "order": 31
+    },
+    {
+      "id": "idiom-032",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 32",
+      "meaning": "This is the meaning of idiom 32.",
+      "example": "Here is an example of idiom 32 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 32
+    },
+    {
+      "id": "idiom-033",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 33",
+      "meaning": "This is the meaning of idiom 33.",
+      "example": "Here is an example of idiom 33 in a sentence.",
+      "difficulty": "Easy",
+      "order": 33
+    },
+    {
+      "id": "idiom-034",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 34",
+      "meaning": "This is the meaning of idiom 34.",
+      "example": "Here is an example of idiom 34 in a sentence.",
+      "difficulty": "Easy",
+      "order": 34
+    },
+    {
+      "id": "idiom-035",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 35",
+      "meaning": "This is the meaning of idiom 35.",
+      "example": "Here is an example of idiom 35 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 35
+    },
+    {
+      "id": "idiom-036",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 36",
+      "meaning": "This is the meaning of idiom 36.",
+      "example": "Here is an example of idiom 36 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 36
+    },
+    {
+      "id": "idiom-037",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 37",
+      "meaning": "This is the meaning of idiom 37.",
+      "example": "Here is an example of idiom 37 in a sentence.",
+      "difficulty": "Easy",
+      "order": 37
+    },
+    {
+      "id": "idiom-038",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 38",
+      "meaning": "This is the meaning of idiom 38.",
+      "example": "Here is an example of idiom 38 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 38
+    },
+    {
+      "id": "idiom-039",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 39",
+      "meaning": "This is the meaning of idiom 39.",
+      "example": "Here is an example of idiom 39 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 39
+    },
+    {
+      "id": "idiom-040",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 40",
+      "meaning": "This is the meaning of idiom 40.",
+      "example": "Here is an example of idiom 40 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 40
+    },
+    {
+      "id": "idiom-041",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 41",
+      "meaning": "This is the meaning of idiom 41.",
+      "example": "Here is an example of idiom 41 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 41
+    },
+    {
+      "id": "idiom-042",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 42",
+      "meaning": "This is the meaning of idiom 42.",
+      "example": "Here is an example of idiom 42 in a sentence.",
+      "difficulty": "Easy",
+      "order": 42
+    },
+    {
+      "id": "idiom-043",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 43",
+      "meaning": "This is the meaning of idiom 43.",
+      "example": "Here is an example of idiom 43 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 43
+    },
+    {
+      "id": "idiom-044",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 44",
+      "meaning": "This is the meaning of idiom 44.",
+      "example": "Here is an example of idiom 44 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 44
+    },
+    {
+      "id": "idiom-045",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 45",
+      "meaning": "This is the meaning of idiom 45.",
+      "example": "Here is an example of idiom 45 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 45
+    },
+    {
+      "id": "idiom-046",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 46",
+      "meaning": "This is the meaning of idiom 46.",
+      "example": "Here is an example of idiom 46 in a sentence.",
+      "difficulty": "Easy",
+      "order": 46
+    },
+    {
+      "id": "idiom-047",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 47",
+      "meaning": "This is the meaning of idiom 47.",
+      "example": "Here is an example of idiom 47 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 47
+    },
+    {
+      "id": "idiom-048",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 48",
+      "meaning": "This is the meaning of idiom 48.",
+      "example": "Here is an example of idiom 48 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 48
+    },
+    {
+      "id": "idiom-049",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 49",
+      "meaning": "This is the meaning of idiom 49.",
+      "example": "Here is an example of idiom 49 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 49
+    },
+    {
+      "id": "idiom-050",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 50",
+      "meaning": "This is the meaning of idiom 50.",
+      "example": "Here is an example of idiom 50 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 50
+    },
+    {
+      "id": "idiom-051",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 51",
+      "meaning": "This is the meaning of idiom 51.",
+      "example": "Here is an example of idiom 51 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 51
+    },
+    {
+      "id": "idiom-052",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 52",
+      "meaning": "This is the meaning of idiom 52.",
+      "example": "Here is an example of idiom 52 in a sentence.",
+      "difficulty": "Easy",
+      "order": 52
+    },
+    {
+      "id": "idiom-053",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 53",
+      "meaning": "This is the meaning of idiom 53.",
+      "example": "Here is an example of idiom 53 in a sentence.",
+      "difficulty": "Easy",
+      "order": 53
+    },
+    {
+      "id": "idiom-054",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 54",
+      "meaning": "This is the meaning of idiom 54.",
+      "example": "Here is an example of idiom 54 in a sentence.",
+      "difficulty": "Easy",
+      "order": 54
+    },
+    {
+      "id": "idiom-055",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 55",
+      "meaning": "This is the meaning of idiom 55.",
+      "example": "Here is an example of idiom 55 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 55
+    },
+    {
+      "id": "idiom-056",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 56",
+      "meaning": "This is the meaning of idiom 56.",
+      "example": "Here is an example of idiom 56 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 56
+    },
+    {
+      "id": "idiom-057",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 57",
+      "meaning": "This is the meaning of idiom 57.",
+      "example": "Here is an example of idiom 57 in a sentence.",
+      "difficulty": "Easy",
+      "order": 57
+    },
+    {
+      "id": "idiom-058",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 58",
+      "meaning": "This is the meaning of idiom 58.",
+      "example": "Here is an example of idiom 58 in a sentence.",
+      "difficulty": "Easy",
+      "order": 58
+    },
+    {
+      "id": "idiom-059",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 59",
+      "meaning": "This is the meaning of idiom 59.",
+      "example": "Here is an example of idiom 59 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 59
+    },
+    {
+      "id": "idiom-060",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 60",
+      "meaning": "This is the meaning of idiom 60.",
+      "example": "Here is an example of idiom 60 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 60
+    },
+    {
+      "id": "idiom-061",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 61",
+      "meaning": "This is the meaning of idiom 61.",
+      "example": "Here is an example of idiom 61 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 61
+    },
+    {
+      "id": "idiom-062",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 62",
+      "meaning": "This is the meaning of idiom 62.",
+      "example": "Here is an example of idiom 62 in a sentence.",
+      "difficulty": "Easy",
+      "order": 62
+    },
+    {
+      "id": "idiom-063",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 63",
+      "meaning": "This is the meaning of idiom 63.",
+      "example": "Here is an example of idiom 63 in a sentence.",
+      "difficulty": "Easy",
+      "order": 63
+    },
+    {
+      "id": "idiom-064",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 64",
+      "meaning": "This is the meaning of idiom 64.",
+      "example": "Here is an example of idiom 64 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 64
+    },
+    {
+      "id": "idiom-065",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 65",
+      "meaning": "This is the meaning of idiom 65.",
+      "example": "Here is an example of idiom 65 in a sentence.",
+      "difficulty": "Easy",
+      "order": 65
+    },
+    {
+      "id": "idiom-066",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 66",
+      "meaning": "This is the meaning of idiom 66.",
+      "example": "Here is an example of idiom 66 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 66
+    },
+    {
+      "id": "idiom-067",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 67",
+      "meaning": "This is the meaning of idiom 67.",
+      "example": "Here is an example of idiom 67 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 67
+    },
+    {
+      "id": "idiom-068",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 68",
+      "meaning": "This is the meaning of idiom 68.",
+      "example": "Here is an example of idiom 68 in a sentence.",
+      "difficulty": "Easy",
+      "order": 68
+    },
+    {
+      "id": "idiom-069",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 69",
+      "meaning": "This is the meaning of idiom 69.",
+      "example": "Here is an example of idiom 69 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 69
+    },
+    {
+      "id": "idiom-070",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 70",
+      "meaning": "This is the meaning of idiom 70.",
+      "example": "Here is an example of idiom 70 in a sentence.",
+      "difficulty": "Easy",
+      "order": 70
+    },
+    {
+      "id": "idiom-071",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 71",
+      "meaning": "This is the meaning of idiom 71.",
+      "example": "Here is an example of idiom 71 in a sentence.",
+      "difficulty": "Easy",
+      "order": 71
+    },
+    {
+      "id": "idiom-072",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 72",
+      "meaning": "This is the meaning of idiom 72.",
+      "example": "Here is an example of idiom 72 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 72
+    },
+    {
+      "id": "idiom-073",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 73",
+      "meaning": "This is the meaning of idiom 73.",
+      "example": "Here is an example of idiom 73 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 73
+    },
+    {
+      "id": "idiom-074",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 74",
+      "meaning": "This is the meaning of idiom 74.",
+      "example": "Here is an example of idiom 74 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 74
+    },
+    {
+      "id": "idiom-075",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 75",
+      "meaning": "This is the meaning of idiom 75.",
+      "example": "Here is an example of idiom 75 in a sentence.",
+      "difficulty": "Easy",
+      "order": 75
+    },
+    {
+      "id": "idiom-076",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 76",
+      "meaning": "This is the meaning of idiom 76.",
+      "example": "Here is an example of idiom 76 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 76
+    },
+    {
+      "id": "idiom-077",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 77",
+      "meaning": "This is the meaning of idiom 77.",
+      "example": "Here is an example of idiom 77 in a sentence.",
+      "difficulty": "Easy",
+      "order": 77
+    },
+    {
+      "id": "idiom-078",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 78",
+      "meaning": "This is the meaning of idiom 78.",
+      "example": "Here is an example of idiom 78 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 78
+    },
+    {
+      "id": "idiom-079",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 79",
+      "meaning": "This is the meaning of idiom 79.",
+      "example": "Here is an example of idiom 79 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 79
+    },
+    {
+      "id": "idiom-080",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 80",
+      "meaning": "This is the meaning of idiom 80.",
+      "example": "Here is an example of idiom 80 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 80
+    },
+    {
+      "id": "idiom-081",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 81",
+      "meaning": "This is the meaning of idiom 81.",
+      "example": "Here is an example of idiom 81 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 81
+    },
+    {
+      "id": "idiom-082",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 82",
+      "meaning": "This is the meaning of idiom 82.",
+      "example": "Here is an example of idiom 82 in a sentence.",
+      "difficulty": "Easy",
+      "order": 82
+    },
+    {
+      "id": "idiom-083",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 83",
+      "meaning": "This is the meaning of idiom 83.",
+      "example": "Here is an example of idiom 83 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 83
+    },
+    {
+      "id": "idiom-084",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 84",
+      "meaning": "This is the meaning of idiom 84.",
+      "example": "Here is an example of idiom 84 in a sentence.",
+      "difficulty": "Easy",
+      "order": 84
+    },
+    {
+      "id": "idiom-085",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 85",
+      "meaning": "This is the meaning of idiom 85.",
+      "example": "Here is an example of idiom 85 in a sentence.",
+      "difficulty": "Easy",
+      "order": 85
+    },
+    {
+      "id": "idiom-086",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 86",
+      "meaning": "This is the meaning of idiom 86.",
+      "example": "Here is an example of idiom 86 in a sentence.",
+      "difficulty": "Easy",
+      "order": 86
+    },
+    {
+      "id": "idiom-087",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 87",
+      "meaning": "This is the meaning of idiom 87.",
+      "example": "Here is an example of idiom 87 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 87
+    },
+    {
+      "id": "idiom-088",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 88",
+      "meaning": "This is the meaning of idiom 88.",
+      "example": "Here is an example of idiom 88 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 88
+    },
+    {
+      "id": "idiom-089",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 89",
+      "meaning": "This is the meaning of idiom 89.",
+      "example": "Here is an example of idiom 89 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 89
+    },
+    {
+      "id": "idiom-090",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 90",
+      "meaning": "This is the meaning of idiom 90.",
+      "example": "Here is an example of idiom 90 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 90
+    },
+    {
+      "id": "idiom-091",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 91",
+      "meaning": "This is the meaning of idiom 91.",
+      "example": "Here is an example of idiom 91 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 91
+    },
+    {
+      "id": "idiom-092",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 92",
+      "meaning": "This is the meaning of idiom 92.",
+      "example": "Here is an example of idiom 92 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 92
+    },
+    {
+      "id": "idiom-093",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 93",
+      "meaning": "This is the meaning of idiom 93.",
+      "example": "Here is an example of idiom 93 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 93
+    },
+    {
+      "id": "idiom-094",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 94",
+      "meaning": "This is the meaning of idiom 94.",
+      "example": "Here is an example of idiom 94 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 94
+    },
+    {
+      "id": "idiom-095",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 95",
+      "meaning": "This is the meaning of idiom 95.",
+      "example": "Here is an example of idiom 95 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 95
+    },
+    {
+      "id": "idiom-096",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 96",
+      "meaning": "This is the meaning of idiom 96.",
+      "example": "Here is an example of idiom 96 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 96
+    },
+    {
+      "id": "idiom-097",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 97",
+      "meaning": "This is the meaning of idiom 97.",
+      "example": "Here is an example of idiom 97 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 97
+    },
+    {
+      "id": "idiom-098",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 98",
+      "meaning": "This is the meaning of idiom 98.",
+      "example": "Here is an example of idiom 98 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 98
+    },
+    {
+      "id": "idiom-099",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 99",
+      "meaning": "This is the meaning of idiom 99.",
+      "example": "Here is an example of idiom 99 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 99
+    },
+    {
+      "id": "idiom-100",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 100",
+      "meaning": "This is the meaning of idiom 100.",
+      "example": "Here is an example of idiom 100 in a sentence.",
+      "difficulty": "Easy",
+      "order": 100
+    },
+    {
+      "id": "idiom-101",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 101",
+      "meaning": "This is the meaning of idiom 101.",
+      "example": "Here is an example of idiom 101 in a sentence.",
+      "difficulty": "Easy",
+      "order": 101
+    },
+    {
+      "id": "idiom-102",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 102",
+      "meaning": "This is the meaning of idiom 102.",
+      "example": "Here is an example of idiom 102 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 102
+    },
+    {
+      "id": "idiom-103",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 103",
+      "meaning": "This is the meaning of idiom 103.",
+      "example": "Here is an example of idiom 103 in a sentence.",
+      "difficulty": "Advanced",
+      "order": 103
+    },
+    {
+      "id": "idiom-104",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 104",
+      "meaning": "This is the meaning of idiom 104.",
+      "example": "Here is an example of idiom 104 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 104
+    },
+    {
+      "id": "idiom-105",
+      "subcategoryId": "common-idioms",
+      "idiom": "Idiom 105",
+      "meaning": "This is the meaning of idiom 105.",
+      "example": "Here is an example of idiom 105 in a sentence.",
+      "difficulty": "Intermediate",
+      "order": 105
+    }
+  ],
+  "phrasalVerbItems": [
+    {
+      "id": "phrasal-001",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "Look up",
+      "meaning": "To search for information in a reference source",
+      "example": "I need to look up this word in the dictionary.",
+      "difficulty": "Easy",
+      "order": 1
+    },
+    {
+      "id": "phrasal-002",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "Turn down",
+      "meaning": "To reject or refuse an offer or request",
+      "example": "She turned down the job offer because the salary was too low.",
+      "difficulty": "Easy",
+      "order": 2
+    },
+    {
+      "id": "phrasal-003",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "Give up",
+      "meaning": "To stop trying to do something; to quit",
+      "example": "Don't give up on your dreams, keep working hard.",
+      "difficulty": "Easy",
+      "order": 3
+    },
+    {
+      "id": "phrasal-004",
+      "subcategoryId": "advanced-phrasal-verbs",
+      "verb": "Come across",
+      "meaning": "To find or encounter something by chance",
+      "example": "I came across an interesting article while browsing the internet.",
+      "difficulty": "Intermediate",
+      "order": 1
+    },
+    {
+      "id": "phrasal-005",
+      "subcategoryId": "advanced-phrasal-verbs",
+      "verb": "Bring about",
+      "meaning": "To cause something to happen",
+      "example": "The new policies will bring about significant changes in the company.",
+      "difficulty": "Advanced",
+      "order": 2
+    },
+    {
+      "id": "phrasal-006",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb6",
+      "meaning": "This is the meaning of phrasal verb 6.",
+      "example": "An example of phrasal verb 6 used in context.",
+      "difficulty": "Advanced",
+      "order": 6
+    },
+    {
+      "id": "phrasal-007",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb7",
+      "meaning": "This is the meaning of phrasal verb 7.",
+      "example": "An example of phrasal verb 7 used in context.",
+      "difficulty": "Advanced",
+      "order": 7
+    },
+    {
+      "id": "phrasal-008",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb8",
+      "meaning": "This is the meaning of phrasal verb 8.",
+      "example": "An example of phrasal verb 8 used in context.",
+      "difficulty": "Advanced",
+      "order": 8
+    },
+    {
+      "id": "phrasal-009",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb9",
+      "meaning": "This is the meaning of phrasal verb 9.",
+      "example": "An example of phrasal verb 9 used in context.",
+      "difficulty": "Advanced",
+      "order": 9
+    },
+    {
+      "id": "phrasal-010",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb10",
+      "meaning": "This is the meaning of phrasal verb 10.",
+      "example": "An example of phrasal verb 10 used in context.",
+      "difficulty": "Intermediate",
+      "order": 10
+    },
+    {
+      "id": "phrasal-011",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb11",
+      "meaning": "This is the meaning of phrasal verb 11.",
+      "example": "An example of phrasal verb 11 used in context.",
+      "difficulty": "Intermediate",
+      "order": 11
+    },
+    {
+      "id": "phrasal-012",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb12",
+      "meaning": "This is the meaning of phrasal verb 12.",
+      "example": "An example of phrasal verb 12 used in context.",
+      "difficulty": "Easy",
+      "order": 12
+    },
+    {
+      "id": "phrasal-013",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb13",
+      "meaning": "This is the meaning of phrasal verb 13.",
+      "example": "An example of phrasal verb 13 used in context.",
+      "difficulty": "Advanced",
+      "order": 13
+    },
+    {
+      "id": "phrasal-014",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb14",
+      "meaning": "This is the meaning of phrasal verb 14.",
+      "example": "An example of phrasal verb 14 used in context.",
+      "difficulty": "Advanced",
+      "order": 14
+    },
+    {
+      "id": "phrasal-015",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb15",
+      "meaning": "This is the meaning of phrasal verb 15.",
+      "example": "An example of phrasal verb 15 used in context.",
+      "difficulty": "Advanced",
+      "order": 15
+    },
+    {
+      "id": "phrasal-016",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb16",
+      "meaning": "This is the meaning of phrasal verb 16.",
+      "example": "An example of phrasal verb 16 used in context.",
+      "difficulty": "Intermediate",
+      "order": 16
+    },
+    {
+      "id": "phrasal-017",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb17",
+      "meaning": "This is the meaning of phrasal verb 17.",
+      "example": "An example of phrasal verb 17 used in context.",
+      "difficulty": "Easy",
+      "order": 17
+    },
+    {
+      "id": "phrasal-018",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb18",
+      "meaning": "This is the meaning of phrasal verb 18.",
+      "example": "An example of phrasal verb 18 used in context.",
+      "difficulty": "Advanced",
+      "order": 18
+    },
+    {
+      "id": "phrasal-019",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb19",
+      "meaning": "This is the meaning of phrasal verb 19.",
+      "example": "An example of phrasal verb 19 used in context.",
+      "difficulty": "Easy",
+      "order": 19
+    },
+    {
+      "id": "phrasal-020",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb20",
+      "meaning": "This is the meaning of phrasal verb 20.",
+      "example": "An example of phrasal verb 20 used in context.",
+      "difficulty": "Easy",
+      "order": 20
+    },
+    {
+      "id": "phrasal-021",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb21",
+      "meaning": "This is the meaning of phrasal verb 21.",
+      "example": "An example of phrasal verb 21 used in context.",
+      "difficulty": "Advanced",
+      "order": 21
+    },
+    {
+      "id": "phrasal-022",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb22",
+      "meaning": "This is the meaning of phrasal verb 22.",
+      "example": "An example of phrasal verb 22 used in context.",
+      "difficulty": "Advanced",
+      "order": 22
+    },
+    {
+      "id": "phrasal-023",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb23",
+      "meaning": "This is the meaning of phrasal verb 23.",
+      "example": "An example of phrasal verb 23 used in context.",
+      "difficulty": "Intermediate",
+      "order": 23
+    },
+    {
+      "id": "phrasal-024",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb24",
+      "meaning": "This is the meaning of phrasal verb 24.",
+      "example": "An example of phrasal verb 24 used in context.",
+      "difficulty": "Intermediate",
+      "order": 24
+    },
+    {
+      "id": "phrasal-025",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb25",
+      "meaning": "This is the meaning of phrasal verb 25.",
+      "example": "An example of phrasal verb 25 used in context.",
+      "difficulty": "Intermediate",
+      "order": 25
+    },
+    {
+      "id": "phrasal-026",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb26",
+      "meaning": "This is the meaning of phrasal verb 26.",
+      "example": "An example of phrasal verb 26 used in context.",
+      "difficulty": "Advanced",
+      "order": 26
+    },
+    {
+      "id": "phrasal-027",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb27",
+      "meaning": "This is the meaning of phrasal verb 27.",
+      "example": "An example of phrasal verb 27 used in context.",
+      "difficulty": "Intermediate",
+      "order": 27
+    },
+    {
+      "id": "phrasal-028",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb28",
+      "meaning": "This is the meaning of phrasal verb 28.",
+      "example": "An example of phrasal verb 28 used in context.",
+      "difficulty": "Intermediate",
+      "order": 28
+    },
+    {
+      "id": "phrasal-029",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb29",
+      "meaning": "This is the meaning of phrasal verb 29.",
+      "example": "An example of phrasal verb 29 used in context.",
+      "difficulty": "Intermediate",
+      "order": 29
+    },
+    {
+      "id": "phrasal-030",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb30",
+      "meaning": "This is the meaning of phrasal verb 30.",
+      "example": "An example of phrasal verb 30 used in context.",
+      "difficulty": "Advanced",
+      "order": 30
+    },
+    {
+      "id": "phrasal-031",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb31",
+      "meaning": "This is the meaning of phrasal verb 31.",
+      "example": "An example of phrasal verb 31 used in context.",
+      "difficulty": "Advanced",
+      "order": 31
+    },
+    {
+      "id": "phrasal-032",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb32",
+      "meaning": "This is the meaning of phrasal verb 32.",
+      "example": "An example of phrasal verb 32 used in context.",
+      "difficulty": "Easy",
+      "order": 32
+    },
+    {
+      "id": "phrasal-033",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb33",
+      "meaning": "This is the meaning of phrasal verb 33.",
+      "example": "An example of phrasal verb 33 used in context.",
+      "difficulty": "Easy",
+      "order": 33
+    },
+    {
+      "id": "phrasal-034",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb34",
+      "meaning": "This is the meaning of phrasal verb 34.",
+      "example": "An example of phrasal verb 34 used in context.",
+      "difficulty": "Easy",
+      "order": 34
+    },
+    {
+      "id": "phrasal-035",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb35",
+      "meaning": "This is the meaning of phrasal verb 35.",
+      "example": "An example of phrasal verb 35 used in context.",
+      "difficulty": "Easy",
+      "order": 35
+    },
+    {
+      "id": "phrasal-036",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb36",
+      "meaning": "This is the meaning of phrasal verb 36.",
+      "example": "An example of phrasal verb 36 used in context.",
+      "difficulty": "Intermediate",
+      "order": 36
+    },
+    {
+      "id": "phrasal-037",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb37",
+      "meaning": "This is the meaning of phrasal verb 37.",
+      "example": "An example of phrasal verb 37 used in context.",
+      "difficulty": "Intermediate",
+      "order": 37
+    },
+    {
+      "id": "phrasal-038",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb38",
+      "meaning": "This is the meaning of phrasal verb 38.",
+      "example": "An example of phrasal verb 38 used in context.",
+      "difficulty": "Advanced",
+      "order": 38
+    },
+    {
+      "id": "phrasal-039",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb39",
+      "meaning": "This is the meaning of phrasal verb 39.",
+      "example": "An example of phrasal verb 39 used in context.",
+      "difficulty": "Easy",
+      "order": 39
+    },
+    {
+      "id": "phrasal-040",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb40",
+      "meaning": "This is the meaning of phrasal verb 40.",
+      "example": "An example of phrasal verb 40 used in context.",
+      "difficulty": "Easy",
+      "order": 40
+    },
+    {
+      "id": "phrasal-041",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb41",
+      "meaning": "This is the meaning of phrasal verb 41.",
+      "example": "An example of phrasal verb 41 used in context.",
+      "difficulty": "Advanced",
+      "order": 41
+    },
+    {
+      "id": "phrasal-042",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb42",
+      "meaning": "This is the meaning of phrasal verb 42.",
+      "example": "An example of phrasal verb 42 used in context.",
+      "difficulty": "Intermediate",
+      "order": 42
+    },
+    {
+      "id": "phrasal-043",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb43",
+      "meaning": "This is the meaning of phrasal verb 43.",
+      "example": "An example of phrasal verb 43 used in context.",
+      "difficulty": "Advanced",
+      "order": 43
+    },
+    {
+      "id": "phrasal-044",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb44",
+      "meaning": "This is the meaning of phrasal verb 44.",
+      "example": "An example of phrasal verb 44 used in context.",
+      "difficulty": "Advanced",
+      "order": 44
+    },
+    {
+      "id": "phrasal-045",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb45",
+      "meaning": "This is the meaning of phrasal verb 45.",
+      "example": "An example of phrasal verb 45 used in context.",
+      "difficulty": "Advanced",
+      "order": 45
+    },
+    {
+      "id": "phrasal-046",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb46",
+      "meaning": "This is the meaning of phrasal verb 46.",
+      "example": "An example of phrasal verb 46 used in context.",
+      "difficulty": "Intermediate",
+      "order": 46
+    },
+    {
+      "id": "phrasal-047",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb47",
+      "meaning": "This is the meaning of phrasal verb 47.",
+      "example": "An example of phrasal verb 47 used in context.",
+      "difficulty": "Intermediate",
+      "order": 47
+    },
+    {
+      "id": "phrasal-048",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb48",
+      "meaning": "This is the meaning of phrasal verb 48.",
+      "example": "An example of phrasal verb 48 used in context.",
+      "difficulty": "Intermediate",
+      "order": 48
+    },
+    {
+      "id": "phrasal-049",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb49",
+      "meaning": "This is the meaning of phrasal verb 49.",
+      "example": "An example of phrasal verb 49 used in context.",
+      "difficulty": "Intermediate",
+      "order": 49
+    },
+    {
+      "id": "phrasal-050",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb50",
+      "meaning": "This is the meaning of phrasal verb 50.",
+      "example": "An example of phrasal verb 50 used in context.",
+      "difficulty": "Easy",
+      "order": 50
+    },
+    {
+      "id": "phrasal-051",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb51",
+      "meaning": "This is the meaning of phrasal verb 51.",
+      "example": "An example of phrasal verb 51 used in context.",
+      "difficulty": "Advanced",
+      "order": 51
+    },
+    {
+      "id": "phrasal-052",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb52",
+      "meaning": "This is the meaning of phrasal verb 52.",
+      "example": "An example of phrasal verb 52 used in context.",
+      "difficulty": "Easy",
+      "order": 52
+    },
+    {
+      "id": "phrasal-053",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb53",
+      "meaning": "This is the meaning of phrasal verb 53.",
+      "example": "An example of phrasal verb 53 used in context.",
+      "difficulty": "Intermediate",
+      "order": 53
+    },
+    {
+      "id": "phrasal-054",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb54",
+      "meaning": "This is the meaning of phrasal verb 54.",
+      "example": "An example of phrasal verb 54 used in context.",
+      "difficulty": "Advanced",
+      "order": 54
+    },
+    {
+      "id": "phrasal-055",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb55",
+      "meaning": "This is the meaning of phrasal verb 55.",
+      "example": "An example of phrasal verb 55 used in context.",
+      "difficulty": "Advanced",
+      "order": 55
+    },
+    {
+      "id": "phrasal-056",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb56",
+      "meaning": "This is the meaning of phrasal verb 56.",
+      "example": "An example of phrasal verb 56 used in context.",
+      "difficulty": "Advanced",
+      "order": 56
+    },
+    {
+      "id": "phrasal-057",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb57",
+      "meaning": "This is the meaning of phrasal verb 57.",
+      "example": "An example of phrasal verb 57 used in context.",
+      "difficulty": "Advanced",
+      "order": 57
+    },
+    {
+      "id": "phrasal-058",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb58",
+      "meaning": "This is the meaning of phrasal verb 58.",
+      "example": "An example of phrasal verb 58 used in context.",
+      "difficulty": "Easy",
+      "order": 58
+    },
+    {
+      "id": "phrasal-059",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb59",
+      "meaning": "This is the meaning of phrasal verb 59.",
+      "example": "An example of phrasal verb 59 used in context.",
+      "difficulty": "Advanced",
+      "order": 59
+    },
+    {
+      "id": "phrasal-060",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb60",
+      "meaning": "This is the meaning of phrasal verb 60.",
+      "example": "An example of phrasal verb 60 used in context.",
+      "difficulty": "Easy",
+      "order": 60
+    },
+    {
+      "id": "phrasal-061",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb61",
+      "meaning": "This is the meaning of phrasal verb 61.",
+      "example": "An example of phrasal verb 61 used in context.",
+      "difficulty": "Advanced",
+      "order": 61
+    },
+    {
+      "id": "phrasal-062",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb62",
+      "meaning": "This is the meaning of phrasal verb 62.",
+      "example": "An example of phrasal verb 62 used in context.",
+      "difficulty": "Advanced",
+      "order": 62
+    },
+    {
+      "id": "phrasal-063",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb63",
+      "meaning": "This is the meaning of phrasal verb 63.",
+      "example": "An example of phrasal verb 63 used in context.",
+      "difficulty": "Advanced",
+      "order": 63
+    },
+    {
+      "id": "phrasal-064",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb64",
+      "meaning": "This is the meaning of phrasal verb 64.",
+      "example": "An example of phrasal verb 64 used in context.",
+      "difficulty": "Intermediate",
+      "order": 64
+    },
+    {
+      "id": "phrasal-065",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb65",
+      "meaning": "This is the meaning of phrasal verb 65.",
+      "example": "An example of phrasal verb 65 used in context.",
+      "difficulty": "Intermediate",
+      "order": 65
+    },
+    {
+      "id": "phrasal-066",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb66",
+      "meaning": "This is the meaning of phrasal verb 66.",
+      "example": "An example of phrasal verb 66 used in context.",
+      "difficulty": "Advanced",
+      "order": 66
+    },
+    {
+      "id": "phrasal-067",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb67",
+      "meaning": "This is the meaning of phrasal verb 67.",
+      "example": "An example of phrasal verb 67 used in context.",
+      "difficulty": "Advanced",
+      "order": 67
+    },
+    {
+      "id": "phrasal-068",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb68",
+      "meaning": "This is the meaning of phrasal verb 68.",
+      "example": "An example of phrasal verb 68 used in context.",
+      "difficulty": "Intermediate",
+      "order": 68
+    },
+    {
+      "id": "phrasal-069",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb69",
+      "meaning": "This is the meaning of phrasal verb 69.",
+      "example": "An example of phrasal verb 69 used in context.",
+      "difficulty": "Intermediate",
+      "order": 69
+    },
+    {
+      "id": "phrasal-070",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb70",
+      "meaning": "This is the meaning of phrasal verb 70.",
+      "example": "An example of phrasal verb 70 used in context.",
+      "difficulty": "Easy",
+      "order": 70
+    },
+    {
+      "id": "phrasal-071",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb71",
+      "meaning": "This is the meaning of phrasal verb 71.",
+      "example": "An example of phrasal verb 71 used in context.",
+      "difficulty": "Advanced",
+      "order": 71
+    },
+    {
+      "id": "phrasal-072",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb72",
+      "meaning": "This is the meaning of phrasal verb 72.",
+      "example": "An example of phrasal verb 72 used in context.",
+      "difficulty": "Easy",
+      "order": 72
+    },
+    {
+      "id": "phrasal-073",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb73",
+      "meaning": "This is the meaning of phrasal verb 73.",
+      "example": "An example of phrasal verb 73 used in context.",
+      "difficulty": "Intermediate",
+      "order": 73
+    },
+    {
+      "id": "phrasal-074",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb74",
+      "meaning": "This is the meaning of phrasal verb 74.",
+      "example": "An example of phrasal verb 74 used in context.",
+      "difficulty": "Easy",
+      "order": 74
+    },
+    {
+      "id": "phrasal-075",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb75",
+      "meaning": "This is the meaning of phrasal verb 75.",
+      "example": "An example of phrasal verb 75 used in context.",
+      "difficulty": "Advanced",
+      "order": 75
+    },
+    {
+      "id": "phrasal-076",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb76",
+      "meaning": "This is the meaning of phrasal verb 76.",
+      "example": "An example of phrasal verb 76 used in context.",
+      "difficulty": "Intermediate",
+      "order": 76
+    },
+    {
+      "id": "phrasal-077",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb77",
+      "meaning": "This is the meaning of phrasal verb 77.",
+      "example": "An example of phrasal verb 77 used in context.",
+      "difficulty": "Intermediate",
+      "order": 77
+    },
+    {
+      "id": "phrasal-078",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb78",
+      "meaning": "This is the meaning of phrasal verb 78.",
+      "example": "An example of phrasal verb 78 used in context.",
+      "difficulty": "Easy",
+      "order": 78
+    },
+    {
+      "id": "phrasal-079",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb79",
+      "meaning": "This is the meaning of phrasal verb 79.",
+      "example": "An example of phrasal verb 79 used in context.",
+      "difficulty": "Intermediate",
+      "order": 79
+    },
+    {
+      "id": "phrasal-080",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb80",
+      "meaning": "This is the meaning of phrasal verb 80.",
+      "example": "An example of phrasal verb 80 used in context.",
+      "difficulty": "Advanced",
+      "order": 80
+    },
+    {
+      "id": "phrasal-081",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb81",
+      "meaning": "This is the meaning of phrasal verb 81.",
+      "example": "An example of phrasal verb 81 used in context.",
+      "difficulty": "Advanced",
+      "order": 81
+    },
+    {
+      "id": "phrasal-082",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb82",
+      "meaning": "This is the meaning of phrasal verb 82.",
+      "example": "An example of phrasal verb 82 used in context.",
+      "difficulty": "Intermediate",
+      "order": 82
+    },
+    {
+      "id": "phrasal-083",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb83",
+      "meaning": "This is the meaning of phrasal verb 83.",
+      "example": "An example of phrasal verb 83 used in context.",
+      "difficulty": "Intermediate",
+      "order": 83
+    },
+    {
+      "id": "phrasal-084",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb84",
+      "meaning": "This is the meaning of phrasal verb 84.",
+      "example": "An example of phrasal verb 84 used in context.",
+      "difficulty": "Easy",
+      "order": 84
+    },
+    {
+      "id": "phrasal-085",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb85",
+      "meaning": "This is the meaning of phrasal verb 85.",
+      "example": "An example of phrasal verb 85 used in context.",
+      "difficulty": "Advanced",
+      "order": 85
+    },
+    {
+      "id": "phrasal-086",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb86",
+      "meaning": "This is the meaning of phrasal verb 86.",
+      "example": "An example of phrasal verb 86 used in context.",
+      "difficulty": "Easy",
+      "order": 86
+    },
+    {
+      "id": "phrasal-087",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb87",
+      "meaning": "This is the meaning of phrasal verb 87.",
+      "example": "An example of phrasal verb 87 used in context.",
+      "difficulty": "Advanced",
+      "order": 87
+    },
+    {
+      "id": "phrasal-088",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb88",
+      "meaning": "This is the meaning of phrasal verb 88.",
+      "example": "An example of phrasal verb 88 used in context.",
+      "difficulty": "Intermediate",
+      "order": 88
+    },
+    {
+      "id": "phrasal-089",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb89",
+      "meaning": "This is the meaning of phrasal verb 89.",
+      "example": "An example of phrasal verb 89 used in context.",
+      "difficulty": "Advanced",
+      "order": 89
+    },
+    {
+      "id": "phrasal-090",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb90",
+      "meaning": "This is the meaning of phrasal verb 90.",
+      "example": "An example of phrasal verb 90 used in context.",
+      "difficulty": "Easy",
+      "order": 90
+    },
+    {
+      "id": "phrasal-091",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb91",
+      "meaning": "This is the meaning of phrasal verb 91.",
+      "example": "An example of phrasal verb 91 used in context.",
+      "difficulty": "Easy",
+      "order": 91
+    },
+    {
+      "id": "phrasal-092",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb92",
+      "meaning": "This is the meaning of phrasal verb 92.",
+      "example": "An example of phrasal verb 92 used in context.",
+      "difficulty": "Easy",
+      "order": 92
+    },
+    {
+      "id": "phrasal-093",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb93",
+      "meaning": "This is the meaning of phrasal verb 93.",
+      "example": "An example of phrasal verb 93 used in context.",
+      "difficulty": "Intermediate",
+      "order": 93
+    },
+    {
+      "id": "phrasal-094",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb94",
+      "meaning": "This is the meaning of phrasal verb 94.",
+      "example": "An example of phrasal verb 94 used in context.",
+      "difficulty": "Easy",
+      "order": 94
+    },
+    {
+      "id": "phrasal-095",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb95",
+      "meaning": "This is the meaning of phrasal verb 95.",
+      "example": "An example of phrasal verb 95 used in context.",
+      "difficulty": "Easy",
+      "order": 95
+    },
+    {
+      "id": "phrasal-096",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb96",
+      "meaning": "This is the meaning of phrasal verb 96.",
+      "example": "An example of phrasal verb 96 used in context.",
+      "difficulty": "Advanced",
+      "order": 96
+    },
+    {
+      "id": "phrasal-097",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb97",
+      "meaning": "This is the meaning of phrasal verb 97.",
+      "example": "An example of phrasal verb 97 used in context.",
+      "difficulty": "Advanced",
+      "order": 97
+    },
+    {
+      "id": "phrasal-098",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb98",
+      "meaning": "This is the meaning of phrasal verb 98.",
+      "example": "An example of phrasal verb 98 used in context.",
+      "difficulty": "Advanced",
+      "order": 98
+    },
+    {
+      "id": "phrasal-099",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb99",
+      "meaning": "This is the meaning of phrasal verb 99.",
+      "example": "An example of phrasal verb 99 used in context.",
+      "difficulty": "Advanced",
+      "order": 99
+    },
+    {
+      "id": "phrasal-100",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb100",
+      "meaning": "This is the meaning of phrasal verb 100.",
+      "example": "An example of phrasal verb 100 used in context.",
+      "difficulty": "Intermediate",
+      "order": 100
+    },
+    {
+      "id": "phrasal-101",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb101",
+      "meaning": "This is the meaning of phrasal verb 101.",
+      "example": "An example of phrasal verb 101 used in context.",
+      "difficulty": "Advanced",
+      "order": 101
+    },
+    {
+      "id": "phrasal-102",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb102",
+      "meaning": "This is the meaning of phrasal verb 102.",
+      "example": "An example of phrasal verb 102 used in context.",
+      "difficulty": "Easy",
+      "order": 102
+    },
+    {
+      "id": "phrasal-103",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb103",
+      "meaning": "This is the meaning of phrasal verb 103.",
+      "example": "An example of phrasal verb 103 used in context.",
+      "difficulty": "Intermediate",
+      "order": 103
+    },
+    {
+      "id": "phrasal-104",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb104",
+      "meaning": "This is the meaning of phrasal verb 104.",
+      "example": "An example of phrasal verb 104 used in context.",
+      "difficulty": "Easy",
+      "order": 104
+    },
+    {
+      "id": "phrasal-105",
+      "subcategoryId": "basic-phrasal-verbs",
+      "verb": "PhrasalVerb105",
+      "meaning": "This is the meaning of phrasal verb 105.",
+      "example": "An example of phrasal verb 105 used in context.",
+      "difficulty": "Easy",
+      "order": 105
+    }
+  ],
+  "sampleAnswers": [
+    {
+      "id": "sample-001",
+      "topicId": "hometown",
+      "question": "Where are you from?",
+      "answer": "I'm from Dhaka, which is the capital city of Bangladesh. It's a bustling metropolis with over 9 million people. The city is known for its rich history, vibrant culture, and delicious street food. Despite being crowded and sometimes chaotic, I love the energy and diversity of my hometown. There's always something happening, whether it's festivals, markets, or cultural events.",
+      "keyVocabulary": [
+        "metropolis",
+        "bustling",
+        "vibrant",
+        "chaotic",
+        "diversity"
+      ],
+      "tips": [
+        "Use specific details about your hometown",
+        "Include both positive and negative aspects",
+        "Use varied vocabulary to show language range",
+        "Give examples of what makes your city unique"
+      ],
+      "bandScore": "7.5"
+    },
+    {
+      "id": "sample-002",
+      "topicId": "hometown",
+      "question": "What do you like about your hometown?",
+      "answer": "What I really appreciate about Dhaka is the incredible food scene. You can find amazing street food on every corner, from traditional Bengali dishes to international cuisine. I also love how welcoming and friendly the people are. Despite the fast-paced lifestyle, neighbors still look out for each other, and there's a strong sense of community.",
+      "keyVocabulary": [
+        "appreciate",
+        "incredible",
+        "cuisine",
+        "welcoming",
+        "fast-paced",
+        "community"
+      ],
+      "tips": [
+        "Focus on specific aspects you genuinely like",
+        "Use descriptive adjectives",
+        "Give concrete examples",
+        "Show emotional connection to your answer"
+      ],
+      "bandScore": "7.0"
+    },
+    {
+      "id": "sample-003",
+      "topicId": "hobbies",
+      "question": "What do you like to do in your free time?",
+      "answer": "In my spare time, I'm quite passionate about photography. I particularly enjoy taking street photography when I'm exploring different neighborhoods in my city. It allows me to capture candid moments and document the daily life of ordinary people. I also find it incredibly relaxing to spend time in nature, taking landscape photos during weekend trips to nearby areas.",
+      "keyVocabulary": [
+        "passionate",
+        "particularly",
+        "exploring",
+        "candid",
+        "document",
+        "incredibly",
+        "landscape"
+      ],
+      "tips": [
+        "Show enthusiasm for your hobbies",
+        "Explain why you enjoy them",
+        "Use specific vocabulary related to your interests",
+        "Mention how often you do these activities"
+      ],
+      "bandScore": "8.0"
+    }
+  ],
+  "pronunciationItems": [
+    {
+      "id": "pronunciation-001",
+      "topicId": "vowels",
+      "word": "sheep",
+      "ipa": "/\u0283i\u02d0p/",
+      "difficulty": "Easy",
+      "commonMistakes": [
+        "Pronouncing as 'ship' (/\u0283\u026ap/)",
+        "Making the vowel sound too short",
+        "Not maintaining the long 'ee' sound"
+      ],
+      "audioFileName": "sheep.mp3",
+      "example": "The sheep is grazing in the green field.",
+      "order": 1
+    },
+    {
+      "id": "pronunciation-002",
+      "topicId": "vowels",
+      "word": "ship",
+      "ipa": "/\u0283\u026ap/",
+      "difficulty": "Easy",
+      "commonMistakes": [
+        "Pronouncing as 'sheep' (/\u0283i\u02d0p/)",
+        "Making the vowel sound too long",
+        "Not using the short 'i' sound"
+      ],
+      "audioFileName": "ship.mp3",
+      "example": "The large ship sailed across the ocean.",
+      "order": 2
+    }
+  ]
+}

@@ -83,211 +83,211 @@ struct PronunciationItem: Identifiable {
 }
 
 // MARK: - Main Lesson Screen (Redesigned)
-struct LessonScreen: View {
-    @State private var selectedCategory: String? = nil
-    @State private var expandedCategory: String? = nil
-    @State private var showDailyLesson = false
-    @State private var navigationPath = NavigationPath()
-    
-    let categories = [
-        LessonCategory(
-            id: "vocabulary",
-            title: "Vocabulary",
-            description: "Build your word bank with essential IELTS vocabulary",
-            icon: "book.fill",
-            color: Color(red: 0.3, green: 0.7, blue: 1.0), // Bright blue
-            progress: 0.75,
-            streak: 5,
-            lessonCount: 32,
-            illustration: "👨‍🏫"
-        ),
-        LessonCategory(
-            id: "idioms",
-            title: "Idioms",
-            description: "Master common idioms to sound more natural",
-            icon: "quote.bubble.fill",
-            color: Color(red: 0.3, green: 0.8, blue: 0.6), // Teal green
-            progress: 0.45,
-            streak: 3,
-            lessonCount: 44,
-            illustration: "🏄‍♂️"
-        ),
-        LessonCategory(
-            id: "phrasal-verbs",
-            title: "Phrasal Verbs",
-            description: "Learn essential phrasal verbs for fluent speech",
-            icon: "arrow.triangle.2.circlepath",
-            color: Color(red: 1.0, green: 0.6, blue: 0.7), // Pink
-            progress: 0.60,
-            streak: 7,
-            lessonCount: 60,
-            illustration: "👨‍👩‍👧‍👦"
-        ),
-        LessonCategory(
-            id: "sample-answers",
-            title: "Sample Answers",
-            description: "Study high-scoring IELTS speaking responses",
-            icon: "mic.fill",
-            color: Color(red: 1.0, green: 0.5, blue: 0.3), // Orange
-            progress: 0.30,
-            streak: 2,
-            lessonCount: 60,
-            illustration: "🍽️"
-        ),
-        LessonCategory(
-            id: "pronunciation",
-            title: "Pronunciation",
-            description: "Perfect your pronunciation and intonation",
-            icon: "waveform",
-            color: Color(red: 0.6, green: 0.4, blue: 0.9), // Purple
-            progress: 0.85,
-            streak: 12,
-            lessonCount: 28,
-            illustration: "✈️"
-        )
-    ]
-    
-    var body: some View {
-        NavigationStack(path: $navigationPath) {
-            ZStack {
-                Color(.systemGroupedBackground)
-                    .ignoresSafeArea()
-                
-                ScrollView {
-                    VStack(spacing: 20) {
-                        // Header
-                        headerView
-                        
-                        // Categories
-                        categoriesView
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 20)
-                    .padding(.bottom, 100)
-                }
-            }
-            .navigationBarHidden(true)
-            .navigationDestination(for: String.self) { categoryId in
-                destinationView(for: categoryId)
-            }
-            .navigationDestination(for: Subcategory.self) { subcategory in
-                CardLearningView(subcategory: subcategory)
-            }
-            .navigationDestination(for: SampleAnswerTopic.self) { topic in
-                SampleAnswerDetailView(topic: topic)
-            }
-            .navigationDestination(for: PronunciationTopic.self) { topic in
-                PronunciationDetailView(topic: topic)
-            }
-        }
-    }
-    
-    private var headerView: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Lesson")
-                    .font(.custom("Fredoka-SemiBold", size: 32))
-                    .foregroundColor(.primary)
-                
-                Text("Choose your focus area")
-                    .font(.custom("Fredoka-SemiBold", size: 16))
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            Button(action: {}) {
-                Image(systemName: "person.circle.fill")
-                    .font(.title2)
-                    .foregroundColor(.accentColor)
-            }
-        }
-    }
-    
-    private var categoriesView: some View {
-        VStack(spacing: 16) {
-            ForEach(categories) { category in
-                VStack(spacing: 0) {
-                    // Main category card
-                    CategoryCard(
-                        category: category,
-                        isExpanded: expandedCategory == category.id
-                    ) {
-                        handleCategoryTap(category)
-                    }
-                    
-                    // Subcategories (expanded)
-                    if expandedCategory == category.id {
-                        subcategoriesView(for: category)
-                    }
-                }
-            }
-        }
-    }
-    
-    private func subcategoriesView(for category: LessonCategory) -> some View {
-        VStack(spacing: 12) {
-            ForEach(getSubcategories(for: category.id)) { subcategory in
-                SubcategoryCard(subcategory: subcategory) {
-                    navigationPath.append(subcategory)
-                }
-            }
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 20)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
-        )
-        .padding(.top, -10)
-        .transition(.asymmetric(
-            insertion: .opacity.combined(with: .scale(scale: 0.95)),
-            removal: .opacity.combined(with: .scale(scale: 0.95))
-        ))
-    }
-    
-    private func handleCategoryTap(_ category: LessonCategory) {
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
-            if expandedCategory == category.id {
-                expandedCategory = nil
-            } else {
-                expandedCategory = category.id
-            }
-        }
-    }
-    
-    private func getSubcategories(for categoryId: String) -> [Subcategory] {
-        switch categoryId {
-        case "vocabulary":
-            return MockData.vocabularySubcategories
-        case "idioms":
-            return MockData.idiomSubcategories
-        case "phrasal-verbs":
-            return MockData.phrasalVerbSubcategories
-        case "sample-answers":
-            return MockData.sampleAnswerSubcategories
-        case "pronunciation":
-            return MockData.pronunciationSubcategories
-        default:
-            return []
-        }
-    }
-    
-    @ViewBuilder
-    private func destinationView(for categoryId: String) -> some View {
-        switch categoryId {
-        case "vocabulary", "idioms", "phrasal-verbs":
-            SubcategoryListView(categoryId: categoryId)
-        case "sample-answers":
-            SampleAnswerListView()
-        case "pronunciation":
-            PronunciationListView()
-        default:
-            EmptyView()
-        }
-    }
-}
+//struct LessonScreen: View {
+//    @State private var selectedCategory: String? = nil
+//    @State private var expandedCategory: String? = nil
+//    @State private var showDailyLesson = false
+//    @State private var navigationPath = NavigationPath()
+//    
+//    let categories = [
+//        LessonCategory(
+//            id: "vocabulary",
+//            title: "Vocabulary",
+//            description: "Build your word bank with essential IELTS vocabulary",
+//            icon: "book.fill",
+//            color: Color(red: 0.3, green: 0.7, blue: 1.0), // Bright blue
+//            progress: 0.75,
+//            streak: 5,
+//            lessonCount: 32,
+//            illustration: "👨‍🏫"
+//        ),
+//        LessonCategory(
+//            id: "idioms",
+//            title: "Idioms",
+//            description: "Master common idioms to sound more natural",
+//            icon: "quote.bubble.fill",
+//            color: Color(red: 0.3, green: 0.8, blue: 0.6), // Teal green
+//            progress: 0.45,
+//            streak: 3,
+//            lessonCount: 44,
+//            illustration: "🏄‍♂️"
+//        ),
+//        LessonCategory(
+//            id: "phrasal-verbs",
+//            title: "Phrasal Verbs",
+//            description: "Learn essential phrasal verbs for fluent speech",
+//            icon: "arrow.triangle.2.circlepath",
+//            color: Color(red: 1.0, green: 0.6, blue: 0.7), // Pink
+//            progress: 0.60,
+//            streak: 7,
+//            lessonCount: 60,
+//            illustration: "👨‍👩‍👧‍👦"
+//        ),
+//        LessonCategory(
+//            id: "sample-answers",
+//            title: "Sample Answers",
+//            description: "Study high-scoring IELTS speaking responses",
+//            icon: "mic.fill",
+//            color: Color(red: 1.0, green: 0.5, blue: 0.3), // Orange
+//            progress: 0.30,
+//            streak: 2,
+//            lessonCount: 60,
+//            illustration: "🍽️"
+//        ),
+//        LessonCategory(
+//            id: "pronunciation",
+//            title: "Pronunciation",
+//            description: "Perfect your pronunciation and intonation",
+//            icon: "waveform",
+//            color: Color(red: 0.6, green: 0.4, blue: 0.9), // Purple
+//            progress: 0.85,
+//            streak: 12,
+//            lessonCount: 28,
+//            illustration: "✈️"
+//        )
+//    ]
+//    
+//    var body: some View {
+//        NavigationStack(path: $navigationPath) {
+//            ZStack {
+//                Color(.systemGroupedBackground)
+//                    .ignoresSafeArea()
+//                
+//                ScrollView {
+//                    VStack(spacing: 20) {
+//                        // Header
+//                        headerView
+//                        
+//                        // Categories
+//                        categoriesView
+//                    }
+//                    .padding(.horizontal, 20)
+//                    .padding(.top, 20)
+//                    .padding(.bottom, 100)
+//                }
+//            }
+//            .navigationBarHidden(true)
+//            .navigationDestination(for: String.self) { categoryId in
+//                destinationView(for: categoryId)
+//            }
+//            .navigationDestination(for: Subcategory.self) { subcategory in
+//                CardLearningView(subcategory: subcategory)
+//            }
+//            .navigationDestination(for: SampleAnswerTopic.self) { topic in
+//                SampleAnswerDetailView(topic: topic)
+//            }
+//            .navigationDestination(for: PronunciationTopic.self) { topic in
+//                PronunciationDetailView(topic: topic)
+//            }
+//        }
+//    }
+//    
+//    private var headerView: some View {
+//        HStack {
+//            VStack(alignment: .leading, spacing: 4) {
+//                Text("Lesson")
+//                    .font(.custom("Fredoka-SemiBold", size: 32))
+//                    .foregroundColor(.primary)
+//                
+//                Text("Choose your focus area")
+//                    .font(.custom("Fredoka-SemiBold", size: 16))
+//                    .foregroundColor(.secondary)
+//            }
+//            
+//            Spacer()
+//            
+//            Button(action: {}) {
+//                Image(systemName: "person.circle.fill")
+//                    .font(.title2)
+//                    .foregroundColor(.accentColor)
+//            }
+//        }
+//    }
+//    
+//    private var categoriesView: some View {
+//        VStack(spacing: 16) {
+//            ForEach(categories) { category in
+//                VStack(spacing: 0) {
+//                    // Main category card
+//                    CategoryCard(
+//                        category: category,
+//                        isExpanded: expandedCategory == category.id
+//                    ) {
+//                        handleCategoryTap(category)
+//                    }
+//                    
+//                    // Subcategories (expanded)
+//                    if expandedCategory == category.id {
+//                        subcategoriesView(for: category)
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    
+//    private func subcategoriesView(for category: LessonCategory) -> some View {
+//        VStack(spacing: 12) {
+//            ForEach(getSubcategories(for: category.id)) { subcategory in
+//                SubcategoryCard(subcategory: subcategory) {
+//                    navigationPath.append(subcategory)
+//                }
+//            }
+//        }
+//        .padding(.horizontal, 16)
+//        .padding(.vertical, 20)
+//        .background(
+//            RoundedRectangle(cornerRadius: 20)
+//                .fill(Color(.systemBackground))
+//                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+//        )
+//        .padding(.top, -10)
+//        .transition(.asymmetric(
+//            insertion: .opacity.combined(with: .scale(scale: 0.95)),
+//            removal: .opacity.combined(with: .scale(scale: 0.95))
+//        ))
+//    }
+//    
+//    private func handleCategoryTap(_ category: LessonCategory) {
+//        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+//            if expandedCategory == category.id {
+//                expandedCategory = nil
+//            } else {
+//                expandedCategory = category.id
+//            }
+//        }
+//    }
+//    
+//    private func getSubcategories(for categoryId: String) -> [Subcategory] {
+//        switch categoryId {
+//        case "vocabulary":
+//            return MockData.vocabularySubcategories
+//        case "idioms":
+//            return MockData.idiomSubcategories
+//        case "phrasal-verbs":
+//            return MockData.phrasalVerbSubcategories
+//        case "sample-answers":
+//            return MockData.sampleAnswerSubcategories
+//        case "pronunciation":
+//            return MockData.pronunciationSubcategories
+//        default:
+//            return []
+//        }
+//    }
+//    
+//    @ViewBuilder
+//    private func destinationView(for categoryId: String) -> some View {
+//        switch categoryId {
+//        case "vocabulary", "idioms", "phrasal-verbs":
+//            SubcategoryListView(categoryId: categoryId)
+//        case "sample-answers":
+//            SampleAnswerListView()
+//        case "pronunciation":
+//            PronunciationListView()
+//        default:
+//            EmptyView()
+//        }
+//    }
+//}
 
 // MARK: - Category Card (Redesigned)
 struct CategoryCard: View {
@@ -358,7 +358,7 @@ struct CategoryCard: View {
                 // Continue/Unlock button
                 Button(action: onTap) {
                     HStack {
-                        Text(category.progress > 0 ? "Continue this course" : "Unlock this course")
+                        Text(category.progress > 0 ? "Continue this lesson" : "Unlock this lesson")
                             .font(.custom("Fredoka-SemiBold", size: 16))
                             .foregroundColor(category.color)
                         
@@ -461,191 +461,191 @@ struct SubcategoryCard: View {
 }
 
 // MARK: - Card Learning View (Updated to work with new structure)
-struct CardLearningView: View {
-    let subcategory: Subcategory
-    @State private var currentIndex = 0
-    @State private var dragOffset = CGSize.zero
-    @State private var isFlipped = false
-    
-    var items: [Any] {
-        MockData.getItems(for: subcategory.id)
-    }
-    
-    var body: some View {
-        VStack(spacing: 20) {
-            // Progress indicator
-            progressIndicator
-            
-            // Card stack
-            cardStack
-            
-            // Control buttons
-            controlButtons
-        }
-        .padding()
-        .navigationTitle(subcategory.title)
-        .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemGroupedBackground))
-        .onTapGesture {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                isFlipped.toggle()
-            }
-        }
-    }
-    
-    // MARK: - Progress Indicator
-    private var progressIndicator: some View {
-        HStack {
-            ForEach(0..<items.count, id: \.self) { index in
-                progressDot(for: index)
-            }
-        }
-        .padding(.horizontal)
-    }
-    
-    private func progressDot(for index: Int) -> some View {
-        Circle()
-            .fill(index <= currentIndex ? subcategory.color : Color(.systemGray4))
-            .frame(width: 8, height: 8)
-            .scaleEffect(index == currentIndex ? 1.2 : 1.0)
-            .animation(.easeInOut(duration: 0.2), value: currentIndex)
-    }
-    
-    // MARK: - Card Stack
-    private var cardStack: some View {
-        ZStack {
-            ForEach(visibleCardIndices, id: \.self) { index in
-                cardView(for: index)
-            }
-        }
-        .gesture(dragGesture)
-    }
-    
-    private var visibleCardIndices: [Int] {
-        let startIndex = currentIndex
-        let endIndex = min(currentIndex + 3, items.count)
-        return Array(startIndex..<endIndex)
-    }
-    
-    private func cardView(for index: Int) -> some View {
-        let item = items[index]
-        let isCurrentCard = index == currentIndex
-        let cardOffset = index - currentIndex
-        
-        return LearningCard(
-            item: item,
-            isFlipped: isFlipped && isCurrentCard,
-            subcategory: subcategory
-        )
-        .offset(x: isCurrentCard ? dragOffset.width : 0)
-        .scaleEffect(calculateScale(for: cardOffset))
-        .opacity(calculateOpacity(for: cardOffset))
-        .zIndex(Double(items.count - index))
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: dragOffset)
-    }
-    
-    private func calculateScale(for offset: Int) -> CGFloat {
-        if offset == 0 { return 1.0 }
-        return 0.95 - Double(offset) * 0.05
-    }
-    
-    private func calculateOpacity(for offset: Int) -> Double {
-        if offset == 0 { return 1.0 }
-        return 0.7 - Double(offset) * 0.2
-    }
-    
-    // MARK: - Drag Gesture
-    private var dragGesture: some Gesture {
-        DragGesture()
-            .onChanged { value in
-                dragOffset = value.translation
-            }
-            .onEnded { value in
-                handleDragEnd(value)
-            }
-    }
-    
-    private func handleDragEnd(_ value: DragGesture.Value) {
-        let threshold: CGFloat = 100
-        
-        if abs(value.translation.width) > threshold {
-            if value.translation.width > 0 {
-                // Swipe right - previous card
-                moveToPreviousCard()
-            } else {
-                // Swipe left - next card
-                moveToNextCard()
-            }
-        }
-        
-        dragOffset = .zero
-    }
-    
-    private func moveToPreviousCard() {
-        if currentIndex > 0 {
-            currentIndex -= 1
-            isFlipped = false
-        }
-    }
-    
-    private func moveToNextCard() {
-        if currentIndex < items.count - 1 {
-            currentIndex += 1
-            isFlipped = false
-        }
-    }
-    
-    // MARK: - Control Buttons
-    private var controlButtons: some View {
-        HStack(spacing: 40) {
-            previousButton
-            flipButton
-            nextButton
-        }
-        .padding()
-    }
-    
-    private var previousButton: some View {
-        Button(action: moveToPreviousCard) {
-            Image(systemName: "chevron.left")
-                .font(.title2)
-                .foregroundColor(canMoveToPrevious ? subcategory.color : .secondary)
-        }
-        .disabled(!canMoveToPrevious)
-    }
-    
-    private var flipButton: some View {
-        Button(action: toggleFlip) {
-            Image(systemName: isFlipped ? "eye.slash" : "eye")
-                .font(.title2)
-                .foregroundColor(subcategory.color)
-        }
-    }
-    
-    private var nextButton: some View {
-        Button(action: moveToNextCard) {
-            Image(systemName: "chevron.right")
-                .font(.title2)
-                .foregroundColor(canMoveToNext ? subcategory.color : .secondary)
-        }
-        .disabled(!canMoveToNext)
-    }
-    
-    // MARK: - Helper Properties
-    private var canMoveToPrevious: Bool {
-        currentIndex > 0
-    }
-    
-    private var canMoveToNext: Bool {
-        currentIndex < items.count - 1
-    }
-    
-    private func toggleFlip() {
-        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-            isFlipped.toggle()
-        }
-    }
-}
+//struct CardLearningView: View {
+//    let subcategory: Subcategory
+//    @State private var currentIndex = 0
+//    @State private var dragOffset = CGSize.zero
+//    @State private var isFlipped = false
+//    
+//    var items: [Any] {
+//        MockData.getItems(for: subcategory.id)
+//    }
+//    
+//    var body: some View {
+//        VStack(spacing: 20) {
+//            // Progress indicator
+//            progressIndicator
+//            
+//            // Card stack
+//            cardStack
+//            
+//            // Control buttons
+//            controlButtons
+//        }
+//        .padding()
+//        .navigationTitle(subcategory.title)
+//        .navigationBarTitleDisplayMode(.inline)
+//        .background(Color(.systemGroupedBackground))
+//        .onTapGesture {
+//            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+//                isFlipped.toggle()
+//            }
+//        }
+//    }
+//    
+//    // MARK: - Progress Indicator
+//    private var progressIndicator: some View {
+//        HStack {
+//            ForEach(0..<items.count, id: \.self) { index in
+//                progressDot(for: index)
+//            }
+//        }
+//        .padding(.horizontal)
+//    }
+//    
+//    private func progressDot(for index: Int) -> some View {
+//        Circle()
+//            .fill(index <= currentIndex ? subcategory.color : Color(.systemGray4))
+//            .frame(width: 8, height: 8)
+//            .scaleEffect(index == currentIndex ? 1.2 : 1.0)
+//            .animation(.easeInOut(duration: 0.2), value: currentIndex)
+//    }
+//    
+//    // MARK: - Card Stack
+//    private var cardStack: some View {
+//        ZStack {
+//            ForEach(visibleCardIndices, id: \.self) { index in
+//                cardView(for: index)
+//            }
+//        }
+//        .gesture(dragGesture)
+//    }
+//    
+//    private var visibleCardIndices: [Int] {
+//        let startIndex = currentIndex
+//        let endIndex = min(currentIndex + 3, items.count)
+//        return Array(startIndex..<endIndex)
+//    }
+//    
+//    private func cardView(for index: Int) -> some View {
+//        let item = items[index]
+//        let isCurrentCard = index == currentIndex
+//        let cardOffset = index - currentIndex
+//        
+//        return LearningCard(
+//            item: item,
+//            isFlipped: isFlipped && isCurrentCard,
+//            subcategory: subcategory
+//        )
+//        .offset(x: isCurrentCard ? dragOffset.width : 0)
+//        .scaleEffect(calculateScale(for: cardOffset))
+//        .opacity(calculateOpacity(for: cardOffset))
+//        .zIndex(Double(items.count - index))
+//        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: dragOffset)
+//    }
+//    
+//    private func calculateScale(for offset: Int) -> CGFloat {
+//        if offset == 0 { return 1.0 }
+//        return 0.95 - Double(offset) * 0.05
+//    }
+//    
+//    private func calculateOpacity(for offset: Int) -> Double {
+//        if offset == 0 { return 1.0 }
+//        return 0.7 - Double(offset) * 0.2
+//    }
+//    
+//    // MARK: - Drag Gesture
+//    private var dragGesture: some Gesture {
+//        DragGesture()
+//            .onChanged { value in
+//                dragOffset = value.translation
+//            }
+//            .onEnded { value in
+//                handleDragEnd(value)
+//            }
+//    }
+//    
+//    private func handleDragEnd(_ value: DragGesture.Value) {
+//        let threshold: CGFloat = 100
+//        
+//        if abs(value.translation.width) > threshold {
+//            if value.translation.width > 0 {
+//                // Swipe right - previous card
+//                moveToPreviousCard()
+//            } else {
+//                // Swipe left - next card
+//                moveToNextCard()
+//            }
+//        }
+//        
+//        dragOffset = .zero
+//    }
+//    
+//    private func moveToPreviousCard() {
+//        if currentIndex > 0 {
+//            currentIndex -= 1
+//            isFlipped = false
+//        }
+//    }
+//    
+//    private func moveToNextCard() {
+//        if currentIndex < items.count - 1 {
+//            currentIndex += 1
+//            isFlipped = false
+//        }
+//    }
+//    
+//    // MARK: - Control Buttons
+//    private var controlButtons: some View {
+//        HStack(spacing: 40) {
+//            previousButton
+//            flipButton
+//            nextButton
+//        }
+//        .padding()
+//    }
+//    
+//    private var previousButton: some View {
+//        Button(action: moveToPreviousCard) {
+//            Image(systemName: "chevron.left")
+//                .font(.title2)
+//                .foregroundColor(canMoveToPrevious ? subcategory.color : .secondary)
+//        }
+//        .disabled(!canMoveToPrevious)
+//    }
+//    
+//    private var flipButton: some View {
+//        Button(action: toggleFlip) {
+//            Image(systemName: isFlipped ? "eye.slash" : "eye")
+//                .font(.title2)
+//                .foregroundColor(subcategory.color)
+//        }
+//    }
+//    
+//    private var nextButton: some View {
+//        Button(action: moveToNextCard) {
+//            Image(systemName: "chevron.right")
+//                .font(.title2)
+//                .foregroundColor(canMoveToNext ? subcategory.color : .secondary)
+//        }
+//        .disabled(!canMoveToNext)
+//    }
+//    
+//    // MARK: - Helper Properties
+//    private var canMoveToPrevious: Bool {
+//        currentIndex > 0
+//    }
+//    
+//    private var canMoveToNext: Bool {
+//        currentIndex < items.count - 1
+//    }
+//    
+//    private func toggleFlip() {
+//        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+//            isFlipped.toggle()
+//        }
+//    }
+//}
 
 // MARK: - Learning Card
 struct LearningCard: View {
@@ -716,8 +716,8 @@ struct VocabularyCardContent: View {
                             .foregroundColor(color)
                         
                         Text(item.definition)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.primary)
+                            .font(.custom("Fredoka-Medium", size: 16))
+                            .foregroundColor(.primary.opacity(0.8))
                     }
                     
                     VStack(alignment: .leading, spacing: 8) {
@@ -726,8 +726,8 @@ struct VocabularyCardContent: View {
                             .foregroundColor(color)
                         
                         Text(item.example)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.secondary)
+                            .font(.custom("Fredoka-Medium", size: 16))
+                            .foregroundColor(.primary.opacity(0.7))
                             .italic()
                     }
                     
