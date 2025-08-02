@@ -226,6 +226,42 @@ struct TestDetailLabel: View {
 }
 
 // MARK: - Test Navigation Overlay
+//struct TestNavigationOverlay: View {
+//    let isLoading: Bool
+//    let testQuestions: [Int: [QuestionItem]]
+//    @Binding var showTestingView: Bool
+//    @Binding var navigationTrigger: Bool
+//    
+//    var body: some View {
+//        NavigationLink(
+//            destination: destinationView,
+//            isActive: $showTestingView
+//        ) {
+//            EmptyView()
+//        }
+//        .hidden()
+//        .overlay {
+//            if isLoading {
+//                LoadingOverlay()
+//            }
+//        }
+//    }
+//    
+//    @ViewBuilder
+//    private var destinationView: some View {
+//        if navigationTrigger && !testQuestions.isEmpty {
+//            TestSimulatorScreen(questions: testQuestions)
+//        } else {
+//            // Fallback view - this shouldn't happen if everything works correctly
+//            Text("Loading test...")
+//                .onAppear {
+//                    print("TestNavigationOverlay: Fallback view appeared - this indicates an issue")
+//                }
+//        }
+//    }
+//}
+
+
 struct TestNavigationOverlay: View {
     let isLoading: Bool
     let testQuestions: [Int: [QuestionItem]]
@@ -250,9 +286,9 @@ struct TestNavigationOverlay: View {
     @ViewBuilder
     private var destinationView: some View {
         if navigationTrigger && !testQuestions.isEmpty {
-            TestSimulatorScreen(questions: testQuestions)
+            // Use the backend-enabled test simulator
+            BackendEnabledTestSimulatorScreen(questions: testQuestions)
         } else {
-            // Fallback view - this shouldn't happen if everything works correctly
             Text("Loading test...")
                 .onAppear {
                     print("TestNavigationOverlay: Fallback view appeared - this indicates an issue")
@@ -261,6 +297,113 @@ struct TestNavigationOverlay: View {
     }
 }
 
+// MARK: - Backend-Enabled Test Simulator Screen
+
+struct BackendEnabledTestSimulatorScreen: View {
+    @StateObject private var testManager: TestSimulationManager
+    @Environment(\.dismiss) private var dismiss
+    @State private var showQuestions = true
+    let questions: [Int: [QuestionItem]]
+    
+    init(questions: [Int: [QuestionItem]]) {
+        self.questions = questions
+        // Use the backend-enabled initializer
+        _testManager = StateObject(wrappedValue: TestSimulationManager(questionsWithBackend: questions))
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    TestHeaderView(
+                        currentPhase: testManager.currentPhase,
+                        currentPart: testManager.currentPart,
+                        onDismiss: { dismiss() }
+                    )
+
+                    switch testManager.currentPhase {
+                    case .preparation:
+                        TestPreparationView(
+                            onStartTest: testManager.startTestWithBackend // Use backend method
+                        )
+                    case .testing:
+                        ExamTestView(
+                            currentPart: testManager.currentPart,
+                            currentQuestionText: testManager.currentQuestionText,
+                            isExaminerSpeaking: testManager.isExaminerSpeaking,
+                            isUserSpeaking: testManager.isUserSpeaking,
+                            isRecording: testManager.isRecording,
+                            recordingTime: testManager.recordingTime,
+                            waveformData: testManager.audioPlayerManager.isPlaying ? generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                    case .completed:
+                        if let backendResults = testManager.backendResults {
+                            BackendResultsView(
+                                testResults: backendResults,
+                                localConversations: testManager.conversations
+                            )
+                        } else {
+                            TestCompletedView(onViewResults: {
+                                dismiss()
+                            })
+                        }
+                    case .processing:
+                        TestProcessingView(isProcessing: .constant(true))
+                            .overlay(
+                                VStack {
+                                    if SupabaseService.shared.isProcessing {
+                                        Text("AI is analyzing your responses...")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .padding(.top, 8)
+                                        
+                                        Text("This may take up to 2 minutes")
+                                            .font(.caption2)
+                                            .foregroundColor(.secondary)
+                                            .opacity(0.7)
+                                    }
+                                }
+                            )
+                            .onAppear {
+                                testManager.finalizeTest()
+                            }
+                    }
+                }
+            }
+            .navigationBarHidden(true)
+        }
+        .ignoresSafeArea()
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+    
+    private func generateVisualWaveformData(for currentTime: TimeInterval, duration: TimeInterval, isSpeaking: Bool) -> [Double] {
+        guard isSpeaking && duration > 0 else { return Array(repeating: 0.0, count: 50) }
+        let progress = currentTime / duration
+        let activeBarCount = Int(progress * Double(50))
+        var data = Array(repeating: 0.0, count: 50)
+        for i in 0..<50 {
+            if i < activeBarCount {
+                data[i] = Double.random(in: 0.3...1.0)
+            } else {
+                data[i] = 0.1
+            }
+        }
+        return data
+    }
+
+    private func generateUserVisualWaveformData(power: Float) -> [Double] {
+        var data = Array(repeating: 0.0, count: 30)
+        let normalizedPower = max(0.0, min(1.0, power))
+        for i in 0..<30 {
+            data[i] = Double(normalizedPower) * Double.random(in: 0.5...1.0)
+        }
+        return data
+    }
+}
 // MARK: - Loading Overlay
 struct LoadingOverlay: View {
     var body: some View {
@@ -276,14 +419,62 @@ struct LoadingOverlay: View {
 }
 
 // MARK: - Test Service (Extracted Business Logic)
+//class TestService {
+//    static let shared = TestService()
+//    private init() {}
+//    
+//    func fetchTestQuestions(testId: Int = 1) async throws -> [Int: [QuestionItem]] {
+//        // Fetch and decode into QuestionRow
+//        let response = try await supabase
+//            .from("qns")
+//            .select()
+//            .eq("test_id", value: testId)
+//            .order("part", ascending: true)
+//            .order("order", ascending: true)
+//            .execute()
+//            .value as [QuestionRow]
+//        
+//        print(response.count)
+//        
+//        var parts: [Int: [QuestionItem]] = [:]
+//        
+//        for row in response {
+//            do {
+//                // Download audio file from Supabase Storage
+//                let audioData = try await supabase.storage
+//                    .from("audio-question-set")
+//                    .download(path: row.audio_url)
+//                
+//                let item = QuestionItem(
+//                    id: row.id, part: row.part,
+//                    order: row.order,
+//                    questionText: row.question_text,
+//                    audioFile: audioData
+//                )
+//                
+////                print(item)
+//                
+//                let normalizedPart = row.part - 1
+//                parts[normalizedPart, default: []].append(item)
+//            } catch {
+//                print("⚠️ Failed to download audio: \(row.audio_url) - \(error.localizedDescription)")
+//            }
+//        }
+//        return parts
+//    }
+//}
+
+
 class TestService {
     static let shared = TestService()
     private init() {}
     
     func fetchTestQuestions(testId: Int = 1) async throws -> [Int: [QuestionItem]] {
+        print("🔍 Fetching questions for test ID: \(testId)")
+        
         // Fetch and decode into QuestionRow
         let response = try await supabase
-            .from("questions")
+            .from("qns")
             .select()
             .eq("test_id", value: testId)
             .order("part", ascending: true)
@@ -291,32 +482,54 @@ class TestService {
             .execute()
             .value as [QuestionRow]
         
-        print(response.count)
+        print("📥 Fetched \(response.count) question rows from database")
+        
+        // Debug: Print first row structure
+        if let firstRow = response.first {
+            print("🔍 First row structure:")
+            print("   ID: \(firstRow.id) (type: \(type(of: firstRow.id)))")
+            print("   Part: \(firstRow.part)")
+            print("   Order: \(firstRow.order)")
+            print("   Audio URL: \(firstRow.audio_url)")
+        }
         
         var parts: [Int: [QuestionItem]] = [:]
         
         for row in response {
             do {
+                print("📥 Processing question ID \(row.id): \(row.question_text.prefix(30))...")
+                
                 // Download audio file from Supabase Storage
                 let audioData = try await supabase.storage
                     .from("audio-question-set")
                     .download(path: row.audio_url)
                 
+                print("✅ Downloaded audio for question \(row.id): \(audioData.count) bytes")
+                
                 let item = QuestionItem(
+                    id: row.stringId,  // Use the string conversion
                     part: row.part,
                     order: row.order,
                     questionText: row.question_text,
                     audioFile: audioData
                 )
                 
-//                print(item)
-                
-                let normalizedPart = row.part - 1
+                let normalizedPart = row.part - 1  // Convert 1,2,3 to 0,1,2
                 parts[normalizedPart, default: []].append(item)
+                
+                print("✅ Added question \(row.stringId) to part \(normalizedPart)")
+                
             } catch {
-                print("⚠️ Failed to download audio: \(row.audio_url) - \(error.localizedDescription)")
+                print("❌ Failed to process question \(row.id): \(error.localizedDescription)")
+                // Continue with other questions instead of failing completely
             }
         }
+        
+        print("📊 Final question distribution:")
+        for (part, items) in parts.sorted(by: { $0.key < $1.key }) {
+            print("   Part \(part): \(items.count) questions")
+        }
+        
         return parts
     }
 }

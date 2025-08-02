@@ -158,6 +158,56 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
         }
     }
 
+//    func startRecording() throws {
+//        guard !isRecording else {
+//            print("AudioRecorderManager: Already recording.")
+//            return
+//        }
+//
+//        // Always attempt to set the category and activate the session
+//        let audioSession = AVAudioSession.sharedInstance()
+//        do {
+//            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
+//            try audioSession.setActive(true)
+//            print("AudioRecorderManager: Ensured audio session is active for recording.")
+//        } catch {
+//            print("AudioRecorderManager: Failed to set or activate audio session for recording: \(error.localizedDescription)")
+//            throw error // Propagate error if session cannot be activated
+//        }
+//
+//        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
+//        currentRecordedAudioURL = audioFilename
+//
+//        let settings = [
+//            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+//            AVSampleRateKey: 12000,
+//            AVNumberOfChannelsKey: 1,
+//            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+//        ]
+//
+//        do {
+//            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+//            audioRecorder?.delegate = self
+//            audioRecorder?.isMeteringEnabled = true
+//            audioRecorder?.prepareToRecord()
+//
+//            if audioRecorder?.record() == true {
+//                isRecording = true
+//                recordingTime = 0
+//                startRecordingTimer()
+//                print("AudioRecorderManager: Recording started to: \(audioFilename.lastPathComponent)")
+//            } else {
+//                isRecording = false
+//                print("AudioRecorderManager: Failed to start recording (record() returned false).")
+//            }
+//        } catch {
+//            isRecording = false
+//            print("AudioRecorderManager: Error starting recording: \(error.localizedDescription)")
+//            throw error
+//        }
+//    }
+
+    
     func startRecording() throws {
         guard !isRecording else {
             print("AudioRecorderManager: Already recording.")
@@ -178,11 +228,13 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
         let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
         currentRecordedAudioURL = audioFilename
 
+        // Optimized settings for smaller file sizes while maintaining quality
         let settings = [
             AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 12000,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+            AVSampleRateKey: 16000,        // Reduced from 12000 to 16000 for better speech quality
+            AVNumberOfChannelsKey: 1,       // Mono
+            AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue,  // Changed from high to medium
+            AVEncoderBitRateKey: 32000      // Add explicit bit rate limit (32 kbps)
         ]
 
         do {
@@ -196,6 +248,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
                 recordingTime = 0
                 startRecordingTimer()
                 print("AudioRecorderManager: Recording started to: \(audioFilename.lastPathComponent)")
+                print("AudioRecorderManager: Using optimized settings - 16kHz, mono, medium quality, 32kbps")
             } else {
                 isRecording = false
                 print("AudioRecorderManager: Failed to start recording (record() returned false).")
@@ -206,7 +259,6 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
             throw error
         }
     }
-
     func stopRecording() -> URL? {
         if audioRecorder?.isRecording == true {
             audioRecorder?.stop()
@@ -450,6 +502,10 @@ class TestSimulationManager: ObservableObject {
     @Published var part2SpeakingTimeRemaining: TimeInterval = 120
     @Published var currentQuestionText: String = ""
     @Published var errorMessage: String?
+    @Published var backendResults: TestResults?
+    @Published var isUploadingResponses = false
+    private var questionIds: [String] = [] // Store question IDs from backend
+    private var questionIdMapping: [String: String] = [:]
 
     let audioPlayerManager = AudioPlayerManager()
     let audioRecorderManager = AudioRecorderManager()
@@ -481,19 +537,19 @@ class TestSimulationManager: ObservableObject {
         audioPlayerManager.$isPlaying
             .assign(to: \.isExaminerSpeaking, on: self)
             .store(in: &cancellables)
-
+        
         audioRecorderManager.$isRecording
             .assign(to: \.isRecording, on: self)
             .store(in: &cancellables)
-
+        
         audioRecorderManager.$recordingTime
             .assign(to: \.recordingTime, on: self)
             .store(in: &cancellables)
-
+        
         speechRecognizerManager.$isSpeechDetected
             .assign(to: \.isUserSpeaking, on: self)
             .store(in: &cancellables)
-
+        
         speechRecognizerManager.$error
             .compactMap { $0 }
             .sink { [weak self] error in
@@ -501,38 +557,32 @@ class TestSimulationManager: ObservableObject {
                 print("TestSimulationManager: Speech Recognition Error: \(error)")
             }
             .store(in: &cancellables)
-        
-        // REMOVE OR COMMENT OUT THIS PROBLEMATIC SUBSCRIPTION
-        // This subscription might be interfering with the proper flow
-        /*
-        audioPlayerManager.$isPlaying
-            .filter { !$0 && self.isExaminerSpeaking }
-            .sink { [weak self] _ in
-                if self?.errorMessage == nil {
-                    // This empty block was doing nothing anyway
-                }
-            }
-            .store(in: &cancellables)
-        */
     }
-
+    
     func startTest() {
-            print("TestSimulationManager: startTest() called")
-            print("Current questions keys: \(Array(questions.keys).sorted())")
+        print("TestSimulationManager: startTest() called")
+        print("Current questions keys: \(Array(questions.keys).sorted())")
+        
+        currentPhase = .testing
+        
+        // Initialize backend session first
+        Task {
+            await initializeBackendSession()
             
-            currentPhase = .testing
-            requestAudioAndSpeechPermissions { [weak self] success in
-                if success {
-                    print("TestSimulationManager: Permissions granted. Starting conversation flow.")
-                    self?.startConversationFlow()
-                } else {
-                    self?.errorMessage = "Microphone and Speech Recognition permissions are required to start the test. Please enable them in Settings."
-                    self?.currentPhase = .preparation
-                    print("TestSimulationManager: Permissions denied. Test cannot start.")
+            await MainActor.run {
+                requestAudioAndSpeechPermissions { [weak self] success in
+                    if success {
+                        print("TestSimulationManager: Permissions granted. Starting conversation flow.")
+                        self?.startConversationFlow()
+                    } else {
+                        self?.errorMessage = "Microphone and Speech Recognition permissions are required."
+                        self?.currentPhase = .preparation
+                    }
                 }
             }
         }
-
+    }
+    
     private func requestAudioAndSpeechPermissions(completion: @escaping (Bool) -> Void) {
         AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
             SFSpeechRecognizer.requestAuthorization { speechGranted in
@@ -784,13 +834,14 @@ class TestSimulationManager: ObservableObject {
             }
         }
     }
-
+    
     private func stopUserResponseAndSave(part: Int, order: Int, questionText: String, transcript: String = "") {
         let recordedURL = audioRecorderManager.stopRecording()
         speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
 
         let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
 
+        // Save locally (existing logic)
         DispatchQueue.global(qos: .background).async { [weak self] in
             let newConversation = Conversation(
                 part: part,
@@ -801,16 +852,49 @@ class TestSimulationManager: ObservableObject {
             )
             DispatchQueue.main.async {
                 self?.conversations.append(newConversation)
-                print("TestSimulationManager: Saved conversation for Part \(part), Question: '\(questionText.prefix(30))...'")
-                if let url = recordedURL {
-                    print("TestSimulationManager: Recorded audio saved to: \(url.lastPathComponent)")
-                } else {
-                    print("TestSimulationManager: No audio recorded for this response.")
+                print("TestSimulationManager: Saved conversation for Part \(part)")
+            }
+            
+            // Upload to backend
+            if let audioURL = recordedURL,
+               let sessionId = SupabaseService.shared.currentSession?.id {
+                
+                Task {
+                    do {
+                        // You'll need to get the actual question ID from your backend
+                        // For now, generate a mock ID or fetch from your questions data
+                        let questionId = self?.getQuestionId(part: part, order: order) ?? UUID().uuidString
+                        
+                        try await SupabaseService.shared.uploadResponse(
+                            sessionId: sessionId,
+                            questionId: questionId,
+                            audioURL: audioURL,
+                            part: part,
+                            order: order
+                        )
+                        print("✅ Uploaded response for Part \(part), Question \(order)")
+                    } catch {
+                        print("❌ Failed to upload response: \(error)")
+                        await MainActor.run {
+                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
+                        }
+                    }
                 }
             }
         }
     }
-
+    
+    private func getQuestionId(part: Int, order: Int) -> String? {
+        // Since your questions come from the 'qns' table, you should store the IDs
+        // when you download them. For now, return a placeholder:
+        
+        // TODO: Update your TestService.fetchTestQuestions to return question IDs too
+        // and store them in TestSimulationManager
+        
+        return "placeholder-question-id-part\(part)-order\(order)"
+    }
+    
+    
     private func nextQuestionOrPart() {
         // Clean up all timers and audio operations
         preparationTimer?.invalidate()
@@ -862,11 +946,29 @@ class TestSimulationManager: ObservableObject {
             currentPhase = .processing
         }
     }
-
-    // MARK: - Test Completion
+    
     func finalizeTest() {
-        currentPhase = .completed
-        print("TestSimulationManager: Test completed. Final conversations: \(conversations.count)")
+        currentPhase = .processing
+        
+        Task {
+            // Wait a moment for final uploads to complete
+            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            
+            // Process with backend
+            if let results = await processTestWithBackend() {
+                await MainActor.run {
+                    self.backendResults = results
+                    self.currentPhase = .completed
+                    print("TestSimulationManager: Test completed with backend results")
+                }
+            } else {
+                await MainActor.run {
+                    // Fallback to local results if backend fails
+                    self.currentPhase = .completed
+                    print("TestSimulationManager: Test completed with local results only")
+                }
+            }
+        }
     }
 }
 
@@ -908,28 +1010,35 @@ struct TestSimulatorScreen: View {
                             isRecording: testManager.isRecording,
                             recordingTime: testManager.recordingTime,
                             waveformData: testManager.audioPlayerManager.isPlaying ? generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
-                            userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30),
-//                            part2PreparationTimeRemaining: testManager.part2PreparationTimeRemaining, // Pass Part 2 specific times
-//                            part2SpeakingTimeRemaining: testManager.part2SpeakingTimeRemaining
-                        )
-                        // No .onAppear here for starting flow, testManager handles it
-                        // The flow is started by testManager.startTest()
-                        // and then progresses based on internal state changes.
-
-                    case .processing:
-                        TestProcessingView(isProcessing: .constant(true)) // Assuming processing once entered
-                            .onAppear {
-                                // Simulate processing time
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-                                    testManager.finalizeTest()
-                                }
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                        case .completed:
+                            if let backendResults = testManager.backendResults {
+                                BackendResultsView(
+                                    testResults: backendResults,
+                                    localConversations: testManager.conversations
+                                )
+                            } else {
+                                TestCompletedView(onViewResults: {
+                                    dismiss()
+                                    // Show local results or error message
+                                })
                             }
-                    case .completed:
-                        TestCompletedView(onViewResults: {
-                            dismiss()
-                            // In a real app, you would navigate to a results screen here
-                            // You could pass testManager.conversations to the results view
-                        })
+                        case .processing:
+                            TestProcessingView(isProcessing: .constant(true))
+                                .overlay(
+                                    VStack {
+                                        if SupabaseService.shared.isProcessing {
+                                            Text("AI is analyzing your responses...")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                                .padding(.top, 8)
+                                        }
+                                    }
+                                )
+                                .onAppear {
+                                    // Your existing processing logic, but now handled by testManager.finalizeTest()
+                                    testManager.finalizeTest()
+                                } 
                     }
                 }
             }
@@ -993,34 +1102,345 @@ struct WaveformView: View {
 struct TestSimulatorScreen_Previews: PreviewProvider {
     static var previews: some View {
         // Create dummy audio data for preview purposes
-        // In a real app, this data would come from your backend/downloaded files.
-        let dummyAudioData = "dummy audio data for testing".data(using: .utf8)! // Replace with actual audio data if possible for better testing
+        let dummyAudioData = "dummy audio data for testing".data(using: .utf8)!
 
         let mockTestQuestions: [Int: [QuestionItem]] = [
             0: [ // Part 1
-                QuestionItem(part: 1, order: 1, questionText: "Let's talk about your hometown. Where are you from?", audioFile: dummyAudioData),
-                QuestionItem(part: 1, order: 2, questionText: "What do you like most about your hometown?", audioFile: dummyAudioData),
-                QuestionItem(part: 1, order: 3, questionText: "Is there anything you would like to change about it?", audioFile: dummyAudioData)
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 1,
+                    questionText: "Let's talk about your hometown. Where are you from?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 2,
+                    questionText: "What do you like most about your hometown?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 3,
+                    questionText: "Is there anything you would like to change about it?",
+                    audioFile: dummyAudioData
+                )
             ],
             1: [ // Part 2 (Cue Card)
-                QuestionItem(part: 1, order: 1, questionText: """
-                Describe a time you helped someone.
-                You should say:
-                - who you helped
-                - what the situation was
-                - how you helped them
-                and explain how you felt after helping this person.
-                """, audioFile: dummyAudioData)
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 2,
+                    order: 1,
+                    questionText: """
+                    Describe a time you helped someone.
+                    You should say:
+                    - who you helped
+                    - what the situation was
+                    - how you helped them
+                    and explain how you felt after helping this person.
+                    """,
+                    audioFile: dummyAudioData
+                )
             ],
             2: [ // Part 3
-                QuestionItem(part: 1, order: 1, questionText: "Let's discuss helping others in general. Why do people choose to help others?", audioFile: dummyAudioData),
-                QuestionItem(part: 1, order: 2, questionText: "Do you think people today are more or less willing to help others compared to the past?", audioFile: dummyAudioData),
-                QuestionItem(part: 1, order: 3, questionText: "What are some of the benefits of volunteering in the community?", audioFile: dummyAudioData)
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 1,
+                    questionText: "Let's discuss helping others in general. Why do people choose to help others?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 2,
+                    questionText: "Do you think people today are more or less willing to help others compared to the past?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 3,
+                    questionText: "What are some of the benefits of volunteering in the community?",
+                    audioFile: dummyAudioData
+                )
             ]
         ]
 
         TestSimulatorScreen(questions: mockTestQuestions)
-            .environment(\.colorScheme, .light) // Example for light mode
+            .environment(\.colorScheme, .light)
     }
 }
 
+
+
+// MARK: - Enhanced TestSimulationManager with Backend Integration
+
+extension TestSimulationManager {
+    
+    // MARK: - Backend Integration Methods
+    
+    /// Initialize test session with backend
+    func initializeBackendSession() async {
+        do {
+            let session = try await SupabaseService.shared.createTestSession()
+            print("✅ Backend session created: \(session.id)")
+        } catch {
+            print("❌ Failed to create backend session: \(error)")
+            self.errorMessage = "Failed to initialize test session: \(error.localizedDescription)"
+        }
+    }
+    
+    /// Enhanced method to save response with backend upload
+    private func stopUserResponseAndSaveWithBackend(
+        part: Int,
+        order: Int,
+        questionId: String,
+        questionText: String,
+        transcript: String = ""
+    ) {
+        let recordedURL = audioRecorderManager.stopRecording()
+        speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
+
+        let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
+
+        // Save locally first (existing logic)
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            let newConversation = Conversation(
+                part: part,
+                order: order,
+                question: questionText,
+                answer: answerText,
+                errors: []
+            )
+            
+            DispatchQueue.main.async {
+                self?.conversations.append(newConversation)
+                print("TestSimulationManager: Saved conversation locally for Part \(part)")
+            }
+            
+            // Upload to backend if we have audio and session
+            if let audioURL = recordedURL,
+               let sessionId = SupabaseService.shared.currentSession?.id {
+                
+                Task {
+                    do {
+                        try await SupabaseService.shared.uploadResponse(
+                            sessionId: sessionId,
+                            questionId: questionId,
+                            audioURL: audioURL,
+                            part: part,
+                            order: order
+                        )
+                        print("✅ Uploaded response for Part \(part), Question \(order)")
+                    } catch {
+                        print("❌ Failed to upload response: \(error)")
+                        DispatchQueue.main.async {
+                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /// Process test completion with backend
+//    func processTestWithBackend() async -> TestResults? {
+//        guard let sessionId = SupabaseService.shared.currentSession?.id else {
+//            print("❌ No active session for processing")
+//            return nil
+//        }
+//        
+//        do {
+//            // Wait for backend processing to complete
+//            SupabaseService.shared.isProcessing = true
+//            let results = try await SupabaseService.shared.waitForResults(sessionId: sessionId)
+//            SupabaseService.shared.isProcessing = false
+//            
+//            print("✅ Got results from backend:")
+//            print("   Overall Band Score: \(results.overallBandScore)")
+//            print("   Fluency: \(results.fluencyScore)")
+//            print("   Pronunciation: \(results.pronunciationScore)")
+//            
+//            return results
+//            
+//        } catch {
+//            print("❌ Failed to get results: \(error)")
+//            SupabaseService.shared.isProcessing = false
+//            self.errorMessage = "Failed to process results: \(error.localizedDescription)"
+//            return nil
+//        }
+//    }
+    
+    func processTestWithBackend() async -> TestResults? {
+            guard let sessionId = SupabaseService.shared.currentSession?.id else {
+                print("❌ No active session for processing")
+                return nil
+            }
+            
+            do {
+                await MainActor.run {
+                    SupabaseService.shared.isProcessing = true
+                }
+                
+                let results = try await SupabaseService.shared.waitForResults(sessionId: sessionId)
+                
+                await MainActor.run {
+                    SupabaseService.shared.isProcessing = false
+                }
+                
+                print("✅ Got results from backend:")
+                print("   Overall Band Score: \(results.overallBandScore)")
+                print("   Fluency: \(results.fluencyScore)")
+                print("   Pronunciation: \(results.pronunciationScore)")
+                
+                return results
+                
+            } catch {
+                print("❌ Failed to get results: \(error)")
+                await MainActor.run {
+                    SupabaseService.shared.isProcessing = false
+                    self.errorMessage = "Failed to process results: \(error.localizedDescription)"
+                }
+                return nil
+            }
+        }
+}
+
+// MARK: - Updated Test Start Method
+
+extension TestSimulationManager {
+    
+    /// Enhanced start test with backend initialization
+    func startTestWithBackend() {
+        print("TestSimulationManager: startTestWithBackend() called")
+        
+        currentPhase = .testing
+        
+        // First initialize backend session
+        Task {
+            await initializeBackendSession()
+            
+            // Then request permissions and start
+            await MainActor.run {
+                requestAudioAndSpeechPermissions { [weak self] success in
+                    if success {
+                        print("TestSimulationManager: Permissions granted. Starting conversation flow.")
+                        self?.startConversationFlow()
+                    } else {
+                        self?.errorMessage = "Microphone and Speech Recognition permissions are required to start the test. Please enable them in Settings."
+                        self?.currentPhase = .preparation
+                        print("TestSimulationManager: Permissions denied. Test cannot start.")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+// Add this extension to your existing TestSimulationManager.swift file
+
+extension TestSimulationManager {
+    
+    // MARK: - Enhanced Initialization with Question ID Mapping
+    
+    convenience init(questionsWithBackend questions: [Int: [QuestionItem]]) {
+        self.init(questions: questions)
+        buildQuestionIdMapping()
+    }
+    
+    private func buildQuestionIdMapping() {
+        questionIdMapping.removeAll()
+        
+        for (part, items) in questions {
+            for (index, item) in items.enumerated() {
+                let key = "\(part)_\(index)" // part_order key
+                questionIdMapping[key] = item.id
+                print("Mapped \(key) -> \(item.id)")
+            }
+        }
+        
+        print("Question ID mapping completed: \(questionIdMapping.count) mappings")
+    }
+    
+    // MARK: - Enhanced Response Saving with Proper Question IDs
+    
+    private func stopUserResponseAndSaveWithBackend(
+        part: Int,
+        order: Int,
+        questionText: String,
+        transcript: String = ""
+    ) {
+        let recordedURL = audioRecorderManager.stopRecording()
+        speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
+
+        let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
+
+        // Save locally first (existing logic)
+        DispatchQueue.global(qos: .background).async { [weak self] in
+            let newConversation = Conversation(
+                part: part,
+                order: order,
+                question: questionText,
+                answer: answerText,
+                errors: []
+            )
+            
+            DispatchQueue.main.async {
+                self?.conversations.append(newConversation)
+                print("TestSimulationManager: Saved conversation locally for Part \(part)")
+            }
+            
+            // Upload to backend if we have audio and session
+            if let audioURL = recordedURL,
+               let sessionId = SupabaseService.shared.currentSession?.id,
+               let questionId = self?.getQuestionId(part: part, order: order) {
+                
+                Task {
+                    do {
+                        try await SupabaseService.shared.uploadResponse(
+                            sessionId: sessionId,
+                            questionId: questionId,
+                            audioURL: audioURL,
+                            part: part,
+                            order: order
+                        )
+                        print("✅ Uploaded response for Part \(part), Question \(order)")
+                    } catch {
+                        print("❌ Failed to upload response: \(error)")
+                        await MainActor.run {
+                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
+                        }
+                    }
+                }
+            } else {
+                print("❌ Missing data for upload: audioURL=\(recordedURL != nil), sessionId=\(SupabaseService.shared.currentSession?.id != nil), questionId=\(self?.getQuestionId(part: part, order: order) != nil)")
+            }
+        }
+    }
+    
+    // MARK: - Get Question ID Helper
+    
+//    private func getQuestionId(part: Int, order: Int) -> String? {
+//        let key = "\(part)_\(order)"
+//        let questionId = questionIdMapping[key]
+//        print("Getting question ID for \(key): \(questionId ?? "nil")")
+//        return questionId
+//    }
+//    
+//    // MARK: - Update stopUserResponseAndSave to use backend method
+//    
+//    func stopUserResponseAndSave(part: Int, order: Int, questionText: String, transcript: String = "") {
+//        // Use the backend-enabled version
+//        stopUserResponseAndSaveWithBackend(
+//            part: part,
+//            order: order,
+//            questionText: questionText,
+//            transcript: transcript
+//        )
+//    }
+}
