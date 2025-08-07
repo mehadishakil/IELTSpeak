@@ -358,16 +358,25 @@ class TestSimulationManager: ObservableObject {
                 print("TestSimulationManager: Saved conversation for Part \(part)")
             }
             
-            // Upload to backend
+            // Upload to backend with comprehensive logging
+            print("🔍 Checking upload prerequisites for Part \(part), Order \(order)")
+            let audioExists = recordedURL != nil
+            let sessionExists = SupabaseService.shared.currentSession?.id != nil
+            let questionId = self?.getQuestionId(part: part, order: order)
+            let questionIdExists = questionId != nil
+            
+            print("   Audio URL: \(audioExists ? "✅" : "❌")")
+            print("   Session ID: \(sessionExists ? "✅" : "❌")")
+            print("   Question ID: \(questionIdExists ? "✅" : "❌") [\(questionId ?? "nil")]")
+            
             if let audioURL = recordedURL,
-               let sessionId = SupabaseService.shared.currentSession?.id {
+               let sessionId = SupabaseService.shared.currentSession?.id,
+               let questionId = questionId {
+                
+                print("🚀 Starting upload for Part \(part), Question \(order)")
                 
                 Task {
                     do {
-                        // You'll need to get the actual question ID from your backend
-                        // For now, generate a mock ID or fetch from your questions data
-                        let questionId = self?.getQuestionId(part: part, order: order) ?? UUID().uuidString
-                        
                         try await SupabaseService.shared.uploadResponse(
                             sessionId: sessionId,
                             questionId: questionId,
@@ -375,25 +384,48 @@ class TestSimulationManager: ObservableObject {
                             part: part,
                             order: order
                         )
-                        print("✅ Uploaded response for Part \(part), Question \(order)")
+                        print("✅ Successfully uploaded response for Part \(part), Question \(order)")
                     } catch {
-                        print("❌ Failed to upload response: \(error)")
+                        print("❌ Upload failed for Part \(part), Question \(order): \(error)")
                         await MainActor.run {
                             self?.errorMessage = "Upload failed: \(error.localizedDescription)"
                         }
                     }
+                }
+            } else {
+                print("❌ Cannot upload Part \(part), Question \(order) - missing prerequisites")
+                if !audioExists {
+                    print("   Missing: Audio recording")
+                }
+                if !sessionExists {
+                    print("   Missing: Backend session")
+                }
+                if !questionIdExists {
+                    print("   Missing: Question ID mapping")
                 }
             }
         }
     }
     
     private func getQuestionId(part: Int, order: Int) -> String? {
-        let key = "\(part)_\(order)"
-        let questionId = questionIdMapping[key]
-        print("🔍 Getting question ID for part \(part), order \(order) (key: \(key)): \(questionId ?? "nil")")
+        // Try multiple key formats to handle part normalization differences
+        let possibleKeys = [
+            "\(part)_\(order)",           // Current format
+            "\(part-1)_\(order)",         // Normalized format
+            "\(part)_\(order+1)",         // Index-based
+            "\(part-1)_\(order+1)"        // Normalized index-based
+        ]
         
-        // Database already provides UUID format, no conversion needed
-        return questionId
+        for key in possibleKeys {
+            if let questionId = questionIdMapping[key] {
+                print("🔍 Found question ID for part \(part), order \(order) using key '\(key)': \(questionId.prefix(8))...")
+                return questionId
+            }
+        }
+        
+        print("❌ No question ID found for part \(part), order \(order). Tried keys: \(possibleKeys)")
+        print("   Available mappings: \(questionIdMapping.keys.sorted().joined(separator: ", "))")
+        return nil
     }
     
     
@@ -858,19 +890,37 @@ extension TestSimulationManager {
     private func buildQuestionIdMapping() {
         questionIdMapping.removeAll()
         
-        for (part, items) in questions {
-            for item in items {
-                let key = "\(part)_\(item.order)"  // Use actual order from question, not array index
-                questionIdMapping[key] = item.id
-                print("🗂️ Mapped \(key) -> \(item.id)")
+        for (normalizedPart, items) in questions {
+            // Convert normalized part (0,1,2) back to database part (1,2,3)
+            let databasePart = normalizedPart + 1
+            
+            for (index, item) in items.enumerated() {
+                // Try multiple key formats to ensure mapping works
+                let keys = [
+                    "\(databasePart)_\(item.order)",  // Database format: "1_1", "1_2", etc.
+                    "\(normalizedPart)_\(item.order)", // Normalized format: "0_1", "0_2", etc.
+                    "\(databasePart)_\(index + 1)",   // Index-based: "1_1", "1_2", etc.
+                    "\(normalizedPart)_\(index + 1)"  // Normalized index: "0_1", "0_2", etc.
+                ]
+                
+                // Map all possible key formats to the same question ID
+                for key in keys {
+                    questionIdMapping[key] = item.id
+                    print("🗂️ Mapped \(key) -> \(item.id)")
+                }
             }
         }
         
         print("✅ Question ID mapping completed: \(questionIdMapping.count) mappings")
         
-        // Debug: Print all mappings
-        for (key, questionId) in questionIdMapping.sorted(by: { $0.key < $1.key }) {
-            print("   \(key) -> \(questionId)")
+        // Debug: Print unique mappings only
+        let uniqueQuestionIds = Set(questionIdMapping.values)
+        print("📊 Mapped \(uniqueQuestionIds.count) unique questions with \(questionIdMapping.count) total key mappings")
+        
+        // Show a sample of mappings
+        let sampleMappings = questionIdMapping.sorted(by: { $0.key < $1.key }).prefix(10)
+        for (key, questionId) in sampleMappings {
+            print("   \(key) -> \(questionId.prefix(8))...")
         }
     }
     
@@ -903,9 +953,21 @@ extension TestSimulationManager {
             }
             
             // Upload to backend if we have audio and session
+            print("🔍 Checking upload prerequisites for Part \(part), Order \(order)")
+            let audioExists = recordedURL != nil
+            let sessionExists = SupabaseService.shared.currentSession?.id != nil
+            let questionId = self?.getQuestionId(part: part, order: order)
+            let questionIdExists = questionId != nil
+            
+            print("   Audio URL: \(audioExists ? "✅" : "❌")")
+            print("   Session ID: \(sessionExists ? "✅" : "❌")")
+            print("   Question ID: \(questionIdExists ? "✅" : "❌") [\(questionId ?? "nil")]")
+            
             if let audioURL = recordedURL,
                let sessionId = SupabaseService.shared.currentSession?.id,
-               let questionId = self?.getQuestionId(part: part, order: order) {
+               let questionId = questionId {
+                
+                print("🚀 Starting upload for Part \(part), Question \(order)")
                 
                 Task {
                     do {
@@ -916,16 +978,16 @@ extension TestSimulationManager {
                             part: part,
                             order: order
                         )
-                        print("✅ Uploaded response for Part \(part), Question \(order)")
+                        print("✅ Successfully uploaded response for Part \(part), Question \(order)")
                     } catch {
-                        print("❌ Failed to upload response: \(error)")
+                        print("❌ Upload failed for Part \(part), Question \(order): \(error)")
                         await MainActor.run {
                             self?.errorMessage = "Upload failed: \(error.localizedDescription)"
                         }
                     }
                 }
             } else {
-                print("❌ Missing data for upload: audioURL=\(recordedURL != nil), sessionId=\(SupabaseService.shared.currentSession?.id != nil), questionId=\(self?.getQuestionId(part: part, order: order) != nil)")
+                print("❌ Cannot upload Part \(part), Question \(order) - missing prerequisites")
             }
         }
     }
