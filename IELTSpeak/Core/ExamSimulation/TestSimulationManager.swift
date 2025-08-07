@@ -43,11 +43,12 @@ class TestSimulationManager: ObservableObject {
                 for (part, items) in questions {
                     print("Part \(part): \(items.count) questions")
                     for (index, item) in items.enumerated() {
-                        print("  Q\(index + 1): \(item.questionText.prefix(50))...")
+                        print("  Q\(index + 1): \(item.questionText.prefix(50))... (ID: \(item.id))")
                     }
                 }
         
         setupBindings()
+        buildQuestionIdMapping()  // Build question ID mapping on initialization
     }
 
     private func setupBindings() {
@@ -387,13 +388,12 @@ class TestSimulationManager: ObservableObject {
     }
     
     private func getQuestionId(part: Int, order: Int) -> String? {
-        // Since your questions come from the 'qns' table, you should store the IDs
-        // when you download them. For now, return a placeholder:
+        let key = "\(part)_\(order)"
+        let questionId = questionIdMapping[key]
+        print("🔍 Getting question ID for part \(part), order \(order) (key: \(key)): \(questionId ?? "nil")")
         
-        // TODO: Update your TestService.fetchTestQuestions to return question IDs too
-        // and store them in TestSimulationManager
-        
-        return "placeholder-question-id-part\(part)-order\(order)"
+        // Database already provides UUID format, no conversion needed
+        return questionId
     }
     
     
@@ -859,14 +859,19 @@ extension TestSimulationManager {
         questionIdMapping.removeAll()
         
         for (part, items) in questions {
-            for (index, item) in items.enumerated() {
-                let key = "\(part)_\(index)" // part_order key
+            for item in items {
+                let key = "\(part)_\(item.order)"  // Use actual order from question, not array index
                 questionIdMapping[key] = item.id
-                print("Mapped \(key) -> \(item.id)")
+                print("🗂️ Mapped \(key) -> \(item.id)")
             }
         }
         
-        print("Question ID mapping completed: \(questionIdMapping.count) mappings")
+        print("✅ Question ID mapping completed: \(questionIdMapping.count) mappings")
+        
+        // Debug: Print all mappings
+        for (key, questionId) in questionIdMapping.sorted(by: { $0.key < $1.key }) {
+            print("   \(key) -> \(questionId)")
+        }
     }
     
     // MARK: - Enhanced Response Saving with Proper Question IDs
@@ -925,24 +930,4 @@ extension TestSimulationManager {
         }
     }
     
-    // MARK: - Get Question ID Helper
-    
-//    private func getQuestionId(part: Int, order: Int) -> String? {
-//        let key = "\(part)_\(order)"
-//        let questionId = questionIdMapping[key]
-//        print("Getting question ID for \(key): \(questionId ?? "nil")")
-//        return questionId
-//    }
-//    
-//    // MARK: - Update stopUserResponseAndSave to use backend method
-//    
-//    func stopUserResponseAndSave(part: Int, order: Int, questionText: String, transcript: String = "") {
-//        // Use the backend-enabled version
-//        stopUserResponseAndSaveWithBackend(
-//            part: part,
-//            order: order,
-//            questionText: questionText,
-//            transcript: transcript
-//        )
-//    }
 }

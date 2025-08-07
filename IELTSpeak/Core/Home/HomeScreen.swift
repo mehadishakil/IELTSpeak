@@ -93,7 +93,7 @@ struct HomeScreen: View {
             Task {
                 do {
                     print("HomeScreen: Fetching test questions...")
-                    testQuestions = try await TestService.shared.fetchTestQuestions(testId: 1)
+                    testQuestions = try await TestService.shared.fetchTestQuestions()
                     
                     print("HomeScreen: Questions fetched successfully:")
                     for (part, items) in testQuestions {
@@ -469,16 +469,16 @@ class TestService {
     static let shared = TestService()
     private init() {}
     
-    func fetchTestQuestions(testId: Int = 1) async throws -> [Int: [QuestionItem]] {
-        print("🔍 Fetching questions for test ID: \(testId)")
+    func fetchTestQuestions(testTemplateId: String = "550e8400-e29b-41d4-a716-446655440000") async throws -> [Int: [QuestionItem]] {
+        print("🔍 Fetching questions for test template ID: \(testTemplateId)")
         
-        // Fetch and decode into QuestionRow
+        // Fetch and decode into QuestionRow with correct column names
         let response = try await supabase
-            .from("qns")
+            .from("questions")
             .select()
-            .eq("test_id", value: testId)
-            .order("part", ascending: true)
-            .order("order", ascending: true)
+            .eq("test_template_id", value: testTemplateId)  // Use UUID string instead of integer
+            .order("part_number", ascending: true) // Changed from part to part_number
+            .order("question_order", ascending: true) // Changed from order to question_order
             .execute()
             .value as [QuestionRow]
         
@@ -507,7 +507,7 @@ class TestService {
                 print("✅ Downloaded audio for question \(row.id): \(audioData.count) bytes")
                 
                 let item = QuestionItem(
-                    id: row.stringId,  // Use the string conversion
+                    id: row.id,  // Database ID is already a UUID string
                     part: row.part,
                     order: row.order,
                     questionText: row.question_text,
@@ -517,7 +517,7 @@ class TestService {
                 let normalizedPart = row.part - 1  // Convert 1,2,3 to 0,1,2
                 parts[normalizedPart, default: []].append(item)
                 
-                print("✅ Added question \(row.stringId) to part \(normalizedPart)")
+                print("✅ Added question \(row.id) to part \(normalizedPart)")
                 
             } catch {
                 print("❌ Failed to process question \(row.id): \(error.localizedDescription)")
