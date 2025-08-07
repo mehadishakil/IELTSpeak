@@ -44,7 +44,16 @@
       "colorHex": "#9966E6",
       "lessonCount": 100,
       "illustration": "\u2708\ufe0f"
-    }
+    },
+    {
+        "id": "grammar",
+        "title": "Grammar",
+        "description": "Master English grammar structures for accuracy and clarity",
+        "icon": "textformat.abc",
+        "colorHex": "#FFA94D",
+        "lessonCount": 130,
+        "illustration": "📚"
+      }
   ],
   "subcategories": [
     {

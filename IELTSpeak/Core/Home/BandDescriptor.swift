@@ -538,7 +538,7 @@ struct IELTSSpeakingBandDescriptorsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
                         // Band Header
-                        HStack {
+                        HStack(alignment: .bottom) {
                             Text("Band \(selectedBand)")
                                 .font(.title)
                                 .fontWeight(.bold)
@@ -547,8 +547,11 @@ struct IELTSSpeakingBandDescriptorsView: View {
                             Spacer()
                             
                             Text(selectedCriteria)
-                                .font(.headline)
-                                .foregroundColor(.secondary)
+                                .font(.caption)
+                                .foregroundColor(
+                                    colorForBand(selectedBand)
+                                )
+                                .offset(y: -6)
                         }
                         
                         // Description
