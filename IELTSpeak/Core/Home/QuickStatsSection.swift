@@ -25,6 +25,7 @@ struct QuickStatsSection: View {
             
             ScoreBarChart(testResults: testResults)
         }
+        .padding()
     }
 }
 
