@@ -9,9 +9,11 @@ class LessonDataManager: ObservableObject {
     @Published var isLoading = false
     @Published var error: DataError?
     @Published var newVocabularyItems: [NewVocabularyItem] = []
+    @Published var realIdiomsSubcategories: [RealIdiomSubcategory] = []
     
     private var lessonData: LessonData?
     private var rawNewVocabularyData: [NewVocabularyItemData] = []
+    private var rawRealIdiomsData: RealIdiomsData?
     private let progressKey = "userProgress"
     
     private init() {
@@ -36,9 +38,18 @@ class LessonDataManager: ObservableObject {
                     self.rawNewVocabularyData = []
                 }
                 
+                // Load real idioms data separately
+                do {
+                    self.rawRealIdiomsData = try self.loadRealIdiomsDataFromJSON()
+                } catch {
+                    print("Warning: Could not load idioms_data.json: \(error.localizedDescription)")
+                    self.rawRealIdiomsData = nil
+                }
+                
                 DispatchQueue.main.async {
                     self.categories = self.convertToViewModels()
                     self.newVocabularyItems = self.rawNewVocabularyData.map { NewVocabularyItem(from: $0) }
+                    self.realIdiomsSubcategories = self.convertRealIdiomsToSubcategories()
                     self.isLoading = false
                 }
             } catch {
@@ -74,6 +85,19 @@ class LessonDataManager: ObservableObject {
         return try decoder.decode([NewVocabularyItemData].self, from: data)
     }
     
+    func loadRealIdiomsDataFromJSON() throws -> RealIdiomsData {
+        guard let path = Bundle.main.path(forResource: "idioms_data", ofType: "json") else {
+            throw DataError.idiomsFileNotFound
+        }
+        
+        guard let data = NSData(contentsOfFile: path) as Data? else {
+            throw DataError.idiomsFileNotFound
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(RealIdiomsData.self, from: data)
+    }
+    
     // MARK: - Data Conversion
     private func convertToViewModels() -> [LessonCategory] {
         guard let lessonData = lessonData else { return [] }
@@ -100,6 +124,8 @@ class LessonDataManager: ObservableObject {
     func getSubcategories(for categoryId: String) -> [Subcategory] {
         if categoryId == "vocabulary" {
             return getVocabularyTopicSubcategories()
+        } else if categoryId == "idioms" {
+            return getRealIdiomsSubcategories()
         }
         
         guard let lessonData = lessonData else { return [] }
@@ -426,12 +452,73 @@ class LessonDataManager: ObservableObject {
         
         return filtered.sorted { $0.word < $1.word }
     }
+    
+    // MARK: - Real Idioms Methods
+    private func convertRealIdiomsToSubcategories() -> [RealIdiomSubcategory] {
+        guard let realIdiomsData = rawRealIdiomsData else { return [] }
+        
+        var subcategories: [RealIdiomSubcategory] = []
+        let colors: [Color] = [.blue, .green, .orange, .purple, .red, .pink, .yellow, .teal, .indigo, .mint, .cyan, .brown]
+        var colorIndex = 0
+        
+        let mirror = Mirror(reflecting: realIdiomsData)
+        for child in mirror.children {
+            guard let categoryItems = child.value as? [RealIdiomItem],
+                  !categoryItems.isEmpty,
+                  let categoryName = child.label else { continue }
+            
+            let viewModelItems = categoryItems.map { item in
+                RealIdiomItemViewModel(from: item, category: categoryName.capitalized)
+            }
+            
+            let subcategory = RealIdiomSubcategory(
+                id: "real_idioms_\(categoryName)",
+                title: formatCategoryTitle(categoryName),
+                description: "Common idioms related to \(formatCategoryTitle(categoryName).lowercased())",
+                itemCount: categoryItems.count,
+                color: colors[colorIndex % colors.count],
+                isLocked: false,
+                items: viewModelItems
+            )
+            
+            subcategories.append(subcategory)
+            colorIndex += 1
+        }
+        
+        return subcategories.sorted { $0.title < $1.title }
+    }
+    
+    private func getRealIdiomsSubcategories() -> [Subcategory] {
+        return realIdiomsSubcategories.map { realSubcategory in
+            let progress = userProgress?.subcategoryProgress[realSubcategory.id]?.progress ?? 0.0
+            let isLocked = !(userProgress?.subcategoryProgress[realSubcategory.id]?.isUnlocked ?? true)
+            
+            return Subcategory(
+                id: realSubcategory.id,
+                title: realSubcategory.title,
+                description: realSubcategory.description,
+                itemCount: realSubcategory.itemCount,
+                progress: progress,
+                color: realSubcategory.color,
+                isLocked: isLocked
+            )
+        }
+    }
+    
+    func getRealIdiomItems(for subcategoryId: String) -> [RealIdiomItemViewModel] {
+        return realIdiomsSubcategories.first { $0.id == subcategoryId }?.items ?? []
+    }
+    
+    private func formatCategoryTitle(_ category: String) -> String {
+        return category.capitalized
+    }
 }
 
 // MARK: - Error Handling
 enum DataError: LocalizedError {
     case fileNotFound
     case vocabularyFileNotFound
+    case idiomsFileNotFound
     case loadingFailed(String)
     case parsingError
     
@@ -441,6 +528,8 @@ enum DataError: LocalizedError {
             return "Lesson data file not found"
         case .vocabularyFileNotFound:
             return "Vocabulary data file not found"
+        case .idiomsFileNotFound:
+            return "Idioms data file not found"
         case .loadingFailed(let message):
             return "Failed to load data: \(message)"
         case .parsingError:

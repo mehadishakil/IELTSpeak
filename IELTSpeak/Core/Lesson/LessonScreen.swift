@@ -262,6 +262,9 @@ struct CardLearningView: View {
         // Determine item type based on subcategory ID pattern or category
         if subcategory.id.contains("vocabulary") || subcategory.id == "academic" || subcategory.id == "business" {
             items = dataManager.getVocabularyItems(for: subcategory.id)
+        } else if subcategory.id.hasPrefix("real_idioms_") {
+            // Handle real idioms data
+            items = dataManager.getRealIdiomItems(for: subcategory.id)
         } else if subcategory.id.contains("idiom") || subcategory.id == "common" {
             items = dataManager.getIdiomItems(for: subcategory.id)
         } else if subcategory.id.contains("phrasal") || subcategory.id == "basic" || subcategory.id == "advanced" {
@@ -379,6 +382,8 @@ struct CardLearningView: View {
             itemId = vocabItem.id
         } else if let idiomItem = item as? IdiomItem {
             itemId = idiomItem.id
+        } else if let realIdiomItem = item as? RealIdiomItemViewModel {
+            itemId = realIdiomItem.id.uuidString
         } else if let phrasalItem = item as? PhrasalVerbItem {
             itemId = phrasalItem.id
         }
@@ -398,7 +403,7 @@ struct CardLearningView: View {
         // Map subcategory to category - you might want to store this in your data
         if subcategoryId.contains("academic") || subcategoryId.contains("business") {
             return "vocabulary"
-        } else if subcategoryId.contains("common") {
+        } else if subcategoryId.hasPrefix("real_idioms_") || subcategoryId.contains("common") {
             return "idioms"
         } else if subcategoryId.contains("basic") || subcategoryId.contains("advanced") {
             return "phrasal-verbs"

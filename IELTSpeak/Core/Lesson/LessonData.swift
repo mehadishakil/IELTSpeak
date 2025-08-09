@@ -71,6 +71,68 @@ struct IdiomItemData: Codable, Identifiable {
     let order: Int
 }
 
+// MARK: - New Real Idioms Data Models
+struct RealIdiomsData: Codable {
+    let animals: [RealIdiomItem]?
+    let body: [RealIdiomItem]?
+    let buildings: [RealIdiomItem]?
+    let clothing: [RealIdiomItem]?
+    let colours: [RealIdiomItem]?
+    let death: [RealIdiomItem]?
+    let food: [RealIdiomItem]?
+    let health: [RealIdiomItem]?
+    let law: [RealIdiomItem]?
+    let money: [RealIdiomItem]?
+    let music: [RealIdiomItem]?
+    let nature: [RealIdiomItem]?
+    let numbers: [RealIdiomItem]?
+    let plants: [RealIdiomItem]?
+    let sports: [RealIdiomItem]?
+    let structures: [RealIdiomItem]?
+    let time: [RealIdiomItem]?
+    let transport: [RealIdiomItem]?
+    let weather: [RealIdiomItem]?
+    let american: [RealIdiomItem]?
+    let australian: [RealIdiomItem]?
+    let british: [RealIdiomItem]?
+    
+    private enum CodingKeys: String, CodingKey {
+        case animals = "Animals"
+        case body = "Body"
+        case buildings = "Buildings"
+        case clothing = "Clothing"
+        case colours = "Colours"
+        case death = "Death"
+        case food = "Food"
+        case health = "Health"
+        case law = "Law"
+        case money = "Money"
+        case music = "Music"
+        case nature = "Nature"
+        case numbers = "Numbers"
+        case plants = "Plants"
+        case sports = "Sports"
+        case structures = "Structures"
+        case time = "Time"
+        case transport = "Transport"
+        case weather = "Weather"
+        case american = "American"
+        case australian = "Australian"
+        case british = "British"
+    }
+}
+
+struct RealIdiomItem: Codable, Identifiable {
+    let id = UUID()
+    let idiom: String
+    let meaning: String
+    let examples: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case idiom, meaning, examples
+    }
+}
+
 struct PhrasalVerbItemData: Codable, Identifiable {
     let id: String
     let subcategoryId: String
@@ -200,6 +262,34 @@ enum CEFRLevel: String, CaseIterable {
     
     var swiftUIColor: Color {
         return Color(self.color)
+    }
+}
+
+// MARK: - Real Idioms View Models
+struct RealIdiomSubcategory: Identifiable {
+    let id: String
+    let title: String
+    let description: String
+    let itemCount: Int
+    let color: Color
+    let isLocked: Bool
+    let items: [RealIdiomItemViewModel]
+}
+
+struct RealIdiomItemViewModel: Identifiable {
+    let id = UUID()
+    let idiom: String
+    let meaning: String
+    let examples: [String]
+    let category: String
+    let difficulty: String
+    
+    init(from realIdiomItem: RealIdiomItem, category: String) {
+        self.idiom = realIdiomItem.idiom
+        self.meaning = realIdiomItem.meaning
+        self.examples = realIdiomItem.examples
+        self.category = category
+        self.difficulty = "Medium" // Default difficulty since it's not in the data
     }
 }
 

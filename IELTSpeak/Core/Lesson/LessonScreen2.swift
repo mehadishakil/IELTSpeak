@@ -659,6 +659,8 @@ struct LearningCard: View {
                 VocabularyCardContent(item: vocabItem, isFlipped: isFlipped, color: subcategory.color)
             } else if let idiomItem = item as? IdiomItem {
                 IdiomCardContent(item: idiomItem, isFlipped: isFlipped, color: subcategory.color)
+            } else if let realIdiomItem = item as? RealIdiomItemViewModel {
+                RealIdiomCardContent(item: realIdiomItem, isFlipped: isFlipped, color: subcategory.color)
             } else if let phrasalItem = item as? PhrasalVerbItem {
                 PhrasalVerbCardContent(item: phrasalItem, isFlipped: isFlipped, color: subcategory.color)
             }
@@ -847,6 +849,80 @@ struct PhrasalVerbCardContent: View {
                             .font(.custom("Fredoka-SemiBold", size: 16))
                             .foregroundColor(.secondary)
                             .italic()
+                    }
+                    
+                    Spacer()
+                }
+                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+            }
+        }
+    }
+}
+
+struct RealIdiomCardContent: View {
+    let item: RealIdiomItemViewModel
+    let isFlipped: Bool
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            if !isFlipped {
+                VStack(spacing: 12) {
+                    Text(item.idiom)
+                        .font(.custom("Fredoka-SemiBold", size: 24))
+                        .foregroundColor(color)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(item.difficulty)
+                        .font(.custom("Fredoka-SemiBold", size: 14))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(color.opacity(0.8))
+                        .clipShape(Capsule())
+                    
+                    Text(item.category)
+                        .font(.custom("Fredoka-Medium", size: 12))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(color.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                
+                Spacer()
+                
+                Text("Tap to see meaning")
+                    .font(.custom("Fredoka-SemiBold", size: 14))
+                    .foregroundColor(.secondary)
+            } else {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Meaning")
+                            .font(.custom("Fredoka-SemiBold", size: 20))
+                            .foregroundColor(color)
+                        
+                        Text(item.meaning)
+                            .font(.custom("Fredoka-Medium", size: 16))
+                            .foregroundColor(.primary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Examples")
+                            .font(.custom("Fredoka-SemiBold", size: 20))
+                            .foregroundColor(color)
+                        
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
+                                    Text("• \(example)")
+                                        .font(.custom("Fredoka-Medium", size: 14))
+                                        .foregroundColor(.primary.opacity(0.8))
+                                        .italic()
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 120)
                     }
                     
                     Spacer()
