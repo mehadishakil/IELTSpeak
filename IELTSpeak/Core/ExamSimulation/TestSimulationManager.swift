@@ -32,6 +32,8 @@ class TestSimulationManager: ObservableObject {
     @Published var isUploadingResponses = false
     private var questionIds: [String] = [] // Store question IDs from backend
     private var questionIdMapping: [String: String] = [:]
+    private var uploadedQuestions = Set<String>() // store questionId strings
+
 
     // MARK: - Audio Managers
     let audioPlayerManager = AudioPlayerManager()
@@ -424,6 +426,8 @@ class TestSimulationManager: ObservableObject {
 
         // Save locally (existing logic)
         DispatchQueue.global(qos: .background).async { [weak self] in
+            guard let self = self else { return }
+            
             let newConversation = Conversation(
                 part: part,
                 order: order,
@@ -432,7 +436,7 @@ class TestSimulationManager: ObservableObject {
                 errors: []
             )
             DispatchQueue.main.async {
-                self?.conversations.append(newConversation)
+                self.conversations.append(newConversation)
                 print("TestSimulationManager: Saved conversation for Part \(part)")
             }
             
@@ -440,7 +444,7 @@ class TestSimulationManager: ObservableObject {
             print("🔍 Checking upload prerequisites for Part \(part), Order \(order)")
             let audioExists = recordedURL != nil
             let sessionExists = SupabaseService.shared.currentSession?.id != nil
-            let questionId = self?.getQuestionId(part: part, order: order)
+            let questionId = self.getQuestionId(part: part, order: order)
             let questionIdExists = questionId != nil
             
             print("   Audio URL: \(audioExists ? "✅" : "❌")")
@@ -450,6 +454,13 @@ class TestSimulationManager: ObservableObject {
             if let audioURL = recordedURL,
                let sessionId = SupabaseService.shared.currentSession?.id,
                let questionId = questionId {
+                
+                // ✅ Duplicate prevention
+                if self.uploadedQuestions.contains(questionId) {
+                    print("⏩ Skipping duplicate upload for questionId: \(questionId)")
+                    return
+                }
+                self.uploadedQuestions.insert(questionId)
                 
                 print("🚀 Starting upload for Part \(part), Question \(order)")
                 
@@ -466,7 +477,9 @@ class TestSimulationManager: ObservableObject {
                     } catch {
                         print("❌ Upload failed for Part \(part), Question \(order): \(error)")
                         await MainActor.run {
-                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
+                            self.errorMessage = "Upload failed: \(error.localizedDescription)"
+                            // Allow retry if failed
+                            self.uploadedQuestions.remove(questionId)
                         }
                     }
                 }
@@ -484,6 +497,7 @@ class TestSimulationManager: ObservableObject {
             }
         }
     }
+
     
     private func getQuestionId(part: Int, order: Int) -> String? {
         let possibleKeys = generatePossibleKeys(part: part, order: order)

@@ -157,7 +157,7 @@ class SupabaseService: ObservableObject {
         do {
             try await supabase
                 .from("responses")
-                .insert(responseRequest)
+                .upsert(responseRequest, onConflict: "test_session_id,question_id")
                 .execute()
             
             print("✅ Created response record for question: \(questionId)")
