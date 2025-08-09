@@ -337,8 +337,8 @@ struct BackendEnabledTestSimulatorScreen: View {
                             isUserSpeaking: testManager.isUserSpeaking,
                             isRecording: testManager.isRecording,
                             recordingTime: testManager.recordingTime,
-                            waveformData: testManager.audioPlayerManager.isPlaying ? generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
-                            userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                            waveformData: testManager.audioPlayerManager.isPlaying ? testManager.generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
                     case .completed:
                         if let backendResults = testManager.backendResults {
                             BackendResultsView(

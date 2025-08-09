@@ -5,7 +5,18 @@ import Combine
 import SwiftUI
 import Speech
 
-
+// MARK: - Constants
+private enum TestConstants {
+    static let part2PreparationTime: TimeInterval = 60
+    static let part2SpeakingTime: TimeInterval = 120
+    static let defaultSilenceDuration: TimeInterval = 2.0
+    static let part3SilenceDuration: TimeInterval = 3.5
+    static let part2SilenceDuration: TimeInterval = 3.0
+    static let stateTransitionDelay: TimeInterval = 0.5
+    static let finalUploadDelay: TimeInterval = 2.0
+    static let promptDelay: TimeInterval = 1.5
+    static let nextQuestionDelay: TimeInterval = 1.0
+}
 
 class TestSimulationManager: ObservableObject {
     @Published var currentPhase: TestPhase = .preparation
@@ -15,8 +26,8 @@ class TestSimulationManager: ObservableObject {
     @Published var isUserSpeaking: Bool = false
     @Published var isRecording: Bool = false
     @Published var recordingTime: TimeInterval = 0
-    @Published var part2PreparationTimeRemaining: TimeInterval = 60
-    @Published var part2SpeakingTimeRemaining: TimeInterval = 120
+    @Published var part2PreparationTimeRemaining: TimeInterval = TestConstants.part2PreparationTime
+    @Published var part2SpeakingTimeRemaining: TimeInterval = TestConstants.part2SpeakingTime
     @Published var currentQuestionText: String = ""
     @Published var errorMessage: String?
     @Published var backendResults: TestResults?
@@ -24,256 +35,351 @@ class TestSimulationManager: ObservableObject {
     private var questionIds: [String] = [] // Store question IDs from backend
     private var questionIdMapping: [String: String] = [:]
 
+    // MARK: - Audio Managers
     let audioPlayerManager = AudioPlayerManager()
     let audioRecorderManager = AudioRecorderManager()
     let speechRecognizerManager = SpeechRecognizerManager()
 
+    // MARK: - Test Data
     var conversations: [Conversation] = []
+    private let questions: [Int: [QuestionItem]]
+    
+    // MARK: - State Management
     private var currentRecordedAudioURL: URL?
     private var currentQuestionStartTime: Date?
     private var preparationTimer: Timer?
     private var part2SpeakingTimer: Timer?
-    private var questions: [Int: [QuestionItem]]
     private var cancellables = Set<AnyCancellable>()
 
     init(questions: [Int: [QuestionItem]]) {
         self.questions = questions
         
-        print("TestSimulationManager Init - Questions structure:")
-                for (part, items) in questions {
-                    print("Part \(part): \(items.count) questions")
-                    for (index, item) in items.enumerated() {
-                        print("  Q\(index + 1): \(item.questionText.prefix(50))... (ID: \(item.id))")
-                    }
-                }
-        
+        logQuestionsStructure()
         setupBindings()
-        buildQuestionIdMapping()  // Build question ID mapping on initialization
+        buildQuestionIdMapping()
     }
 
     private func setupBindings() {
-        audioPlayerManager.$isPlaying
-            .assign(to: \.isExaminerSpeaking, on: self)
-            .store(in: &cancellables)
-        
-        audioRecorderManager.$isRecording
-            .assign(to: \.isRecording, on: self)
-            .store(in: &cancellables)
-        
-        audioRecorderManager.$recordingTime
-            .assign(to: \.recordingTime, on: self)
-            .store(in: &cancellables)
-        
-        speechRecognizerManager.$isSpeechDetected
-            .assign(to: \.isUserSpeaking, on: self)
-            .store(in: &cancellables)
+        Publishers.CombineLatest4(
+            audioPlayerManager.$isPlaying,
+            audioRecorderManager.$isRecording,
+            audioRecorderManager.$recordingTime,
+            speechRecognizerManager.$isSpeechDetected
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] isPlaying, isRecording, recordingTime, isSpeechDetected in
+            self?.isExaminerSpeaking = isPlaying
+            self?.isRecording = isRecording
+            self?.recordingTime = recordingTime
+            self?.isUserSpeaking = isSpeechDetected
+        }
+        .store(in: &cancellables)
         
         speechRecognizerManager.$error
-            .compactMap { $0 }
+            .compactMap { $0 as? Error }
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] error in
-                self?.errorMessage = "Speech Recognition Error: \(error)"
-                print("TestSimulationManager: Speech Recognition Error: \(error)")
+                self?.handleSpeechRecognitionError(error)
             }
             .store(in: &cancellables)
     }
     
+    // MARK: - Public Methods
+    
+    /// Starts the IELTS speaking test with backend initialization and permission requests
     func startTest() {
         print("TestSimulationManager: startTest() called")
         print("Current questions keys: \(Array(questions.keys).sorted())")
         
         currentPhase = .testing
         
-        // Initialize backend session first
         Task {
             await initializeBackendSession()
-            
-            await MainActor.run {
-                requestAudioAndSpeechPermissions { [weak self] success in
-                    if success {
-                        print("TestSimulationManager: Permissions granted. Starting conversation flow.")
-                        self?.startConversationFlow()
-                    } else {
-                        self?.errorMessage = "Microphone and Speech Recognition permissions are required."
-                        self?.currentPhase = .preparation
-                    }
-                }
+            await requestPermissionsAndStart()
+        }
+    }
+    
+    @MainActor
+    private func requestPermissionsAndStart() async {
+        let permissionsGranted = await requestAudioAndSpeechPermissions()
+        if permissionsGranted {
+            print("TestSimulationManager: Permissions granted. Starting conversation flow.")
+            startConversationFlow()
+        } else {
+            errorMessage = "Microphone and Speech Recognition permissions are required."
+            currentPhase = .preparation
+        }
+    }
+    
+    private func requestAudioAndSpeechPermissions() async -> Bool {
+        let microphoneGranted = await withCheckedContinuation { continuation in
+            AVAudioSession.sharedInstance().requestRecordPermission { granted in
+                continuation.resume(returning: granted)
+            }
+        }
+        
+        let speechGranted = await withCheckedContinuation { continuation in
+            SFSpeechRecognizer.requestAuthorization { status in
+                continuation.resume(returning: status)
+            }
+        }
+        
+        return microphoneGranted && speechGranted == .authorized
+    }
+
+    func startConversationFlow() {
+        logConversationFlowStart()
+        
+        guard currentPhase == .testing else {
+            print("TestSimulationManager: Not in testing phase, returning")
+            return
+        }
+
+        cleanupPreviousStates()
+        
+        switch currentPart {
+        case 1:
+            handlePart1Flow()
+        case 2:
+            handlePart2Flow()
+        case 3:
+            handlePart3Flow()
+        default:
+            print("TestSimulationManager: Test flow completed or invalid part. Finalizing.")
+            currentPhase = .processing
+        }
+    }
+    
+    private func logConversationFlowStart() {
+        print("TestSimulationManager: startConversationFlow() called")
+        print("Current phase: \(currentPhase), part: \(currentPart), questionIndex: \(currentQuestionIndex)")
+        print("Available question parts: \(Array(questions.keys).sorted())")
+    }
+    
+    private func cleanupPreviousStates() {
+        _ = audioRecorderManager.stopRecording()
+        speechRecognizerManager.stopSpeechRecognition()
+        audioPlayerManager.stopAudio()
+        part2SpeakingTimer?.invalidate()
+        preparationTimer?.invalidate()
+        print("TestSimulationManager: Cleaned up previous states.")
+    }
+    
+    private func handlePart1Flow() {
+        print("Starting Part 1 - Questions available:")
+        guard let part1Questions = questions[0] else {
+            handleMissingQuestions(part: 1)
+            return
+        }
+        
+        logPartQuestions(part: 1, questions: part1Questions)
+        
+        guard currentQuestionIndex < part1Questions.count else {
+            print("TestSimulationManager: Part 1 finished. Moving to Part 2.")
+            moveToNextPart()
+            return
+        }
+        
+        let question = part1Questions[currentQuestionIndex]
+        currentQuestionText = question.questionText
+        print("TestSimulationManager: Part 1, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText)'")
+        playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: TestConstants.defaultSilenceDuration)
+    }
+    
+    private func handlePart2Flow() {
+        print("Starting Part 2 - Questions available:")
+        guard let part2Questions = questions[1], !part2Questions.isEmpty else {
+            print("TestSimulationManager: Part 2 finished or no questions. Moving to Part 3.")
+            moveToNextPart()
+            return
+        }
+        
+        let cueCard = part2Questions[currentQuestionIndex]
+        currentQuestionText = cueCard.questionText
+        print("TestSimulationManager: Part 2: Playing cue card audio for '\(currentQuestionText.prefix(30))...'")
+        playExaminerQuestion(cueCard.audioFile, part: currentPart, questionText: cueCard.questionText) { [weak self] in
+            self?.startPart2Preparation()
+        }
+    }
+    
+    private func handlePart3Flow() {
+        print("Starting Part 3 - Questions available:")
+        guard let part3Questions = questions[2] else {
+            handleMissingQuestions(part: 3)
+            return
+        }
+        
+        logPartQuestions(part: 3, questions: part3Questions)
+        
+        guard currentQuestionIndex < part3Questions.count else {
+            print("TestSimulationManager: Part 3 finished. Moving to Processing.")
+            currentPhase = .processing
+            return
+        }
+        
+        let question = part3Questions[currentQuestionIndex]
+        currentQuestionText = question.questionText
+        print("TestSimulationManager: Part 3, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText.prefix(30))...'")
+        playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: TestConstants.part3SilenceDuration)
+    }
+    
+    private func handleMissingQuestions(part: Int) {
+        print("TestSimulationManager: ERROR - No Part \(part) questions found!")
+        if part < 3 {
+            moveToNextPart()
+        } else {
+            errorMessage = "No Part \(part) questions available"
+            currentPhase = .processing
+        }
+    }
+    
+    private func logPartQuestions(part: Int, questions: [QuestionItem]) {
+        print("Part \(part) has \(questions.count) questions")
+        for (index, question) in questions.enumerated() {
+            print("  Q\(index + 1): \(question.questionText.prefix(30))...")
+        }
+    }
+    
+    private func moveToNextPart() {
+        currentPart += 1
+        currentQuestionIndex = 0
+        startConversationFlow()
+    }
+
+    private func playExaminerQuestion(
+        _ audioData: Data, 
+        part: Int, 
+        questionText: String, 
+        silenceDuration: TimeInterval = TestConstants.defaultSilenceDuration, 
+        completion: (() -> Void)? = nil
+    ) {
+        audioPlayerManager.playAudio(from: audioData) { [weak self] in
+            self?.handleAudioPlaybackCompletion(part: part, questionText: questionText, silenceDuration: silenceDuration, completion: completion)
+        }
+    }
+    
+    private func handleAudioPlaybackCompletion(
+        part: Int, 
+        questionText: String, 
+        silenceDuration: TimeInterval, 
+        completion: (() -> Void)?
+    ) {
+        print("TestSimulationManager: Examiner audio finished playing. Current Part: \(currentPart)")
+        
+        completion?()
+
+        if shouldStartUserResponseRecording() {
+            print("TestSimulationManager: Starting user response recording after audio finished.")
+            startUserResponseRecording(silenceDuration: silenceDuration, part: part, questionText: questionText)
+        }
+    }
+    
+    private func shouldStartUserResponseRecording() -> Bool {
+        return currentPart != 2 || (currentPart == 2 && part2PreparationTimeRemaining <= 0)
+    }
+    
+    // MARK: - Helper Methods
+    private func logQuestionsStructure() {
+        print("TestSimulationManager Init - Questions structure:")
+        for (part, items) in questions {
+            print("Part \(part): \(items.count) questions")
+            for (index, item) in items.enumerated() {
+                print("  Q\(index + 1): \(item.questionText.prefix(50))... (ID: \(item.id))")
             }
         }
     }
     
-    private func requestAudioAndSpeechPermissions(completion: @escaping (Bool) -> Void) {
-        AVAudioSession.sharedInstance().requestRecordPermission { microphoneGranted in
-            SFSpeechRecognizer.requestAuthorization { speechGranted in
-                DispatchQueue.main.async {
-                    if microphoneGranted && speechGranted == .authorized {
-                        completion(true)
-                    } else {
-                        completion(false)
-                    }
-                }
-            }
+    private func handleSpeechRecognitionError(_ error: Error) {
+        errorMessage = "Speech Recognition Error: \(error)"
+        print("TestSimulationManager: Speech Recognition Error: \(error)")
+    }
+    
+    private func handleRecordingError(_ error: Error) {
+        print("TestSimulationManager: Error starting user response flow: \(error.localizedDescription)")
+        errorMessage = "Recording/Speech Recognition Error: \(error.localizedDescription)"
+        DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.defaultSilenceDuration) {
+            self.nextQuestionOrPart()
         }
     }
-
-    func startConversationFlow() {
-            print("TestSimulationManager: startConversationFlow() called")
-            print("Current phase: \(currentPhase), part: \(currentPart), questionIndex: \(currentQuestionIndex)")
-            print("Available question parts: \(Array(questions.keys).sorted())")
-            
-            guard currentPhase == .testing else {
-                print("TestSimulationManager: Not in testing phase, returning")
-                return
-            }
-
-            audioRecorderManager.stopRecording()
-            speechRecognizerManager.stopSpeechRecognition()
-            audioPlayerManager.stopAudio()
-            part2SpeakingTimer?.invalidate()
-            preparationTimer?.invalidate()
-            print("TestSimulationManager: Cleaned up previous states.")
-
-            if currentPart == 1 {
-                print("Starting Part 1 - Questions available:")
-                if let part1Questions = questions[0] {
-                    print("Part 1 has \(part1Questions.count) questions")
-                    for (index, question) in part1Questions.enumerated() {
-                        print("  Q\(index + 1): \(question.questionText.prefix(30))...")
-                    }
-                    
-                    guard currentQuestionIndex < part1Questions.count else {
-                        print("TestSimulationManager: Part 1 finished. Moving to Part 2.")
-                        currentPart = 2
-                        currentQuestionIndex = 0
-                        startConversationFlow()
-                        return
-                    }
-                    
-                    let question = part1Questions[currentQuestionIndex]
-                    currentQuestionText = question.questionText
-                    print("TestSimulationManager: Part 1, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText)'")
-                    playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 2.0)
-                } else {
-                    print("TestSimulationManager: ERROR - No Part 1 questions found!")
-                    print("Available keys in questions dictionary: \(Array(questions.keys))")
-                    errorMessage = "No Part 1 questions available"
-                    currentPhase = .processing
-                    return
-                }
-
-            } else if currentPart == 2 {
-                print("Starting Part 2 - Questions available:")
-                if let part2Questions = questions[1] {
-                    print("Part 2 has \(part2Questions.count) questions")
-                    
-                    guard !part2Questions.isEmpty else {
-                        print("TestSimulationManager: Part 2 finished or no questions. Moving to Part 3.")
-                        currentPart = 3
-                        currentQuestionIndex = 0
-                        startConversationFlow()
-                        return
-                    }
-                    
-                    let cueCard = part2Questions[currentQuestionIndex]
-                    currentQuestionText = cueCard.questionText
-                    print("TestSimulationManager: Part 2: Playing cue card audio for '\(currentQuestionText.prefix(30))...'")
-                    playExaminerQuestion(cueCard.audioFile, part: currentPart, questionText: cueCard.questionText) { [weak self] in
-                        self?.startPart2Preparation()
-                    }
-                } else {
-                    print("TestSimulationManager: ERROR - No Part 2 questions found!")
-                    currentPart = 3
-                    currentQuestionIndex = 0
-                    startConversationFlow()
-                    return
-                }
-
-            } else if currentPart == 3 {
-                print("Starting Part 3 - Questions available:")
-                if let part3Questions = questions[2] {
-                    print("Part 3 has \(part3Questions.count) questions")
-                    
-                    guard currentQuestionIndex < part3Questions.count else {
-                        print("TestSimulationManager: Part 3 finished. Moving to Processing.")
-                        currentPhase = .processing
-                        return
-                    }
-                    
-                    let question = part3Questions[currentQuestionIndex]
-                    currentQuestionText = question.questionText
-                    print("TestSimulationManager: Part 3, Question \(currentQuestionIndex + 1): Playing examiner audio for '\(currentQuestionText.prefix(30))...'")
-                    playExaminerQuestion(question.audioFile, part: currentPart, questionText: question.questionText, silenceDuration: 3.5)
-                } else {
-                    print("TestSimulationManager: ERROR - No Part 3 questions found!")
-                    currentPhase = .processing
-                    return
-                }
-
-            } else {
-                print("TestSimulationManager: Test flow completed or invalid part. Finalizing.")
-                currentPhase = .processing
-            }
+    
+    private func handlePart2SpeechEnd(part: Int, questionText: String, transcript: String) {
+        if recordingTime >= 60 && recordingTime < 120 {
+            print("TestSimulationManager: Part 2: User stopped speaking after 1 min, before 2 min. Proceeding.")
+        } else if recordingTime < 60 {
+            print("TestSimulationManager: Part 2: User stopped speaking before 1 minute. Saving and proceeding.")
         }
-
-    private func playExaminerQuestion(_ audioData: Data, part: Int, questionText: String, silenceDuration: TimeInterval = 2.0, completion: (() -> Void)? = nil) {
         
-        // Start playing the audio with a completion handler
-        audioPlayerManager.playAudio(from: audioData) { [weak self] in
-            guard let self = self else { return }
-            print("TestSimulationManager: Examiner audio finished playing. Current Part: \(self.currentPart)")
-            
-            // Call completion first if provided
-            completion?()
-
-            // Only start user response recording if not in Part 2 preparation phase
-            if self.currentPart != 2 || (self.currentPart == 2 && self.part2PreparationTimeRemaining <= 0) {
-                print("TestSimulationManager: Starting user response recording after audio finished.")
-                self.startUserResponseRecording(silenceDuration: silenceDuration, part: part, questionText: questionText)
-            }
-        }
+        stopUserResponseAndSave(
+            part: part,
+            order: currentQuestionIndex,
+            questionText: questionText,
+            transcript: transcript
+        )
+        part2SpeakingTimer?.invalidate()
+        part2SpeakingTimer = nil
+        nextQuestionOrPart()
     }
 
     // MARK: - Part 2 Specific Logic
     private func startPart2Preparation() {
         print("TestSimulationManager: Part 2: Starting 1-minute preparation time.")
-        part2PreparationTimeRemaining = 60
+        part2PreparationTimeRemaining = TestConstants.part2PreparationTime
         preparationTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.part2PreparationTimeRemaining -= 1
-            if self.part2PreparationTimeRemaining <= 0 {
-                self.preparationTimer?.invalidate()
-                self.preparationTimer = nil
-                print("TestSimulationManager: Part 2: Preparation time finished. Playing start speaking prompt.")
-                self.playPromptAudioAndStartPart2Speaking()
-            }
+            self?.updatePreparationTimer()
+        }
+    }
+    
+    private func updatePreparationTimer() {
+        part2PreparationTimeRemaining -= 1
+        if part2PreparationTimeRemaining <= 0 {
+            preparationTimer?.invalidate()
+            preparationTimer = nil
+            print("TestSimulationManager: Part 2: Preparation time finished. Playing start speaking prompt.")
+            playPromptAudioAndStartPart2Speaking()
         }
     }
 
     private func playPromptAudioAndStartPart2Speaking() {
         print("TestSimulationManager: SIMULATING PROMPT: You can start speaking now.")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
-            guard let self = self else { return }
-            print("TestSimulationManager: Part 2: Starting user speaking recording.")
-            self.startUserResponseRecording(silenceDuration: 3.0, part: 2, questionText: self.currentQuestionText, isPart2: true)
-            self.startPart2SpeakingTimer()
+        DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.promptDelay) { [weak self] in
+            self?.beginPart2Speaking()
         }
+    }
+    
+    private func beginPart2Speaking() {
+        print("TestSimulationManager: Part 2: Starting user speaking recording.")
+        startUserResponseRecording(
+            silenceDuration: TestConstants.part2SilenceDuration, 
+            part: 2, 
+            questionText: currentQuestionText, 
+            isPart2: true
+        )
+        startPart2SpeakingTimer()
     }
 
     private func startPart2SpeakingTimer() {
-        part2SpeakingTimeRemaining = 120
+        part2SpeakingTimeRemaining = TestConstants.part2SpeakingTime
         print("TestSimulationManager: Part 2: Starting 2-minute speaking timer.")
         part2SpeakingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self = self else { return }
-            self.part2SpeakingTimeRemaining -= 1
-            if self.part2SpeakingTimeRemaining <= 0 {
-                print("TestSimulationManager: Part 2: 2-minute speaking limit reached. Stopping recording.")
-                self.part2SpeakingTimer?.invalidate()
-                self.part2SpeakingTimer = nil
-                self.stopUserResponseAndSave(part: self.currentPart, order: self.currentQuestionIndex, questionText: self.currentQuestionText)
-                print("TestSimulationManager: SIMULATING PROMPT: Thank you, that's enough.")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self.nextQuestionOrPart()
-                }
-            }
+            self?.updatePart2SpeakingTimer()
+        }
+    }
+    
+    private func updatePart2SpeakingTimer() {
+        part2SpeakingTimeRemaining -= 1
+        if part2SpeakingTimeRemaining <= 0 {
+            handlePart2TimeLimit()
+        }
+    }
+    
+    private func handlePart2TimeLimit() {
+        print("TestSimulationManager: Part 2: 2-minute speaking limit reached. Stopping recording.")
+        part2SpeakingTimer?.invalidate()
+        part2SpeakingTimer = nil
+        stopUserResponseAndSave(part: currentPart, order: currentQuestionIndex, questionText: currentQuestionText)
+        print("TestSimulationManager: SIMULATING PROMPT: Thank you, that's enough.")
+        DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.nextQuestionDelay) {
+            self.nextQuestionOrPart()
         }
     }
 
@@ -294,34 +400,12 @@ class TestSimulationManager: ObservableObject {
                     print("TestSimulationManager: User stopped speaking (via onSpeechEnd). Transcript: '\(transcript.prefix(50))...'")
 
                     if isPart2 {
-                        if self.recordingTime >= 60 && self.recordingTime < 120 {
-                            print("TestSimulationManager: Part 2: User stopped speaking after 1 min, before 2 min. Proceeding.")
-                            self.stopUserResponseAndSave(
-                                part: part,
-                                order: currentQuestionIndex,
-                                questionText: questionText,
-                                transcript: transcript
-                            )
-                            self.part2SpeakingTimer?.invalidate()
-                            self.part2SpeakingTimer = nil
-                            self.nextQuestionOrPart()
-                        } else if self.recordingTime < 60 {
-                            print("TestSimulationManager: Part 2: User stopped speaking before 1 minute. Saving and proceeding.")
-                            self.stopUserResponseAndSave(
-                                part: part,
-                                order: currentQuestionIndex,
-                                questionText: questionText,
-                                transcript: transcript
-                            )
-                            self.part2SpeakingTimer?.invalidate()
-                            self.part2SpeakingTimer = nil
-                            self.nextQuestionOrPart()
-                        }
+                        self.handlePart2SpeechEnd(part: part, questionText: questionText, transcript: transcript)
                     } else {
                         print("TestSimulationManager: Part \(part): User stopped speaking. Saving and proceeding.")
                         self.stopUserResponseAndSave(
                             part: part,
-                            order: currentQuestionIndex,
+                            order: self.currentQuestionIndex,
                             questionText: questionText,
                             transcript: transcript
                         )
@@ -330,11 +414,7 @@ class TestSimulationManager: ObservableObject {
                 }
             )
         } catch {
-            print("TestSimulationManager: Error starting user response flow: \(error.localizedDescription)")
-            self.errorMessage = "Recording/Speech Recognition Error: \(error.localizedDescription)"
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                self.nextQuestionOrPart()
-            }
+            handleRecordingError(error)
         }
     }
     
@@ -408,13 +488,7 @@ class TestSimulationManager: ObservableObject {
     }
     
     private func getQuestionId(part: Int, order: Int) -> String? {
-        // Try multiple key formats to handle part normalization differences
-        let possibleKeys = [
-            "\(part)_\(order)",           // Current format
-            "\(part-1)_\(order)",         // Normalized format
-            "\(part)_\(order+1)",         // Index-based
-            "\(part-1)_\(order+1)"        // Normalized index-based
-        ]
+        let possibleKeys = generatePossibleKeys(part: part, order: order)
         
         for key in possibleKeys {
             if let questionId = questionIdMapping[key] {
@@ -423,9 +497,22 @@ class TestSimulationManager: ObservableObject {
             }
         }
         
-        print("❌ No question ID found for part \(part), order \(order). Tried keys: \(possibleKeys)")
-        print("   Available mappings: \(questionIdMapping.keys.sorted().joined(separator: ", "))")
+        logQuestionIdNotFound(part: part, order: order, keys: possibleKeys)
         return nil
+    }
+    
+    private func generatePossibleKeys(part: Int, order: Int) -> [String] {
+        return [
+            "\(part)_\(order)",           // Current format
+            "\(part-1)_\(order)",         // Normalized format
+            "\(part)_\(order+1)",         // Index-based
+            "\(part-1)_\(order+1)"        // Normalized index-based
+        ]
+    }
+    
+    private func logQuestionIdNotFound(part: Int, order: Int, keys: [String]) {
+        print("❌ No question ID found for part \(part), order \(order). Tried keys: \(keys)")
+        print("   Available mappings: \(questionIdMapping.keys.sorted().joined(separator: ", "))")
     }
     
     
@@ -446,14 +533,14 @@ class TestSimulationManager: ObservableObject {
             if currentQuestionIndex < (questions[0]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 1. Index: \(currentQuestionIndex)")
                 // Add a small delay to ensure clean state transition
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.stateTransitionDelay) {
                     self.startConversationFlow()
                 }
             } else {
                 print("TestSimulationManager: All Part 1 questions covered. Initiating Part 2 transition.")
                 currentPart = 2
                 currentQuestionIndex = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.stateTransitionDelay) {
                     self.startConversationFlow()
                 }
             }
@@ -468,7 +555,7 @@ class TestSimulationManager: ObservableObject {
             currentQuestionIndex += 1
             if currentQuestionIndex < (questions[2]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 3. Index: \(currentQuestionIndex)")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.stateTransitionDelay) {
                     self.startConversationFlow()
                 }
             } else {
@@ -486,7 +573,7 @@ class TestSimulationManager: ObservableObject {
         
         Task {
             // Wait a moment for final uploads to complete
-            try? await Task.sleep(nanoseconds: 2_000_000_000)
+            try? await Task.sleep(nanoseconds: UInt64(TestConstants.finalUploadDelay * 1_000_000_000))
             
             // Process with backend
             if let results = await processTestWithBackend() {
@@ -503,6 +590,44 @@ class TestSimulationManager: ObservableObject {
                 }
             }
         }
+    }
+    
+    // MARK: - Waveform Generation
+    
+    /// Generates visual waveform data for examiner audio playback
+    func generateVisualWaveformData(for currentTime: TimeInterval, duration: TimeInterval, isSpeaking: Bool) -> [Double] {
+        guard isSpeaking && duration > 0 else { return Array(repeating: 0.0, count: 50) }
+        let progress = currentTime / duration
+        let activeBarCount = Int(progress * Double(50))
+        var data = Array(repeating: 0.0, count: 50)
+        for i in 0..<50 {
+            if i < activeBarCount {
+                data[i] = Double.random(in: 0.3...1.0)
+            } else {
+                data[i] = 0.1
+            }
+        }
+        return data
+    }
+
+    /// Generates visual waveform data for user speech recording based on microphone power
+    func generateUserVisualWaveformData(power: Float) -> [Double] {
+        var data = Array(repeating: 0.0, count: 30)
+        
+        // Power is already converted to linear scale (0.0 to 1.0) in AudioRecorderManager
+        // Amplify for better visualization and add some variance
+        let normalizedPower = Double(min(1.0, power * 5.0)) // Amplify for better visualization
+        
+        // Create varied waveform bars with random heights based on power level
+        for i in 0..<30 {
+            if normalizedPower > 0.01 { // Only show bars if there's actual sound
+                let variation = Double.random(in: 0.3...1.0)
+                data[i] = normalizedPower * variation
+            } else {
+                data[i] = 0.0 // Silent
+            }
+        }
+        return data
     }
 }
 
@@ -543,8 +668,8 @@ struct TestSimulatorScreen: View {
                             isUserSpeaking: testManager.isUserSpeaking,
                             isRecording: testManager.isRecording,
                             recordingTime: testManager.recordingTime,
-                            waveformData: testManager.audioPlayerManager.isPlaying ? generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
-                            userWaveformData: testManager.audioRecorderManager.isRecording ? generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                            waveformData: testManager.audioPlayerManager.isPlaying ? testManager.generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
                         case .completed:
                             if let backendResults = testManager.backendResults {
                                 BackendResultsView(
@@ -582,57 +707,8 @@ struct TestSimulatorScreen: View {
         .toolbar(.hidden, for: .tabBar)
     }
 
-    
-    private func generateVisualWaveformData(for currentTime: TimeInterval, duration: TimeInterval, isSpeaking: Bool) -> [Double] {
-        guard isSpeaking && duration > 0 else { return Array(repeating: 0.0, count: 50) }
-        let progress = currentTime / duration
-        let activeBarCount = Int(progress * Double(50))
-        var data = Array(repeating: 0.0, count: 50)
-        for i in 0..<50 {
-            if i < activeBarCount {
-                data[i] = Double.random(in: 0.3...1.0)
-            } else {
-                data[i] = 0.1
-            }
-        }
-        return data
-    }
-
-    private func generateUserVisualWaveformData(power: Float) -> [Double] {
-        var data = Array(repeating: 0.0, count: 30)
-        let normalizedPower = max(0.0, min(1.0, power))
-        for i in 0..<30 {
-            data[i] = Double(normalizedPower) * Double.random(in: 0.5...1.0)
-        }
-        return data
-    }
 }
 
-struct WaveformView: View {
-    let amplitudes: [Double]
-    let color: Color
-
-    var body: some View {
-        HStack(spacing: 2) {
-            ForEach(amplitudes.indices, id: \.self) { index in
-                Rectangle()
-                    .frame(width: 4, height: max(1, amplitudes[index] * 50)) // Scale height
-                    .cornerRadius(2)
-                    .foregroundColor(color)
-            }
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-// MARK: - Preview
 struct TestSimulatorScreen_Previews: PreviewProvider {
     static var previews: some View {
         // Create dummy audio data for preview purposes
@@ -708,26 +784,21 @@ struct TestSimulatorScreen_Previews: PreviewProvider {
     }
 }
 
-
-
-// MARK: - Enhanced TestSimulationManager with Backend Integration
-
+// MARK: - Backend Integration
 extension TestSimulationManager {
     
-    // MARK: - Backend Integration Methods
-    
-    /// Initialize test session with backend
     func initializeBackendSession() async {
         do {
             let session = try await SupabaseService.shared.createTestSession()
             print("✅ Backend session created: \(session.id)")
         } catch {
             print("❌ Failed to create backend session: \(error)")
-            self.errorMessage = "Failed to initialize test session: \(error.localizedDescription)"
+            await MainActor.run {
+                self.errorMessage = "Failed to initialize test session: \(error.localizedDescription)"
+            }
         }
     }
     
-    /// Enhanced method to save response with backend upload
     private func stopUserResponseAndSaveWithBackend(
         part: Int,
         order: Int,
@@ -780,34 +851,6 @@ extension TestSimulationManager {
         }
     }
     
-    /// Process test completion with backend
-//    func processTestWithBackend() async -> TestResults? {
-//        guard let sessionId = SupabaseService.shared.currentSession?.id else {
-//            print("❌ No active session for processing")
-//            return nil
-//        }
-//        
-//        do {
-//            // Wait for backend processing to complete
-//            SupabaseService.shared.isProcessing = true
-//            let results = try await SupabaseService.shared.waitForResults(sessionId: sessionId)
-//            SupabaseService.shared.isProcessing = false
-//            
-//            print("✅ Got results from backend:")
-//            print("   Overall Band Score: \(results.overallBandScore)")
-//            print("   Fluency: \(results.fluencyScore)")
-//            print("   Pronunciation: \(results.pronunciationScore)")
-//            
-//            return results
-//            
-//        } catch {
-//            print("❌ Failed to get results: \(error)")
-//            SupabaseService.shared.isProcessing = false
-//            self.errorMessage = "Failed to process results: \(error.localizedDescription)"
-//            return nil
-//        }
-//    }
-    
     func processTestWithBackend() async -> TestResults? {
             guard let sessionId = SupabaseService.shared.currentSession?.id else {
                 print("❌ No active session for processing")
@@ -833,17 +876,19 @@ extension TestSimulationManager {
                 return results
                 
             } catch {
-                print("❌ Failed to get results: \(error)")
-                await MainActor.run {
-                    SupabaseService.shared.isProcessing = false
-                    self.errorMessage = "Failed to process results: \(error.localizedDescription)"
-                }
-                return nil
+                return await handleProcessingError(error)
             }
         }
+    
+    private func handleProcessingError(_ error: Error) async -> TestResults? {
+        print("❌ Failed to get results: \(error)")
+        await MainActor.run {
+            SupabaseService.shared.isProcessing = false
+            self.errorMessage = "Failed to process results: \(error.localizedDescription)"
+        }
+        return nil
+        }
 }
-
-// MARK: - Updated Test Start Method
 
 extension TestSimulationManager {
     
@@ -858,25 +903,10 @@ extension TestSimulationManager {
             await initializeBackendSession()
             
             // Then request permissions and start
-            await MainActor.run {
-                requestAudioAndSpeechPermissions { [weak self] success in
-                    if success {
-                        print("TestSimulationManager: Permissions granted. Starting conversation flow.")
-                        self?.startConversationFlow()
-                    } else {
-                        self?.errorMessage = "Microphone and Speech Recognition permissions are required to start the test. Please enable them in Settings."
-                        self?.currentPhase = .preparation
-                        print("TestSimulationManager: Permissions denied. Test cannot start.")
-                    }
-                }
-            }
+            await requestPermissionsAndStart()
         }
     }
 }
-
-
-
-// Add this extension to your existing TestSimulationManager.swift file
 
 extension TestSimulationManager {
     
@@ -906,7 +936,7 @@ extension TestSimulationManager {
                 // Map all possible key formats to the same question ID
                 for key in keys {
                     questionIdMapping[key] = item.id
-                    print("🗂️ Mapped \(key) -> \(item.id)")
+                    // Mapping logged in batch below
                 }
             }
         }

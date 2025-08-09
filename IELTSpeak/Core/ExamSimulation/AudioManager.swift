@@ -181,56 +181,6 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
             print("AudioRecorderManager: Failed to set up audio session for recording: \(error.localizedDescription)")
         }
     }
-
-//    func startRecording() throws {
-//        guard !isRecording else {
-//            print("AudioRecorderManager: Already recording.")
-//            return
-//        }
-//
-//        // Always attempt to set the category and activate the session
-//        let audioSession = AVAudioSession.sharedInstance()
-//        do {
-//            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
-//            try audioSession.setActive(true)
-//            print("AudioRecorderManager: Ensured audio session is active for recording.")
-//        } catch {
-//            print("AudioRecorderManager: Failed to set or activate audio session for recording: \(error.localizedDescription)")
-//            throw error // Propagate error if session cannot be activated
-//        }
-//
-//        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
-//        currentRecordedAudioURL = audioFilename
-//
-//        let settings = [
-//            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-//            AVSampleRateKey: 12000,
-//            AVNumberOfChannelsKey: 1,
-//            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-//        ]
-//
-//        do {
-//            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
-//            audioRecorder?.delegate = self
-//            audioRecorder?.isMeteringEnabled = true
-//            audioRecorder?.prepareToRecord()
-//
-//            if audioRecorder?.record() == true {
-//                isRecording = true
-//                recordingTime = 0
-//                startRecordingTimer()
-//                print("AudioRecorderManager: Recording started to: \(audioFilename.lastPathComponent)")
-//            } else {
-//                isRecording = false
-//                print("AudioRecorderManager: Failed to start recording (record() returned false).")
-//            }
-//        } catch {
-//            isRecording = false
-//            print("AudioRecorderManager: Error starting recording: \(error.localizedDescription)")
-//            throw error
-//        }
-//    }
-
     
     func startRecording() throws {
         guard !isRecording else {

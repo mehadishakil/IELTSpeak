@@ -64,7 +64,7 @@ struct StudentContent: View {
                 .foregroundColor(.secondary)
             
             if isUserSpeaking || isRecording {
-                WaveformView(amplitudes: waveformData, color: .blue)
+                WaveformView(data: waveformData, color: .blue)
                     .frame(height: 50)
                     .padding(.horizontal)
                     .transition(.opacity)
