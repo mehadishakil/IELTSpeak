@@ -10,10 +10,12 @@ class LessonDataManager: ObservableObject {
     @Published var error: DataError?
     @Published var newVocabularyItems: [NewVocabularyItem] = []
     @Published var realIdiomsSubcategories: [RealIdiomSubcategory] = []
+    @Published var realPhrasalVerbsSubcategories: [RealPhrasalVerbSubcategory] = []
     
     private var lessonData: LessonData?
     private var rawNewVocabularyData: [NewVocabularyItemData] = []
     private var rawRealIdiomsData: RealIdiomsData?
+    private var rawRealPhrasalVerbsData: RealPhrasalVerbsData?
     private let progressKey = "userProgress"
     
     private init() {
@@ -46,10 +48,19 @@ class LessonDataManager: ObservableObject {
                     self.rawRealIdiomsData = nil
                 }
                 
+                // Load real phrasal verbs data separately
+                do {
+                    self.rawRealPhrasalVerbsData = try self.loadRealPhrasalVerbsDataFromJSON()
+                } catch {
+                    print("Warning: Could not load phrasal_verbs.json: \(error.localizedDescription)")
+                    self.rawRealPhrasalVerbsData = nil
+                }
+                
                 DispatchQueue.main.async {
                     self.categories = self.convertToViewModels()
                     self.newVocabularyItems = self.rawNewVocabularyData.map { NewVocabularyItem(from: $0) }
                     self.realIdiomsSubcategories = self.convertRealIdiomsToSubcategories()
+                    self.realPhrasalVerbsSubcategories = self.convertRealPhrasalVerbsToSubcategories()
                     self.isLoading = false
                 }
             } catch {
@@ -98,6 +109,19 @@ class LessonDataManager: ObservableObject {
         return try decoder.decode(RealIdiomsData.self, from: data)
     }
     
+    func loadRealPhrasalVerbsDataFromJSON() throws -> RealPhrasalVerbsData {
+        guard let path = Bundle.main.path(forResource: "phrasal_verbs", ofType: "json") else {
+            throw DataError.phrasalVerbsFileNotFound
+        }
+        
+        guard let data = NSData(contentsOfFile: path) as Data? else {
+            throw DataError.phrasalVerbsFileNotFound
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(RealPhrasalVerbsData.self, from: data)
+    }
+    
     // MARK: - Data Conversion
     private func convertToViewModels() -> [LessonCategory] {
         guard let lessonData = lessonData else { return [] }
@@ -126,6 +150,8 @@ class LessonDataManager: ObservableObject {
             return getVocabularyTopicSubcategories()
         } else if categoryId == "idioms" {
             return getRealIdiomsSubcategories()
+        } else if categoryId == "phrasal-verbs" {
+            return getRealPhrasalVerbsSubcategories()
         }
         
         guard let lessonData = lessonData else { return [] }
@@ -512,6 +538,76 @@ class LessonDataManager: ObservableObject {
     private func formatCategoryTitle(_ category: String) -> String {
         return category.capitalized
     }
+    
+    // MARK: - Real Phrasal Verbs Methods
+    private func convertRealPhrasalVerbsToSubcategories() -> [RealPhrasalVerbSubcategory] {
+        guard let realPhrasalVerbsData = rawRealPhrasalVerbsData else { return [] }
+        
+        var subcategories: [RealPhrasalVerbSubcategory] = []
+        let colors: [Color] = [.blue, .green, .orange, .purple, .red, .pink, .yellow, .teal, .indigo, .mint, .cyan, .brown, .gray]
+        var colorIndex = 0
+        
+        let mirror = Mirror(reflecting: realPhrasalVerbsData)
+        for child in mirror.children {
+            guard let categoryItems = child.value as? [RealPhrasalVerbItem],
+                  !categoryItems.isEmpty,
+                  let categoryName = child.label else { continue }
+            
+            let viewModelItems = categoryItems.map { item in
+                RealPhrasalVerbItemViewModel(from: item, category: formatPhrasalVerbCategoryTitle(categoryName))
+            }
+            
+            let subcategory = RealPhrasalVerbSubcategory(
+                id: "real_phrasal_verbs_\(categoryName)",
+                title: formatPhrasalVerbCategoryTitle(categoryName),
+                description: "Essential phrasal verbs for \(formatPhrasalVerbCategoryTitle(categoryName).lowercased())",
+                itemCount: categoryItems.count,
+                color: colors[colorIndex % colors.count],
+                isLocked: false,
+                items: viewModelItems
+            )
+            
+            subcategories.append(subcategory)
+            colorIndex += 1
+        }
+        
+        return subcategories.sorted { $0.title < $1.title }
+    }
+    
+    private func getRealPhrasalVerbsSubcategories() -> [Subcategory] {
+        return realPhrasalVerbsSubcategories.map { realSubcategory in
+            let progress = userProgress?.subcategoryProgress[realSubcategory.id]?.progress ?? 0.0
+            let isLocked = !(userProgress?.subcategoryProgress[realSubcategory.id]?.isUnlocked ?? true)
+            
+            return Subcategory(
+                id: realSubcategory.id,
+                title: realSubcategory.title,
+                description: realSubcategory.description,
+                itemCount: realSubcategory.itemCount,
+                progress: progress,
+                color: realSubcategory.color,
+                isLocked: isLocked
+            )
+        }
+    }
+    
+    func getRealPhrasalVerbItems(for subcategoryId: String) -> [RealPhrasalVerbItemViewModel] {
+        return realPhrasalVerbsSubcategories.first { $0.id == subcategoryId }?.items ?? []
+    }
+    
+    private func formatPhrasalVerbCategoryTitle(_ category: String) -> String {
+        // Handle specific cases for better formatting
+        switch category {
+        case "climateChange":
+            return "Climate Change"
+        case "healthFitness":
+            return "Health & Fitness"
+        case "morningRoutine":
+            return "Morning Routine"
+        default:
+            return category.capitalized
+        }
+    }
 }
 
 // MARK: - Error Handling
@@ -519,6 +615,7 @@ enum DataError: LocalizedError {
     case fileNotFound
     case vocabularyFileNotFound
     case idiomsFileNotFound
+    case phrasalVerbsFileNotFound
     case loadingFailed(String)
     case parsingError
     
@@ -530,6 +627,8 @@ enum DataError: LocalizedError {
             return "Vocabulary data file not found"
         case .idiomsFileNotFound:
             return "Idioms data file not found"
+        case .phrasalVerbsFileNotFound:
+            return "Phrasal verbs data file not found"
         case .loadingFailed(let message):
             return "Failed to load data: \(message)"
         case .parsingError:

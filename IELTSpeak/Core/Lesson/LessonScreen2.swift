@@ -661,6 +661,8 @@ struct LearningCard: View {
                 IdiomCardContent(item: idiomItem, isFlipped: isFlipped, color: subcategory.color)
             } else if let realIdiomItem = item as? RealIdiomItemViewModel {
                 RealIdiomCardContent(item: realIdiomItem, isFlipped: isFlipped, color: subcategory.color)
+            } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
+                RealPhrasalVerbCardContent(item: realPhrasalVerbItem, isFlipped: isFlipped, color: subcategory.color)
             } else if let phrasalItem = item as? PhrasalVerbItem {
                 PhrasalVerbCardContent(item: phrasalItem, isFlipped: isFlipped, color: subcategory.color)
             }
@@ -903,6 +905,80 @@ struct RealIdiomCardContent: View {
                             .foregroundColor(color)
                         
                         Text(item.meaning)
+                            .font(.custom("Fredoka-Medium", size: 16))
+                            .foregroundColor(.primary)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Examples")
+                            .font(.custom("Fredoka-SemiBold", size: 20))
+                            .foregroundColor(color)
+                        
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 8) {
+                                ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
+                                    Text("• \(example)")
+                                        .font(.custom("Fredoka-Medium", size: 14))
+                                        .foregroundColor(.primary.opacity(0.8))
+                                        .italic()
+                                }
+                            }
+                        }
+                        .frame(maxHeight: 120)
+                    }
+                    
+                    Spacer()
+                }
+                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+            }
+        }
+    }
+}
+
+struct RealPhrasalVerbCardContent: View {
+    let item: RealPhrasalVerbItemViewModel
+    let isFlipped: Bool
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 16) {
+            if !isFlipped {
+                VStack(spacing: 12) {
+                    Text(item.phrasalVerb)
+                        .font(.custom("Fredoka-SemiBold", size: 24))
+                        .foregroundColor(color)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(item.difficulty)
+                        .font(.custom("Fredoka-SemiBold", size: 14))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(color.opacity(0.8))
+                        .clipShape(Capsule())
+                    
+                    Text(item.category)
+                        .font(.custom("Fredoka-Medium", size: 12))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(color.opacity(0.1))
+                        .clipShape(Capsule())
+                }
+                
+                Spacer()
+                
+                Text("Tap to see definition")
+                    .font(.custom("Fredoka-SemiBold", size: 14))
+                    .foregroundColor(.secondary)
+            } else {
+                VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Definition")
+                            .font(.custom("Fredoka-SemiBold", size: 20))
+                            .foregroundColor(color)
+                        
+                        Text(item.definition)
                             .font(.custom("Fredoka-Medium", size: 16))
                             .foregroundColor(.primary)
                     }

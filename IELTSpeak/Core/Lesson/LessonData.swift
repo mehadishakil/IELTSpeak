@@ -293,3 +293,82 @@ struct RealIdiomItemViewModel: Identifiable {
     }
 }
 
+// MARK: - Real Phrasal Verbs Data Models
+struct RealPhrasalVerbsData: Codable {
+    let climateChange: [RealPhrasalVerbItem]?
+    let eating: [RealPhrasalVerbItem]?
+    let work: [RealPhrasalVerbItem]?
+    let sleep: [RealPhrasalVerbItem]?
+    let feelings: [RealPhrasalVerbItem]?
+    let travel: [RealPhrasalVerbItem]?
+    let technology: [RealPhrasalVerbItem]?
+    let healthFitness: [RealPhrasalVerbItem]?
+    let money: [RealPhrasalVerbItem]?
+    let education: [RealPhrasalVerbItem]?
+    let friendship: [RealPhrasalVerbItem]?
+    let housework: [RealPhrasalVerbItem]?
+    let morningRoutine: [RealPhrasalVerbItem]?
+    let business: [RealPhrasalVerbItem]?
+    let clothes: [RealPhrasalVerbItem]?
+    let sports: [RealPhrasalVerbItem]?
+    
+    private enum CodingKeys: String, CodingKey {
+        case climateChange = "Climate Change"
+        case eating = "Eating"
+        case work = "Work"
+        case sleep = "Sleep"
+        case feelings = "Feelings"
+        case travel = "Travel"
+        case technology = "Technology"
+        case healthFitness = "Health & Fitness"
+        case money = "Money"
+        case education = "Education"
+        case friendship = "Friendship"
+        case housework = "Housework"
+        case morningRoutine = "Morning Routine"
+        case business = "Business"
+        case clothes = "Clothes"
+        case sports = "Sports"
+    }
+}
+
+struct RealPhrasalVerbItem: Codable, Identifiable {
+    let id = UUID()
+    let phrasalVerb: String
+    let definition: String
+    let examples: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case phrasalVerb = "phrasal_verb"
+        case definition, examples
+    }
+}
+
+// MARK: - Real Phrasal Verbs View Models
+struct RealPhrasalVerbSubcategory: Identifiable {
+    let id: String
+    let title: String
+    let description: String
+    let itemCount: Int
+    let color: Color
+    let isLocked: Bool
+    let items: [RealPhrasalVerbItemViewModel]
+}
+
+struct RealPhrasalVerbItemViewModel: Identifiable {
+    let id = UUID()
+    let phrasalVerb: String
+    let definition: String
+    let examples: [String]
+    let category: String
+    let difficulty: String
+    
+    init(from realPhrasalVerbItem: RealPhrasalVerbItem, category: String) {
+        self.phrasalVerb = realPhrasalVerbItem.phrasalVerb
+        self.definition = realPhrasalVerbItem.definition
+        self.examples = realPhrasalVerbItem.examples
+        self.category = category
+        self.difficulty = "Medium" // Default difficulty since it's not in the data
+    }
+}
+

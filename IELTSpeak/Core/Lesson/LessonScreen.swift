@@ -265,6 +265,9 @@ struct CardLearningView: View {
         } else if subcategory.id.hasPrefix("real_idioms_") {
             // Handle real idioms data
             items = dataManager.getRealIdiomItems(for: subcategory.id)
+        } else if subcategory.id.hasPrefix("real_phrasal_verbs_") {
+            // Handle real phrasal verbs data
+            items = dataManager.getRealPhrasalVerbItems(for: subcategory.id)
         } else if subcategory.id.contains("idiom") || subcategory.id == "common" {
             items = dataManager.getIdiomItems(for: subcategory.id)
         } else if subcategory.id.contains("phrasal") || subcategory.id == "basic" || subcategory.id == "advanced" {
@@ -384,6 +387,8 @@ struct CardLearningView: View {
             itemId = idiomItem.id
         } else if let realIdiomItem = item as? RealIdiomItemViewModel {
             itemId = realIdiomItem.id.uuidString
+        } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
+            itemId = realPhrasalVerbItem.id.uuidString
         } else if let phrasalItem = item as? PhrasalVerbItem {
             itemId = phrasalItem.id
         }
@@ -405,7 +410,7 @@ struct CardLearningView: View {
             return "vocabulary"
         } else if subcategoryId.hasPrefix("real_idioms_") || subcategoryId.contains("common") {
             return "idioms"
-        } else if subcategoryId.contains("basic") || subcategoryId.contains("advanced") {
+        } else if subcategoryId.hasPrefix("real_phrasal_verbs_") || subcategoryId.contains("basic") || subcategoryId.contains("advanced") {
             return "phrasal-verbs"
         }
         return "vocabulary" // default
