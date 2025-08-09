@@ -1,3 +1,163 @@
+import SwiftUI
+
+struct TestSimulatorScreen: View {
+    @StateObject private var testManager: TestSimulationManager
+    @Environment(\.dismiss) private var dismiss
+    @State private var showQuestions = true
+    let questions: [Int: [QuestionItem]]
+    
+    init(questions: [Int: [QuestionItem]]) {
+        self.questions = questions
+        _testManager = StateObject(wrappedValue: TestSimulationManager(questions: questions))
+    }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    TestHeaderView(
+                        currentPhase: testManager.currentPhase,
+                        currentPart: testManager.currentPart,
+                        onDismiss: { dismiss() }
+                    )
+
+                    switch testManager.currentPhase {
+                    case .preparation:
+                        TestPreparationView(
+                            onStartTest: testManager.startTest
+                        )
+                    case .testing:
+                        ExamTestView(
+                            currentPart: testManager.currentPart,
+                            currentQuestionText: testManager.currentQuestionText,
+                            isExaminerSpeaking: testManager.isExaminerSpeaking,
+                            isUserSpeaking: testManager.isUserSpeaking,
+                            isRecording: testManager.isRecording,
+                            recordingTime: testManager.recordingTime,
+                            waveformData: testManager.audioPlayerManager.isPlaying ? testManager.generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                        case .completed:
+                            if let backendResults = testManager.backendResults {
+                                BackendResultsView(
+                                    testResults: backendResults,
+                                    localConversations: testManager.conversations
+                                )
+                            } else {
+                                TestCompletedView(onViewResults: {
+                                    dismiss()
+                                    // Show local results or error message
+                                })
+                            }
+                        case .processing:
+                            TestProcessingView(isProcessing: .constant(true))
+                                .overlay(
+                                    VStack {
+                                        if SupabaseService.shared.isProcessing {
+                                            Text("AI is analyzing your responses...")
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                                .padding(.top, 8)
+                                        }
+                                    }
+                                )
+                                .onAppear {
+                                    // Your existing processing logic, but now handled by testManager.finalizeTest()
+                                    testManager.finalizeTest()
+                                }
+                    }
+                }
+            }
+            .navigationBarHidden(true)
+        }
+        .ignoresSafeArea()
+        .toolbar(.hidden, for: .tabBar)
+    }
+
+}
+
+struct TestSimulatorScreen_Previews: PreviewProvider {
+    static var previews: some View {
+        // Create dummy audio data for preview purposes
+        let dummyAudioData = "dummy audio data for testing".data(using: .utf8)!
+
+        let mockTestQuestions: [Int: [QuestionItem]] = [
+            0: [ // Part 1
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 1,
+                    questionText: "Let's talk about your hometown. Where are you from?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 2,
+                    questionText: "What do you like most about your hometown?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 1,
+                    order: 3,
+                    questionText: "Is there anything you would like to change about it?",
+                    audioFile: dummyAudioData
+                )
+            ],
+            1: [ // Part 2 (Cue Card)
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 2,
+                    order: 1,
+                    questionText: """
+                    Describe a time you helped someone.
+                    You should say:
+                    - who you helped
+                    - what the situation was
+                    - how you helped them
+                    and explain how you felt after helping this person.
+                    """,
+                    audioFile: dummyAudioData
+                )
+            ],
+            2: [ // Part 3
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 1,
+                    questionText: "Let's discuss helping others in general. Why do people choose to help others?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 2,
+                    questionText: "Do you think people today are more or less willing to help others compared to the past?",
+                    audioFile: dummyAudioData
+                ),
+                QuestionItem(
+                    id: UUID().uuidString,
+                    part: 3,
+                    order: 3,
+                    questionText: "What are some of the benefits of volunteering in the community?",
+                    audioFile: dummyAudioData
+                )
+            ]
+        ]
+
+        TestSimulatorScreen(questions: mockTestQuestions)
+            .environment(\.colorScheme, .light)
+    }
+}
+
+
+
+
+
+
 //
 //import SwiftUI
 //
@@ -175,8 +335,6 @@
 //        // TestSimulatorScreen(questions: testQuestions)
 //    }
 //}
-
-
 
 
 
