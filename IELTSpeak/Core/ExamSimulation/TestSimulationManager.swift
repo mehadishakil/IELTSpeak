@@ -11,7 +11,7 @@ private enum TestConstants {
     static let part3SilenceDuration: TimeInterval = 3.5
     static let part2SilenceDuration: TimeInterval = 3.0
     static let stateTransitionDelay: TimeInterval = 0.5
-    static let finalUploadDelay: TimeInterval = 2.0
+    static let finalUploadDelay: TimeInterval = 4.0
     static let promptDelay: TimeInterval = 1.5
     static let nextQuestionDelay: TimeInterval = 1.0
 }

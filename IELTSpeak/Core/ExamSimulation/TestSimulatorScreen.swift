@@ -72,7 +72,7 @@ struct TestSimulatorScreen: View {
             }
             .navigationBarHidden(true)
         }
-        .ignoresSafeArea()
+        .ignoresSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
     }
 

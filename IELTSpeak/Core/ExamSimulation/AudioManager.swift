@@ -1,10 +1,3 @@
-//
-//  AudioManager.swift
-//  IELTSpeak
-//
-//  Created by Mehadi Hasan on 7/8/25.
-//
-
 import Foundation
 import Foundation
 import AVFoundation
@@ -199,17 +192,20 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
             throw error // Propagate error if session cannot be activated
         }
 
-        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
+        // Changed file extension from .m4a to .wav
+        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".wav")
         currentRecordedAudioURL = audioFilename
 
-        // Optimized settings for smaller file sizes while maintaining quality
+        // WAV PCM settings - mono, 16kHz
         let settings = [
-            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
-            AVSampleRateKey: 16000,        // Reduced from 12000 to 16000 for better speech quality
-            AVNumberOfChannelsKey: 1,       // Mono
-            AVEncoderAudioQualityKey: AVAudioQuality.medium.rawValue,  // Changed from high to medium
-            AVEncoderBitRateKey: 32000      // Add explicit bit rate limit (32 kbps)
-        ]
+            AVFormatIDKey: Int(kAudioFormatLinearPCM),        // Changed to Linear PCM
+            AVSampleRateKey: 16000,                           // 16kHz sample rate
+            AVNumberOfChannelsKey: 1,                         // Mono
+            AVLinearPCMBitDepthKey: 16,                       // 16-bit depth
+            AVLinearPCMIsBigEndianKey: false,                 // Little endian
+            AVLinearPCMIsFloatKey: false,                     // Integer samples
+            AVLinearPCMIsNonInterleaved: false                // Interleaved
+        ] as [String : Any]
 
         do {
             audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
@@ -222,7 +218,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
                 recordingTime = 0
                 startRecordingTimer()
                 print("AudioRecorderManager: Recording started to: \(audioFilename.lastPathComponent)")
-                print("AudioRecorderManager: Using optimized settings - 16kHz, mono, medium quality, 32kbps")
+                print("AudioRecorderManager: Using WAV PCM - 16kHz, mono, 16-bit")
             } else {
                 isRecording = false
                 print("AudioRecorderManager: Failed to start recording (record() returned false).")
@@ -233,6 +229,8 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
             throw error
         }
     }
+    
+    
     func stopRecording() -> URL? {
         if audioRecorder?.isRecording == true {
             audioRecorder?.stop()

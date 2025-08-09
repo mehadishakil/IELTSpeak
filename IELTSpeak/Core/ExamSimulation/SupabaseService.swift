@@ -1,14 +1,6 @@
-//
-//  SupabaseService.swift
-//  IELTSpeak
-//
-//  Created by Mehadi Hasan on 1/8/25.
-//
-
 import Foundation
 import Supabase
 import AVFoundation
-
 
 
 // MARK: - Codable structs for database operations
@@ -101,47 +93,6 @@ class SupabaseService: ObservableObject {
             return session
         }
     
-    /// Upload audio response and create response record
-//    func uploadResponse(
-//        sessionId: String,
-//        questionId: String,
-//        audioURL: URL,
-//        part: Int,
-//        order: Int
-//    ) async throws {
-//        // 1. Generate unique filename
-//        let filename = "\(sessionId)_part\(part)_q\(order).m4a"
-//        let storagePath = "responses/\(filename)"
-//        
-//        // 2. Read audio data
-//        let audioData = try Data(contentsOf: audioURL)
-//        
-//        // 3. Upload to Supabase Storage
-//        try await supabase.storage
-//            .from("audio-responses")
-//            .upload(
-//                path: storagePath,
-//                file: audioData,
-//                options: FileOptions(contentType: "audio/m4a")
-//            )
-//        
-//        print("✅ Uploaded audio: \(storagePath)")
-//        
-//        // 4. Create response record in database
-//        let responseRequest = CreateResponseRequest(
-//            test_session_id: sessionId,
-//            question_id: questionId,
-//            audio_file_path: storagePath
-//        )
-//        
-//        try await supabase
-//            .from("responses")
-//            .insert(responseRequest)
-//            .execute()
-//        
-//        print("✅ Created response record for question: \(questionId)")
-//    }
-    
     func uploadResponse(
         sessionId: String,
         questionId: String,
@@ -149,8 +100,8 @@ class SupabaseService: ObservableObject {
         part: Int,
         order: Int
     ) async throws {
-        // 1. Generate unique filename
-        let filename = "\(sessionId)_part\(part)_q\(order).m4a"
+        // 1. Generate unique filename with .wav extension
+        let filename = "\(sessionId)_part\(part)_q\(order).wav"  // Changed from .m4a to .wav
         let storagePath = "responses/\(filename)"
         
         // 2. Read and validate audio data
@@ -159,16 +110,16 @@ class SupabaseService: ObservableObject {
         
         print("📊 Audio file size: \(String(format: "%.2f", fileSizeMB)) MB (\(audioData.count) bytes)")
         
-        // 3. Check file size limits (Supabase typically has 50MB limit, but we'll be conservative)
-        let maxSizeMB: Double = 10.0  // 10MB limit
+        // 3. Check file size limits (WAV files will be larger than M4A)
+        let maxSizeMB: Double = 25.0  // Increased from 10MB to 25MB for WAV files
         guard fileSizeMB <= maxSizeMB else {
             print("❌ Audio file too large: \(String(format: "%.2f", fileSizeMB))MB > \(maxSizeMB)MB")
             throw SupabaseError.fileTooLarge(fileSizeMB)
         }
         
-        // 4. Upload to Supabase Storage with timeout and retry logic
+        // 4. Upload to Supabase Storage with correct content type
         do {
-            print("📤 Uploading audio file: \(storagePath)")
+            print("📤 Uploading WAV audio file: \(storagePath)")
             
             try await supabase.storage
                 .from("audio-responses")
@@ -176,12 +127,12 @@ class SupabaseService: ObservableObject {
                     path: storagePath,
                     file: audioData,
                     options: FileOptions(
-                        contentType: "audio/m4a",
+                        contentType: "audio/wav",  // Changed from "audio/m4a" to "audio/wav"
                         upsert: true  // Allow overwrite if exists
                     )
                 )
             
-            print("✅ Uploaded audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)")
+            print("✅ Uploaded WAV audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)")
             
         } catch {
             print("❌ Storage upload failed: \(error)")
@@ -222,6 +173,8 @@ class SupabaseService: ObservableObject {
             throw error
         }
     }
+    
+    
     /// Check if session is queued for processing
     func checkSessionStatus(sessionId: String) async throws -> String {
         let response: SessionStatusResponse = try await supabase
@@ -304,23 +257,6 @@ class SupabaseService: ObservableObject {
         throw SupabaseError.processingTimeout
     }
 }
-
-//enum SupabaseError: LocalizedError {
-//    case noUser
-//    case processingTimeout
-//    case sessionNotFound
-//    
-//    var errorDescription: String? {
-//        switch self {
-//        case .noUser:
-//            return "No authenticated user found"
-//        case .processingTimeout:
-//            return "Processing took too long. Please try again later."
-//        case .sessionNotFound:
-//            return "Test session not found"
-//        }
-//    }
-//}
 
 
 enum SupabaseError: LocalizedError {

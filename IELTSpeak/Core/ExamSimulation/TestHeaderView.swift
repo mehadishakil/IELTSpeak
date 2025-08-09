@@ -25,17 +25,7 @@ struct TestHeaderView: View {
                 )
                 
                 HStack {
-                    Button(action: onDismiss) {
-                        ZStack {
-                            Circle()
-                                .fill(Color.white.opacity(0.2))
-                                .frame(width: 40, height: 40)
-                            
-                            Image(systemName: "xmark")
-                                .font(.title2)
-                                .foregroundColor(.white)
-                        }
-                    }
+                    
                     
                     Spacer()
                     
@@ -57,6 +47,18 @@ struct TestHeaderView: View {
                     Circle()
                         .fill(Color.clear)
                         .frame(width: 40, height: 40)
+                    
+                    Button(action: onDismiss) {
+                        ZStack {
+                            Circle()
+                                .fill(Color.white.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                            
+                            Image(systemName: "xmark")
+                                .font(.title2)
+                                .foregroundColor(.white)
+                        }
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)
