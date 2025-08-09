@@ -35,7 +35,13 @@ struct LessonScreen: View {
                 destinationView(for: categoryId)
             }
             .navigationDestination(for: Subcategory.self) { subcategory in
-                CardLearningView(subcategory: subcategory)
+                if subcategory.id.hasPrefix("vocab_") {
+                    // Extract topic from subcategory id (format: "vocab_topicname")
+                    let topic = String(subcategory.id.dropFirst(6)) // Remove "vocab_" prefix
+                    NewVocabularyView(topic: topic)
+                } else {
+                    CardLearningView(subcategory: subcategory)
+                }
             }
             .navigationDestination(for: SampleAnswerTopic.self) { topic in
                 SampleAnswerDetailView(topic: topic)
@@ -176,6 +182,7 @@ struct LessonScreen: View {
     }
     
     private func handleCategoryTap(_ category: LessonCategory) {
+        // Expand/collapse to show subcategories for all categories
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
             if expandedCategory == category.id {
                 expandedCategory = nil
@@ -188,7 +195,9 @@ struct LessonScreen: View {
     @ViewBuilder
     private func destinationView(for categoryId: String) -> some View {
         switch categoryId {
-        case "vocabulary", "idioms", "phrasal-verbs":
+        case "vocabulary":
+            NewVocabularyView()
+        case "idioms", "phrasal-verbs":
             SubcategoryListView(categoryId: categoryId)
         case "sample-answers":
             SampleAnswerListView()

@@ -8,8 +8,10 @@ class LessonDataManager: ObservableObject {
     @Published var userProgress: UserProgress?
     @Published var isLoading = false
     @Published var error: DataError?
+    @Published var newVocabularyItems: [NewVocabularyItem] = []
     
     private var lessonData: LessonData?
+    private var rawNewVocabularyData: [NewVocabularyItemData] = []
     private let progressKey = "userProgress"
     
     private init() {
@@ -26,8 +28,17 @@ class LessonDataManager: ObservableObject {
             do {
                 self.lessonData = try self.loadLessonDataFromJSON()
                 
+                // Load vocabulary data separately - don't fail if this doesn't work
+                do {
+                    self.rawNewVocabularyData = try self.loadNewVocabularyDataFromJSON()
+                } catch {
+                    print("Warning: Could not load vocabulary_data.json: \(error.localizedDescription)")
+                    self.rawNewVocabularyData = []
+                }
+                
                 DispatchQueue.main.async {
                     self.categories = self.convertToViewModels()
+                    self.newVocabularyItems = self.rawNewVocabularyData.map { NewVocabularyItem(from: $0) }
                     self.isLoading = false
                 }
             } catch {
@@ -48,6 +59,19 @@ class LessonDataManager: ObservableObject {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
         return try decoder.decode(LessonData.self, from: data)
+    }
+    
+    func loadNewVocabularyDataFromJSON() throws -> [NewVocabularyItemData] {
+        guard let path = Bundle.main.path(forResource: "vocabulary_data", ofType: "json") else {
+            throw DataError.vocabularyFileNotFound
+        }
+        
+        guard let data = NSData(contentsOfFile: path) as Data? else {
+            throw DataError.vocabularyFileNotFound
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode([NewVocabularyItemData].self, from: data)
     }
     
     // MARK: - Data Conversion
@@ -74,6 +98,10 @@ class LessonDataManager: ObservableObject {
     
     // MARK: - Subcategories
     func getSubcategories(for categoryId: String) -> [Subcategory] {
+        if categoryId == "vocabulary" {
+            return getVocabularyTopicSubcategories()
+        }
+        
         guard let lessonData = lessonData else { return [] }
         
         return lessonData.subcategories
@@ -96,6 +124,38 @@ class LessonDataManager: ObservableObject {
                     isLocked: isLocked
                 )
             }
+    }
+    
+    // MARK: - Vocabulary Topic Subcategories
+    private func getVocabularyTopicSubcategories() -> [Subcategory] {
+        let topics = getUniqueTopics()
+        let colors: [Color] = [.blue, .green, .orange, .purple, .red, .pink, .yellow, .teal, .indigo, .mint, .cyan, .brown]
+        
+        return topics.enumerated().map { index, topic in
+            let itemCount = newVocabularyItems.filter { $0.topic == topic }.count
+            let color = colors[index % colors.count]
+            
+            // Create a readable title from topic name
+            let title = formatTopicTitle(topic)
+            let description = "Essential vocabulary for \(title.lowercased())"
+            
+            return Subcategory(
+                id: "vocab_\(topic)",
+                title: title,
+                description: description,
+                itemCount: itemCount,
+                progress: 0.0, // You can implement progress tracking later
+                color: color,
+                isLocked: false
+            )
+        }.sorted { $0.title < $1.title }
+    }
+    
+    private func formatTopicTitle(_ topic: String) -> String {
+        // Convert topic names like "transport-by-car-or-lorry" to "Transport by Car or Lorry"
+        return topic.split(separator: "-")
+            .map { $0.capitalized }
+            .joined(separator: " ")
     }
     
     // MARK: - Content Items
@@ -338,11 +398,40 @@ class LessonDataManager: ObservableObject {
         }
         return nil
     }
+    
+    // MARK: - New Vocabulary Methods
+    func getUniqueTopics() -> [String] {
+        return Array(Set(newVocabularyItems.map { $0.topic })).sorted()
+    }
+    
+    func getUniqueSubTopics(for topic: String? = nil) -> [String] {
+        let items = topic == nil ? newVocabularyItems : newVocabularyItems.filter { $0.topic == topic }
+        return Array(Set(items.map { $0.subTopic })).sorted()
+    }
+    
+    func getFilteredVocabulary(topic: String? = nil, subTopic: String? = nil, cefrLevel: CEFRLevel? = nil) -> [NewVocabularyItem] {
+        var filtered = newVocabularyItems
+        
+        if let topic = topic {
+            filtered = filtered.filter { $0.topic == topic }
+        }
+        
+        if let subTopic = subTopic {
+            filtered = filtered.filter { $0.subTopic == subTopic }
+        }
+        
+        if let cefrLevel = cefrLevel {
+            filtered = filtered.filter { $0.cefrLevel == cefrLevel }
+        }
+        
+        return filtered.sorted { $0.word < $1.word }
+    }
 }
 
 // MARK: - Error Handling
 enum DataError: LocalizedError {
     case fileNotFound
+    case vocabularyFileNotFound
     case loadingFailed(String)
     case parsingError
     
@@ -350,6 +439,8 @@ enum DataError: LocalizedError {
         switch self {
         case .fileNotFound:
             return "Lesson data file not found"
+        case .vocabularyFileNotFound:
+            return "Vocabulary data file not found"
         case .loadingFailed(let message):
             return "Failed to load data: \(message)"
         case .parsingError:

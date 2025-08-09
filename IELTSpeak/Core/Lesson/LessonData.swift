@@ -1,4 +1,5 @@
 import Foundation
+import SwiftUI
 
 // MARK: - Codable Data Models for JSON Storage
 struct LessonData: Codable {
@@ -9,6 +10,24 @@ struct LessonData: Codable {
     let phrasalVerbItems: [PhrasalVerbItemData]
     let sampleAnswers: [SampleAnswerData]
     let pronunciationItems: [PronunciationItemData]
+}
+
+// MARK: - New Vocabulary Data Models
+struct NewVocabularyItemData: Codable, Identifiable {
+    let id = UUID()
+    let topic: String
+    let subTopic: String
+    let word: String
+    let partOfSpeech: String
+    let cefrLevel: String
+    let examples: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case topic, word, examples
+        case subTopic = "sub_topic"
+        case partOfSpeech = "part_of_speech"
+        case cefrLevel = "cefr_level"
+    }
 }
 
 struct LessonCategoryData: Codable, Identifiable {
@@ -134,5 +153,53 @@ struct ItemProgress: Codable {
     let lastStudiedDate: Date?
     let studyCount: Int
     let masteryLevel: Int // 0-5 scale
+}
+
+// MARK: - New Vocabulary View Models
+struct NewVocabularyItem: Identifiable {
+    let id = UUID()
+    let topic: String
+    let subTopic: String
+    let word: String
+    let partOfSpeech: String
+    let cefrLevel: CEFRLevel
+    let examples: [String]
+    
+    init(from data: NewVocabularyItemData) {
+        self.topic = data.topic
+        self.subTopic = data.subTopic
+        self.word = data.word
+        self.partOfSpeech = data.partOfSpeech
+        self.cefrLevel = CEFRLevel(rawValue: data.cefrLevel.uppercased()) ?? .B1
+        self.examples = data.examples
+    }
+}
+
+enum CEFRLevel: String, CaseIterable {
+    case A1 = "A1"
+    case A2 = "A2"
+    case B1 = "B1"
+    case B2 = "B2"
+    case C1 = "C1"
+    case C2 = "C2"
+    
+    var displayName: String {
+        return self.rawValue
+    }
+    
+    var color: UIColor {
+        switch self {
+        case .A1: return UIColor.systemGreen
+        case .A2: return UIColor.systemBlue
+        case .B1: return UIColor.systemOrange
+        case .B2: return UIColor.systemPurple
+        case .C1: return UIColor.systemRed
+        case .C2: return UIColor.systemPink
+        }
+    }
+    
+    var swiftUIColor: Color {
+        return Color(self.color)
+    }
 }
 
