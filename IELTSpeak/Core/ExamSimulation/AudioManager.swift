@@ -432,7 +432,7 @@ class SpeechRecognizerManager: NSObject, ObservableObject, SFSpeechRecognizerDel
     }
 
     // MARK: - SFSpeechRecognizerDelegate
-    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChangeTo available: Bool) {
+    func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
         if !available {
             self.error = "Speech recognition is not currently available."
             print("SpeechRecognizerManager: Speech recognizer availability changed: NOT available.")
