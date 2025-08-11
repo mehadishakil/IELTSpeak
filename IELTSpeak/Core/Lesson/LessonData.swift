@@ -372,3 +372,64 @@ struct RealPhrasalVerbItemViewModel: Identifiable {
     }
 }
 
+// MARK: - Sample Answers Data Models
+struct SampleAnswersData: Codable {
+    let part_1_sample_answers: [Part1SampleAnswer]
+    let part_2_sample_answers: [Part2SampleAnswer]
+    let part_3_sample_answers: [Part3SampleAnswer]
+}
+
+struct Part1SampleAnswer: Codable, Identifiable {
+    let id = UUID()
+    let topic: String
+    let questions: [Part1Question]
+    
+    enum CodingKeys: String, CodingKey {
+        case topic, questions
+    }
+}
+
+struct Part1Question: Codable, Identifiable {
+    let id = UUID()
+    let question: String
+    let answer: String
+    let alternative_answer: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case question, answer, alternative_answer
+    }
+}
+
+struct Part2SampleAnswer: Codable, Identifiable {
+    let id = UUID()
+    let question: String
+    let answer1: String
+    let answer2: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case question, answer1, answer2
+    }
+}
+
+struct Part3SampleAnswer: Codable, Identifiable {
+    let id = UUID()
+    let topic: String
+    let questions: [Part3Question]
+    
+    enum CodingKeys: String, CodingKey {
+        case topic, questions
+    }
+}
+
+struct Part3Question: Codable, Identifiable {
+    let id = UUID()
+    let question: String
+    let answer: String
+    let alternative_answer: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case question, answer, alternative_answer
+    }
+}
+
+

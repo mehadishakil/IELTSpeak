@@ -39,15 +39,45 @@ struct LessonScreen: View {
                     // Extract topic from subcategory id (format: "vocab_topicname")
                     let topic = String(subcategory.id.dropFirst(6)) // Remove "vocab_" prefix
                     NewVocabularyView(topic: topic)
+                } else if subcategory.id == "sample-answers-part1" {
+                    if let sampleAnswersData = dataManager.sampleAnswersData {
+                        Part1SampleAnswersView(data: sampleAnswersData.part_1_sample_answers)
+                    } else {
+                        VStack {
+                            Text("Loading Sample Answers...")
+                                .font(.custom("Fredoka-SemiBold", size: 18))
+                            ProgressView()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                } else if subcategory.id == "sample-answers-part2" {
+                    if let sampleAnswersData = dataManager.sampleAnswersData {
+                        Part2SampleAnswersView(data: sampleAnswersData.part_2_sample_answers)
+                    } else {
+                        VStack {
+                            Text("Loading Sample Answers...")
+                                .font(.custom("Fredoka-SemiBold", size: 18))
+                            ProgressView()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
+                } else if subcategory.id == "sample-answers-part3" {
+                    if let sampleAnswersData = dataManager.sampleAnswersData {
+                        Part3SampleAnswersView(data: sampleAnswersData.part_3_sample_answers)
+                    } else {
+                        VStack {
+                            Text("Loading Sample Answers...")
+                                .font(.custom("Fredoka-SemiBold", size: 18))
+                            ProgressView()
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 } else {
                     CardLearningView(subcategory: subcategory)
                 }
             }
             .navigationDestination(for: SampleAnswerTopic.self) { topic in
-                SampleAnswerDetailView(topic: topic)
-            }
-            .navigationDestination(for: PronunciationTopic.self) { topic in
-                PronunciationDetailView(topic: topic)
+                EmptyView() // Removed - using new SampleAnswersView instead
             }
             .onAppear {
                 if dataManager.categories.isEmpty {
@@ -200,9 +230,7 @@ struct LessonScreen: View {
         case "idioms", "phrasal-verbs":
             SubcategoryListView(categoryId: categoryId)
         case "sample-answers":
-            SampleAnswerListView()
-        case "pronunciation":
-            PronunciationListView()
+            SampleAnswersView()
         default:
             EmptyView()
         }

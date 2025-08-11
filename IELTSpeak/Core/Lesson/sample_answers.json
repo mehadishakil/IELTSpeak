@@ -1,0 +1,432 @@
+{
+    "part_1_sample_answers": [
+        {
+            "topic": "Clothes",
+            "questions": [
+                {
+                    "question": "Where do you buy most of your clothes?",
+                    "answer": "I buy most of my clothes from physical retail stores and sometimes from online platforms. When I want to try on clothes and see how they fit before making a purchase, I enjoy browsing through different clothing brands in malls or shopping districts. On the other hand, I sometimes do online shopping as it offers convenience, a wider range of options, and the ability to compare prices and read customer reviews.",
+                    "alternative_answer": "As a fashionable person I prefer to buy most of my clothes from brand shops. These brand shops offer a curated selection of high-quality clothing items that are often created by renowned designers. Shopping at brand shops allows me to stay updated with the latest fashion releases and ensures that I have access to exclusive collections and limited-edition pieces."
+                },
+                {
+                    "question": "How often do you buy new clothes for yourself?",
+                    "answer": "The frequency with which I buy new clothes varies depending on several factors. Generally, I tend to buy new clothes when my existing ones become worn out or no longer fit properly. Additionally, I may purchase clothes to suit different occasions or to follow the latest fashion trends. However, I am mindful of practising sustainable consumption and try not to indulge in excessive shopping. ",
+                    "alternative_answer": "Being a fashion-forward individual, I frequently buy new clothes to stay on top of the ever-changing fashion scene. I believe that fashion is a form of self-expression, and updating my wardrobe regularly allows me to showcase my personal style and creativity. I enjoy exploring new collections and trends, and I consider fashion as an ongoing journey of experimentation and self-discovery. By buying new clothes regularly, I can continually reinvent my look and feel confident in my appearance."
+                },
+                {
+                    "question": "How do you decide which clothes to buy?",
+                    "answer": "When deciding which clothes to buy, I consider a few factors. Firstly, I assess the quality and durability of the fabric and craftsmanship to ensure that the clothing item will last. Secondly, I consider comfort and fit, as I prioritize clothes that are comfortable to wear and flatter my body shape. Additionally, I take into account my personal style preferences and whether the item aligns with my overall wardrobe. Lastly, I consider the occasion or purpose for which I need the clothes, ensuring they are suitable for the intended use.",
+                    "alternative_answer": "When deciding which clothes to buy, I prioritize the latest fashion trends, innovative designs, and the reputation of the brand. I pay attention to runway shows, fashion magazines, and style influencers to gain inspiration and insight into the current fashion landscape. I seek out unique and eye-catching pieces that reflect my fashion-forward mindset. Additionally, I consider the quality of the materials and the craftsmanship of the garments, as I value well-made and durable clothing that will stand the test of time."
+                },
+                {
+                    "question": "Have the kinds of clothes you like changed in recent years?",
+                    "answer": "Yes, the kinds of clothes I like have changed to some extent in recent years. As fashion trends evolve and personal style develops, my preferences have shifted. I find myself gravitating towards more versatile and timeless pieces rather than fleeting trends. Comfort and sustainability have also become increasingly important factors for me when choosing clothes. ",
+                    "alternative_answer": "Yes, the kinds of clothes I like have changed in recent years as my fashion tastes have evolved and adapted to new trends. As a fashionable person, I am always on the lookout for fresh and innovative styles that push boundaries and challenge conventional fashion norms. I have become more experimental with my choices, embracing bold patterns, unique cuts, and unconventional silhouettes. Moreover, my preferences have shifted towards sustainable and eco-friendly fashion options, reflecting my growing awareness of the environmental impact of the industry."
+                }
+            ]
+        },
+        {
+            "topic": "Paying bills",
+            "questions": [
+                {
+                    "question": "What kinds of bills do you have to pay?",
+                    "answer": "Well, I need to pay a different variety of bills as I am the one in our family who takes care of these types of tasks. I pay for electricity, water, gas, internet, cable TV, land-phone bill and so on. Sometimes I also need to pay mobile phone bills, municipal bills and garbage bills - which often are taken care of by my elder brother.",
+                    "alternative_answer": "I have to pay several bills every month, including electricity, water, internet, and phone bills. I also have subscriptions for streaming services and website hosting fees. So, there are quite a few, and I believe these expenses are necessary for daily life and entertainment."
+                },
+                {
+                    "question": "How do you usually pay your bills - in cash or by another method?",
+                    "answer": "In most cases, I pay the bills online - either using credit or debit cards or by using mobile financial services. In some rare cases, like paying for the garbage bill, I use cash because they do not accept cashless payments. I pay my bills online or using mobile financial services because it saves the time and effort required to pay offline as I can pay my bills from home without the need to travel to different places. ",
+                    "alternative_answer": "I usually pay my bills online using a banking app or credit card because it is fast, convenient, and secure. However, for smaller expenses or certain services, I sometimes prefer paying in cash."
+                },
+                {
+                    "question": "Have you ever forgotten to pay a bill?",
+                    "answer": "Even though forgetting to pay a bill is not a frequent incident for me, I sometimes (let's say two or three times a year) can't remember the deadline or get busy or distracted to pay my bills in time. As I have noticed, when I stay at a relative or friend's house, I sometimes forget about paying a bill. This rarely happens when I am at home. I guess breaking the usual routine, like visiting a friend and staying there for a couple of days distracts me from what I am supposed to do at home, and this is the primary reason for me to forget paying a bill on time. ",
+                    "alternative_answer": "Yes, I have forgotten to pay a bill a few times, especially when I was busy or travelling. For example, I once forgot to pay my internet bill, and my connection was temporarily cut off. Another time, I missed my credit card payment, which resulted in a late fee. Now, I set reminders to avoid such problems."
+                },
+                {
+                    "question": "Is there anything you could do to make your bills cheaper?",
+                    "answer": "Overall, we do not lead an extravagant life, so there is little that we can do to reduce our bills or make it cheaper. For utility bills - like electricity, gas and water bills, we can do almost nothing. But when it comes to telephone and other subscription-related bills, we can either go for a cheaper service or use them less to reduce our bills. But I believe that's not going to make a significant difference in the amount of bills that we pay each month.",
+                    "alternative_answer": "Yes, I can reduce my bills by using electricity and water wisely, switching to budget-friendly plans, and cancelling unnecessary subscriptions. Paying bills on time also helps avoid late fees and extra charges. I believe making small changes in daily habits can save a significant amount of money over time."
+                },
+                {
+                    "question": "What kinds of bills do you have to pay?",
+                    "answer": "Well, my favourite season is \"spring\" because the weather is pleasantly warm, and nature looks beautiful with blooming flowers and fresh greenery. It's also a great time to go outside and enjoy outdoor activities without extreme temperatures.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "How do you usually pay your bills - in cash or by another method?",
+                    "answer": "In my country, we have four distinct seasons: spring, summer, autumn, and winter. Spring is mild and full of blooming flowers, summer is hot and sunny, autumn brings cool temperatures and colourful leaves, and winter is often cold with snowfall in some areas. Each season has its own charm and activities.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Have you ever forgotten to pay a bill?",
+                    "answer": "People wear light and breathable clothes like t-shirts and shorts in summer, while in winter, they switch to warm clothing like coats, scarves, and boots. In spring and autumn, people usually wear a mix of light and layered clothing to adjust to the changing temperatures.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Is there anything you could do to make your bills cheaper?",
+                    "answer": "Yes, some jobs are highly dependent on the seasons. For example, farming is influenced by the weather, with planting in spring and harvesting in autumn. Tourism also changes with the seasons, as people visit beaches in summer and ski resorts in winter. Additionally, construction work slows down in extremely cold weather.",
+                    "alternative_answer": null
+                }
+            ]
+        },
+        {
+            "topic": "Seasons",
+            "questions": [
+                {
+                    "question": "What is your favourite season?",
+                    "answer": "Well, my favourite season is \"spring\" because the weather is pleasantly warm, and nature looks beautiful with blooming flowers and fresh greenery. It's also a great time to go outside and enjoy outdoor activities without extreme temperatures.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Tell me about the different seasons in your country.",
+                    "answer": "In my country, we have four distinct seasons: spring, summer, autumn, and winter. Spring is mild and full of blooming flowers, summer is hot and sunny, autumn brings cool temperatures and colourful leaves, and winter is often cold with snowfall in some areas. Each season has its own charm and activities.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "How do the clothes people wear in your country change with the seasons?",
+                    "answer": "People wear light and breathable clothes like t-shirts and shorts in summer, while in winter, they switch to warm clothing like coats, scarves, and boots. In spring and autumn, people usually wear a mix of light and layered clothing to adjust to the changing temperatures.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Do any types of jobs people do in your country change with the seasons?",
+                    "answer": "Yes, some jobs are highly dependent on the seasons. For example, farming is influenced by the weather, with planting in spring and harvesting in autumn. Tourism also changes with the seasons, as people visit beaches in summer and ski resorts in winter. Additionally, construction work slows down in extremely cold weather.",
+                    "alternative_answer": null
+                }
+            ]
+        },
+        {
+            "topic": "People you study/work with",
+            "questions": [
+                {
+                    "question": "Who do you spend most time studying/working with?",
+                    "answer": "As a university student, I have a couple of classmates, who are also my friends, with whom I spend a considerable amount of time studying or discussing different topics related to our studies or assignments. If I had to single out a person among them, I would say I spend the most time with “Jessica”, who is a very close friend of mine, and a very brilliant student. ",
+                    "alternative_answer": "I work in a software company in our country, and I often have to work with a number of colleagues on different projects and requirements. However, I believe I work most with two of my colleagues, who happen to be also from my university, as we are often in the same team working on the same projects."
+                },
+                {
+                    "question": "What kinds of things do you study/work on with other people?",
+                    "answer": "My major is Business Studies, and I often find myself studying or discussing accounting, banking, technology, finance, management and computer applications-related topics or assignments with the people I study with. If we have important assignments, which are quite frequent, we also discuss how we can approach and prepare to get a good grade. ",
+                    "alternative_answer": "As a software developer, almost always I work in a team. My work nature is such that I have to constantly interact with a group of people ranging from the clients to the project manager, from teammates, subordinates, the design team, the marketing team to the testing team. I work with the clients to understand the project requirements. With other teams and project managers, I mostly discuss the progress of the projects or do formal meetings about the projects. With the testing team, I collaborate in order to solve bugs or improve a feature."
+                },
+                {
+                    "question": "Are there times when you study/work better by yourself?",
+                    "answer": "I think most of us would agree that group studies are better for understanding comparatively complex topics and it also helps us share our ideas. However, there are some instances, at least this is what my experience has taught me, when we tend to do better if we study all by ourselves. For instance, if I need to write an essay, read a chapter of a book that requires utmost attention, solve a math problem, or do some online research for a small project, I prefer working alone to being in a group of several people. I would like to share my ideas or get reviews on the work I do in such situations, but when it comes to jotting down my thoughts or thinking with rapt attention, I think working solo is sometimes the best option. ",
+                    "alternative_answer": "Well, before starting working on a project, I need to discuss and collaborate with several people. But when it comes to actually writing codes for the software or application, I prefer to work all by myself. However, during this work, I often need to supervise my subordinates and interact with seniors. I think I prefer writing code in a silent environment without the intervention of others because this way, I can pay absolute attention and produce great outputs."
+                },
+                {
+                    "question": "Is it important to like the people you study/work with?",
+                    "answer": "Yes, it is absolutely important to like the people we study with. Students, most of the time, if not always, create a friendly bond with others they study with. So if they do not like each other, chances are that the group would not sustain in the long run and produce very poor output. As for me, the students who I study with are my dear friends, and this friendship began after we started studying together. ",
+                    "alternative_answer": "In my opinion, it is quite important to like and respect the people we work with. Without having a work environment where we have friendly and helpful colleagues, we cannot go on for long. In fact, we spend a significant amount of our day-time in our workplace, so it is imperative that we are surrounded by the people we like to work with and respect each other."
+                }
+            ]
+        },
+        {
+            "topic": "Names",
+            "questions": [
+                {
+                    "question": "Did your parents choose your name(s)?",
+                    "answer": "Yes, my parents selected my name. When I was born, my parents wanted me to have a great name, at least to them. I have heard from my mother that my father brought a \"baby-name\" book even before I was born. So the credit of my name solely goes to them. ",
+                    "alternative_answer": "Yes, my parents chose my name. They believed that selecting a name for their child was an important decision and wanted to give me a name that held meaning and significance to them."
+                },
+                {
+                    "question": "How did your parents choose your name(s)?",
+                    "answer": "I learned that they were inspired by a name they found in the book and they took the surname from my grandfather. Thus they combined the name and selected it for me. However, this was the final step they went through to pick my name. As far as I know, they had to choose from hundreds of names and spend considerable hours to finally become satisfied with the name. ",
+                    "alternative_answer": "My parents chose my name after considering various factors. They took inspiration from family traditions, cultural influences, and personal preferences. They wanted a name that had a pleasant sound, was easy to pronounce, and had a positive meaning."
+                },
+                {
+                    "question": "Does your name have any special meaning?",
+                    "answer": "My name is very special to me as it is to my parents. The first part of my name, Clyde, came from the name of a river, more specifically it is a Scottish river. The river was close to the location where I was born and I believe my parents wanted me to be as big as a river! The second part of my name, which is Entriken', is the family name of a famous ancient dynasty from Great Britain.",
+                    "alternative_answer": "Yes, my name does have a special meaning. It holds cultural and symbolic significance. The specific meaning of my name represents qualities such as strength, wisdom, or beauty, which my parents wished for me to embody throughout my life. It is a meaningful reminder of their hopes and aspirations for me."
+                },
+                {
+                    "question": "Is your name common or unusual in your country?",
+                    "answer": "Statistically speaking, this is not a very common name. However, from my experience, I can tell that I have personally met at least 10 others with the same name but with a different family name. "
+                },
+                {
+                    "question": "If you could change your name, would you?",
+                    "answer": "My name is very special to me and I would never change it. For anyone, his/her name is quite unique and significantly important. I might take an alias someday if I need to ghost-write some articles, but changing my real name to something for the sake of modernism or style is something I will never accept.",
+                    "alternative_answer": "Personally, I would not change my name. I have grown accustomed to my name, and it has become an integral part of my identity. It carries sentimental value as it was given to me by my parents with care and consideration. Additionally, my name is associated with memories, experiences, and relationships, making it an essential part of who I am. Changing my name would mean altering a significant aspect of my identity, which I would not be comfortable dealing with."
+                }
+            ]
+        },
+        {
+          "topic": "Indoor activities",
+          "questions": [
+              {
+                  "question": "Do you like indoor activities?",
+                  "answer": "Yes, I enjoy indoor activities, especially reading, watching movies, and playing board games. They help me relax and spend quality time with my family and friends.",
+                  "alternative_answer": null
+              },
+              {
+                  "question": "What indoor activities do you like?",
+                  "answer": "I enjoy reading books and playing video games. Reading expands my knowledge, while gaming is a fun way to unwind and connect with friends.",
+                  "alternative_answer": null
+              },
+              {
+                  "question": "How much time do you spend indoors every week?",
+                  "answer": "I spend a significant amount of time indoors, especially during weekdays. Since I work or study indoors, I usually go out only in the evenings or on weekends.",
+                  "alternative_answer": null
+              },
+              {
+                  "question": "What types of indoor activities are popular in your country?",
+                  "answer": "In my country, activities like watching television, reading, cooking, and indoor sports like badminton are quite popular. Many people also enjoy socializing at home or in cafes.",
+                  "alternative_answer": null
+              }
+          ]
+        },
+        {
+            "topic": "Food and cooking",
+            "questions": [
+                {
+                    "question": "What sorts of food do you like eating most?",
+                    "answer": "I prefer homemade food and am a fan of my mother's recipe. She is an amazing cook and I always enjoy her cooking. Whenever we go to a restaurant, we like to order Chinese menus. Apart from that, I like buttered popcorn, pizza, Indian Masala dosa, Mexican Tacos, doughnuts and sandwiches - a mixture of many foreign food items actually. ",
+                    "alternative_answer": "I enjoy eating a variety of foods, but if I had to choose, I would say that I particularly enjoy eating Asian cuisine. The flavours, spices, and ingredients used in Asian dishes create a unique and delicious taste that I find very appealing. I appreciate the balance of sweet, sour, spicy, and savoury flavours that are often present in Asian dishes. Moreover, the diversity of Asian cuisine offers a wide range of options, from aromatic curries to stir-fried noodles, which keeps the dining experience interesting and enjoyable."
+                },
+                {
+                    "question": "Who normally does the cooking in your home?",
+                    "answer": "My mother does the cooking in our house and as I have said, she is a magnificent cook. I often compliment her and inspire her to start a restaurant in the city and she always laughs hearing this. Sometimes, my elder sister Emma assists my mother in the kitchen. I, on the contrary, am in charge of the grocery and daily shopping. ",
+                    "alternative_answer": "In my home, cooking responsibilities are shared among family members. My parents and I take turns preparing meals based on our availability and preferences. It's a collaborative effort, and we all contribute to creating delicious and wholesome meals. We enjoy experimenting with different recipes and techniques, and cooking together also provides an opportunity for quality time and bonding."
+                },
+                {
+                    "question": "Do you watch cookery programmes on TV?",
+                    "answer": "Not much, I would say. I am not a big fan of TV programmes and mostly watch movies on my laptop. Once in a while, I watch programmes related to travel and cooking and 'Hell's Kitchen', 'Iron Chef' and 30 'Minute Meals' are my favourites.",
+                    "alternative_answer": "Yes, I do watch cookery programmes on TV. I find them both informative and entertaining. Cookery programmes offer valuable insights into culinary techniques, recipe ideas, and innovative cooking methods. They inspire me to try new recipes and experiment with flavours in my own kitchen. Additionally, watching these programmes is a great way to relax and unwind, especially when I can learn something new while enjoying the artistry of cooking."
+                },
+                {
+                    "question": "In general, do you prefer eating out or eating at home?",
+                    "answer": "I like to eat at home. Homemade food has better food value and offers a wide range of choices. It is more hygienic and less expensive. However, we like to eat at a restaurant whenever we have special occasions to celebrate. As dining out in a restaurant offers my mom plenty of time to socialise rather than getting stuck in the kitchen, my father and I often insist she goes to an eatery on occasions like wedding anniversaries and birthdays.",
+                    "alternative_answer": "While I appreciate the convenience and social aspect of dining out, I generally prefer eating at home. Eating at home allows me to have control over the ingredients, portion sizes, and cooking methods used in preparing meals. I enjoy the process of selecting fresh ingredients, cooking from scratch, and savouring the flavours of homemade dishes. Moreover, eating at home provides a comfortable and relaxed environment, allowing me to fully enjoy the meal and have quality time with my family."
+                }
+            ]
+        },
+        {
+            "topic": "Photographs",
+            "questions": [
+                {
+                    "question": "What type of photos do you like taking?",
+                    "answer": "I often experiment with my camera and mobile phone camera and that's why I like to take a wide range of photos that include nature, people, gift items, sky, river, flowers and so on. However, I am inclined to take photos of people. Some of the best photos that I took were taken in unknown places where people posed for my camera. Their genuine smile, sad expressions and sometimes bewilderment make the photograph worth cherishing.",
+                    "alternative_answer": "I enjoy taking a variety of photos, but I particularly like capturing landscapes and nature scenes. I find that nature has a way of mesmerizing me, and I love trying to capture its beauty through photography. Whether it's a stunning sunset, a serene forest, or a vibrant flower, I find joy in preserving these moments through my camera lens. Additionally, nature photography allows me to connect with the environment and appreciate the wonders of the natural world."
+                },
+                {
+                    "question": "What do you do with the photos you take?",
+                    "answer": "After I take around 20-30 photographs on my camera or my mobile phone, I connect it to my laptop and sort out the best clicks. Then I name those photos according to the theme and prepare those to upload to my Flickr account. Flickr is a great photo storing and sharing website owned by Yahoo! and it offers enormous storage space. Sometimes, I share a few pictures with my friends on Facebook and Instagram. I usually print a photo if I want to gift it to someone or frame it.",
+                    "alternative_answer": "Once I take photos, I usually store them on my computer or upload them to a cloud storage platform for safekeeping. I also like to organize and categorize them based on themes or locations. Furthermore, I enjoy sharing my photos with friends and family on social media platforms or through personal albums. Some of my favourite shots may also find their way into frames or photo books, allowing me to display and cherish those memories in a tangible form."
+                },
+                {
+                    "question": "When you visit other places, do you take photos or buy postcards?",
+                    "answer": "I used to buy postcards whenever I visited a new place with my parents in my childhood. Perhaps I did so to bring souvenirs of the places I had been to. But with the increasing use of the smartphone and cameras, we can now take our own pictures and videos, and frame them to our digital storage. In this age of technological advancement, we are more inclined to take pictures and videos and then share those with friends and family rather than purchasing souvenirs, especially postcards.",
+                    "alternative_answer": "When I visit other places, I usually prefer to take my own photos rather than buy postcards. Taking my own photos allows me to capture the unique experiences and perspectives of the places I visit. It adds a personal touch to my memories and enables me to document my own journey. Moreover, taking photos allows me to express my creativity and perspective as I frame the scenes and subjects that resonate with me the most."
+                },
+                {
+                    "question": "Do you like people taking photos of you?",
+                    "answer": "If someone asks me first and I feel like being captured in a photo, I do not mind. Otherwise, I do not prefer to be in a photograph, especially with less known or unknown people. I think this is a personal choice and I am not the type of person who likes taking selfies or self-photographs now and then.",
+                    "alternative_answer": "It depends on the context and the people taking the photos. Generally, I don't mind people taking photos of me, especially during special occasions or memorable moments. I see it as a way to capture shared experiences and create lasting memories. However, I do appreciate it when people ask for permission before taking my photo and respect my boundaries. Ultimately, I believe that photography can be a beautiful way to preserve and celebrate moments, as long as it's done with mutual respect and consideration."
+                }
+            ]
+        },
+        {
+            "topic": "Bicycles",
+            "questions": [
+                {
+                    "question": "How popular are bicycles in your hometown?",
+                    "answer": "Well, I would say bicycles are moderately popular in my hometown. It was widely used when I was a child and I have seen so many people using bicycles to reach their destinations. In fact, the majority of people used to ride bicycles to travel to and from their offices at that time. But, motorized vehicles have become more popular these days and this trend has decreased the prevalence of bicycles. However, It's a good sign that many young people these days are using bicycles.",
+                    "alternative_answer": "Bicycles are quite popular in my hometown. It is a small and environmentally conscious city where cycling is actively encouraged. The city has developed a well-connected network of bicycle lanes and paths, making it safe and convenient for people to ride bicycles. Additionally, there is a growing awareness of the health and environmental benefits of cycling, which has contributed to its popularity. Many residents use bicycles as a means of transportation, especially for short distances or commuting to work or school."
+                },
+                {
+                    "question": "How often do you ride a bicycle?",
+                    "answer": "Honestly speaking, I scarcely ride a bicycle these days. Busy lifestyle, faster speed of motorized vehicles and our apathy to get involved in physical activities have forced us to use a bicycle less often. Once in a while, I ride a bicycle and that's primarily to have fun and not to travel. Personally, I more often use a car than a bicycle because the former is faster and more comfortable to ride in.",
+                    "alternative_answer": "I ride a bicycle regularly, at least a few times a week. I find it to be an enjoyable and efficient way to incorporate exercise into my daily routine. I often use my bicycle for short errands, such as going to the grocery store or meeting friends in the neighbourhood. Cycling also allows me to appreciate the surroundings and enjoy the fresh air. However, there are times when I may not ride a bicycle, such as during unfavourable weather conditions or when I have to travel longer distances where other modes of transportation are more practical."
+                },
+                {
+                    "question": "Do you think that bicycles are suitable for all ages?",
+                    "answer": "Yes, I absolutely believe that bicycles are suitable for people of all age groups. Bicycles are cheap, have almost zero maintenance costs, and are good for the environment and our health. Since it doesn't take much physical labour, children, youth and senior citizens alike can ride it without any hassle. The health benefits of riding a bicycle are unparalleled and that's why people from all age groups should consider this as their primary means of transportation.",
+                    "alternative_answer": "Yes, I believe that bicycles are suitable for all ages. While children and teenagers may initially come to mind when thinking about cycling, bicycles can be enjoyed by people of all age groups. They offer a low-impact form of exercise that can be adjusted to different fitness levels. Older adults can benefit from cycling as it helps improve cardiovascular health, joint mobility, and overall fitness. Moreover, cycling provides a sense of independence, freedom, and enjoyment for people of all ages."
+                },
+                {
+                    "question": "What are the advantages of a bicycle compared to a car?",
+                    "answer": "Bicycles have far more benefits than cars except for the fact that a car is faster. The most important advantage of riding a bicycle is that it keeps us healthy. Bicycles do not pollute the air and they are environment-friendly. They are cheap and require no costly maintenance or services. While cars take larger spaces to be parked into, bicycles do not. Considering the environmental consequences, bicycles could be a great replacement for motorised vehicles in our hometown.",
+                    "alternative_answer": "There are several advantages of using a bicycle compared to a car. Firstly, bicycles are a more environmentally friendly mode of transportation as they produce zero emissions and contribute less to air pollution. Secondly, cycling helps promote physical fitness and is a great way to incorporate exercise into daily routines. It can improve cardiovascular health, muscle strength, and overall well-being. Additionally, bicycles are more cost-effective as they require minimal maintenance and do not incur expenses related to fuel, insurance, or parking. Furthermore, bicycles are often more convenient in urban areas with congested traffic, as they can navigate through narrow streets and bypass congestion."
+                }
+            ]
+        },
+        {
+            "topic": "Giving gifts",
+            "questions": [
+                {
+                    "question": "When do people give gifts or presents in your country?",
+                    "answer": "In my country, we mostly give gifts to others on a special day like a birthday, a wedding ceremony, and on an anniversary day. It's a widely followed custom to exchange gifts during the Christmas holidays. We often buy gifts for a classmate, colleague or teacher on their farewell days. Besides, we often buy candies for children and flowers for our relatives whenever we visit their house.",
+                    "alternative_answer": "In my country, people give gifts or presents on various occasions and festivals. Some common occasions include birthdays, weddings, anniversaries, festivals such as Christmas or New Year, and special milestones like graduations or promotions. Giving gifts is seen as a gesture of appreciation, celebration, and showing care for the recipient."
+                },
+                {
+                    "question": "Do you ever take a gift when you visit someone in their home?",
+                    "answer": "Yes, I most often buy a gift on such an occasion. I do it as it is a broadly followed convention in our country, and the idea of giving a host some sort of gift is exciting, especially when the host loves the gift. Besides, it's a token of appreciation and a good gesture as a guest. ",
+                    "alternative_answer": "Yes, I often take a gift when I visit someone's home. It is considered polite and a way to show gratitude and respect for the hospitality extended by the host. The gift can vary depending on the occasion and the relationship with the person. It could be something like a bouquet of flowers, a box of chocolates, or a small token that reflects the recipient's interests. Taking a gift is a way to express my appreciation and contribute to the pleasant experience of being a guest."
+                },
+                {
+                    "question": "When did you last receive a gift?",
+                    "answer": "Well, that's an interesting question and it reminds me of a gift that a close friend of mine gave me a few weeks ago. Maria went to Italy last November to visit her grandparents and after she returned, she gave me a perfume made in Italy. The 'Gucci Premiere Eau De Parfum' that she gave me was expensive and I really appreciate her gift.",
+                    "alternative_answer": "The last gift I received was on my birthday a few months ago. My friends surprised me with a beautifully wrapped box, and inside it was a novel that I had been wanting to read for a long time. It was a thoughtful gift because my friends knew about my love for reading and made an effort to choose something that would resonate with my interests. I was genuinely touched by their gesture and felt grateful for their friendship."
+                },
+                {
+                    "question": "Do you enjoy looking for gifts for people?",
+                    "answer": "Yes, most of the time I love to browse different shops to find a suitable gift for someone I care for. Finding a suitable gift idea and then getting the item can be time-consuming, but it represents our care and love for the person we are presenting the gift. If the person likes the present, the time we spend to find it is worth every second of it.",
+                    "alternative_answer": "Yes, I do enjoy looking for gifts for people. I find it exciting and fulfilling to search for something that matches the recipient's preferences, interests, or needs. It allows me to show my thoughtfulness and care by selecting a gift that reflects their personality or brings them joy. It allows me to express my appreciation and strengthen my bond with the person. Additionally, the process of finding a suitable gift can be creative and enjoyable, as it involves exploring different options and considering what would make the person happy."
+                }
+            ]
+        },
+        {
+            "topic": "Games",
+            "questions": [
+                {
+                    "question": "What games are popular in your country?",
+                    "answer": "People in my country are crazy about football. You will find most of the youths playing football in the evening. Among the indoor games, people love to play chess and cards most of the time. Finally, computer games are highly popular among the young generation. ",
+                    "alternative_answer": "In my country, various games are popular, both traditional and modern. Traditional games like cricket, football (soccer), kabaddi, and badminton have a significant following. These games have a long history and cultural significance in our society. Additionally, games like chess, carrom, and card games are also widely played. As for modern games, video games and online games have gained immense popularity among the younger generation due to their accessibility, technological advancements, and the ability to connect with players worldwide."
+                },
+                {
+                    "question": "Do you play any games?",
+                    "answer": "Yes, I like to play badminton most of the time. Football was, and still is my favourite sport, but I can't manage time to practice football in the evening. I am a great fan of chess and I often visit a few of my friends who are also passionate about playing chess. Sometimes, a single chess match between me and my friend takes multiple days to finish!",
+                    "alternative_answer": "Yes, I enjoy playing games, and football is my favourite outdoor game that I often play with my friends. I like to play chess a lot as well. I find them not only entertaining but also a great way to relax, have fun, and engage with others. Playing games allows me to challenge myself, stay fit, improve my problem-solving skills, and enhance my cognitive abilities. Whether it's board games with friends, outdoor sports, or video games, they provide a break from daily routines and offer an avenue for recreation and social interaction."
+                },
+                {
+                    "question": "How do people learn to play games in your country?",
+                    "answer": "I think most of the people in my country learn to play different games in their childhood and their family, classmates and friends have a great role in teaching these games to them. Young children often mimic elders and play games that are popular in their area. Those who are serious about sports or want to become professional sportsmen often get admitted to different training institutes to develop their skills.",
+                    "alternative_answer": "The learning process for playing games in my country varies depending on the type of game. For traditional games like cricket or football, many people learn through informal settings such as playing with friends in local communities, parks, or schools. Sports clubs and academies also provide formal training for those interested in pursuing the games at a competitive level. For games like chess or card games, individuals often learn from family members, and friends, or through organized events and tournaments. With the rise of video games, many people learn through self-exploration, online tutorials, or by joining gaming communities where experienced players share their knowledge."
+                },
+                {
+                    "question": "Do you think it’s important for people to play games?",
+                    "answer": "Yes, I do believe that sports and games are vital for a balanced life. Games are highly entertaining and beneficial for our health. Many games are helpful for children's physical and cognitive development. It also teaches them important skills like how to be a team member and develops their decision-making capabilities.",
+                    "alternative_answer": "Yes, I believe it's important for people to play games and sports. Games provide numerous benefits for individuals of all ages. They promote physical fitness and overall well-being, encourage teamwork, enhance problem-solving and strategic thinking skills, and foster creativity and imagination. Games also offer a platform for social interaction, helping individuals build relationships, develop communication skills, and learn sportsmanship. Moreover, playing games can be a source of stress relief and enjoyment, allowing individuals to rejuvenate and have a break from their daily routines."
+                }
+            ]
+        },
+        {
+            "topic": "Work",
+            "questions": [
+                {
+                    "question": "What work do you do?",
+                    "answer": "I work as a digital marketing specialist. My job involves creating online campaigns, managing social media platforms, and analyzing market trends to help businesses grow.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "What do you enjoy most about your work?",
+                    "answer": "I enjoy the creativity involved in designing marketing campaigns and coming up with new ideas to engage customers. I also like the flexibility of working online and the opportunity to learn new digital trends.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Is there any other work you would like to do in the future?",
+                    "answer": "In the future, I would love to start my own digital marketing agency or work as a consultant for different businesses. I enjoy being independent and helping brands establish a strong online presence.",
+                    "alternative_answer": null
+                },
+                {
+                    "question": "Will you have to do more training for your work in the future?",
+                    "answer": "Yes, the digital marketing industry is constantly evolving with new tools, trends, and algorithms. I will need to keep learning through courses, certifications, and hands-on experience to stay competitive.",
+                    "alternative_answer": null
+                }
+            ]
+        },
+        {
+            "topic": "Your friends",
+            "questions": [
+                {
+                    "question": "Do you prefer to have one particular friend or a group of friends?",
+                    "answer": "I think it's a tough question to answer. But I will try. Naturally, I would like to have a group of friends from my school, my neighbourhood and a few online friends but someone truly special would become my best friend. One particular friend, who I believe would be a truly great friend and completely reliable, is hard to find but will remain my buddy for a long time while many other friends would be for a short span of time.",
+                    "alternative_answer": "I believe both having a particular friend and having a group of friends have their own merits. It's nice to have a close bond with one particular friend as it allows for deeper and more intimate conversations, sharing personal experiences, and having someone who truly understands you. On the other hand, being part of a group of friends brings a sense of belonging, diversity of perspectives, and the opportunity to engage in group activities and create lasting memories together. Ultimately, it depends on the individual and the dynamics of their relationships, as different friendships can fulfil different needs."
+                },
+                {
+                    "question": "What do you like doing most with your friend(s)?",
+                    "answer": "I like to have conversations with my friends and hang out with them. I often play indoor and outdoor games with them. Since we can virtually say anything to our friends and do anything with them, we can be truly ourselves with our friends. I sometimes, prefer to travel to different cities with my friends, and I went to Milan a few months ago with two of my close buddies.",
+                    "alternative_answer": "There are various activities I enjoy doing with my friends. One of my favourite things is simply spending quality time together, whether it's going out for meals, watching movies, taking walks, or engaging in hobbies we both enjoy. I also cherish engaging in meaningful conversations and sharing our thoughts, dreams, and experiences. Additionally, participating in fun and adventurous activities, such as travelling, hiking, or trying new things, strengthens the bond and creates memorable experiences."
+                },
+                {
+                    "question": "Do you think it’s important to keep in contact with friends you knew as a child?",
+                    "answer": "I think childhood friends are special in a sense. We make friends during this phase of life very innocently and without any expectations from them. Besides, childhood memories are truly special and our childhood friends are a part of these reminiscences. So keeping in touch with those buddies is important. However, from a practical point of view, having regular contact with all childhood friends is not possible as we lose contact with many of them as we grow older.",
+                    "alternative_answer": "Yes, I believe it's important to maintain contact with friends I knew as a child, although it may not always be feasible due to various circumstances. Childhood friends hold a special place in our lives as they have witnessed our growth and shared formative experiences with us. Keeping in touch allows us to preserve those connections, reminisce about shared memories, and provide ongoing support and understanding. Additionally, childhood friends often have a unique understanding of our background and can provide a sense of familiarity and continuity in our lives."
+                },
+                {
+                    "question": "What makes a friend into a good friend?",
+                    "answer": "I believe it takes time, common interests and a similar mentality to bring friends even closer. We make many friends in our life and some of them become close friends as they prove through their activities that we can trust them and share anything with them.",
+                    "alternative_answer": "In my opinion, several qualities contribute to making a friend a good friend. Firstly, trust is essential. A good friend is someone who can be relied upon and keeps their word. They are honest and dependable, and maintain confidentiality. Empathy and understanding are also crucial. A good friend listens attentively, shows genuine concern for your well-being, and offers support during difficult times. Additionally, good communication, respect for boundaries, and the ability to have fun and enjoy each other's company are important aspects of a strong friendship."
+                }
+            ]
+        },
+        {
+            "topic": "Musical instruments",
+            "questions": [
+                {
+                    "question": "Which instrument do you like listening to the most?",
+                    "answer": "I mostly like the sound of a piano. The note that a piano produces is so delightful and melodious. It soothes the ear and refreshes my mind. The guitar is perhaps my second most preferred musical instrument and it is widely used with most of the music types.",
+                    "alternative_answer": "I particularly enjoy listening to the violin. The violin has a beautiful and expressive sound that can evoke a wide range of emotions. It has a unique ability to convey both delicate and powerful melodies, and its versatility allows it to be a prominent instrument in various genres of music, such as classical, folk, and even contemporary styles. The way a skilled violinist can draw out such rich tones and convey profound emotions through their playing is truly captivating to me."
+                },
+                {
+                    "question": "Have you ever learned to play a musical instrument?",
+                    "answer": "I once tried to master the skills of playing the guitar. I even got admitted to a music school to learn to play the guitar but could not finish the whole course. I can play some basic tones and music on the guitar but I am not a skilled guitarist.",
+                    "alternative_answer": "Yes, I have learned to play the piano. I started learning to play the piano when I was a child, and I continued my studies through my teenage years. The piano is a versatile instrument with a wide range of notes and expressive capabilities. It allows me to explore a vast repertoire of music, from classical compositions to contemporary pieces."
+                },
+                {
+                    "question": "Do you think children should learn to play a musical instrument at school?",
+                    "answer": "I believe schools should have the facility for interested students who want to learn to sing and play a musical instrument, but it should not be forced on all. If a child at school feels passionate about learning it, he/she should be given the choice to do so.",
+                    "alternative_answer": "Absolutely, I believe that learning to play a musical instrument at school can be highly beneficial for children. Music education offers numerous advantages, including cognitive development, improved coordination, and enhanced creativity. Learning an instrument also teaches discipline, perseverance, and the ability to work in a team if they participate in a school band or orchestra. Moreover, playing an instrument can serve as a means of self-expression and provide a source of joy and fulfilment throughout their lives."
+                },
+                {
+                    "question": "How easy would it be to learn to play an instrument without a teacher?",
+                    "answer": "I think it was quite impossible in the pre-internet era. However, online courses and interactive video tutorials make it a bit easier to learn to play a musical instrument like a guitar or a drum without the direct supervision of a mentor these days. Nevertheless, having a teacher is tremendously beneficial as he/she inspires us to learn and can be a role model for mastering the skills of playing a musical instrument.",
+                    "alternative_answer": "Learning to play an instrument without a teacher can be challenging, especially for beginners. While it's possible to find resources such as online tutorials or instructional books, having a knowledgeable teacher provides guidance, feedback, and personalized instruction that accelerates the learning process. A teacher can correct techniques, introduce proper practice methods, and offer tailored guidance based on the student's individual strengths and weaknesses. Additionally, a teacher can inspire and motivate students, helping them navigate through difficulties and explore different musical styles and techniques. While it's possible to learn independently to some extent, the guidance of a teacher greatly enhances the learning experience."
+                }
+            ]
+        },
+        {
+            "topic": "Summer",
+            "questions": [
+                {
+                    "question": "Is summer your favourite time of year?",
+                    "answer": "I like the summer season when it is not too hot, but I can not say that it is my favourite season because I like Autumn over any other season. During mild summer, which lasts for just a month or two, the weather is just perfect for outdoor activities and visiting beach areas. But the rest of the summer is too hot and too humid for my liking. In our country, the sun often shines mercilessly and the temperature reaches around 40 degree Celsius.",
+                    "alternative_answer": "No, my favourite time of year is actually the mild winter season. I find the cooler temperatures and cosy atmosphere of winter more appealing to me. I enjoy activities such as wearing warm sweaters, drinking hot beverages, and spending time indoors with family and friends. The winter season has a certain charm that resonates with me more than the hot and humid weather of summer."
+                },
+                {
+                    "question": "What do you do in summer when the weather's very hot?",
+                    "answer": "I am extremely lucky that I own a house that has air coolers, and I work in an office that has a central air conditioner. I even have my own car. So I can mostly avoid the fierce hot weather and stay cool indoors. Sometimes when I go out without the comfort of the car, I can feel the heat and perspire profoundly. This is extremely annoying but this is the reality for millions of people in our country. During summer, I try to drink plenty of water and go out during the evening time after sunset to avoid direct sunlight.",
+                    "alternative_answer": "When the weather gets very hot in summer, I prefer to engage in activities that help me stay cool and refreshed. I often spend time near water bodies like swimming pools or beaches to beat the heat. I also enjoy indoor activities such as watching movies, reading books, or pursuing hobbies that can be done in the comfort of air-conditioned spaces. It's important for me to maintain a comfortable and enjoyable environment during the hot summer months."
+                },
+                {
+                    "question": "Do you go on holiday every summer?",
+                    "answer": "Yes, I enjoy holidays during the summer season, when I get one or two weeks' leave from my office. I either choose a sea beach or a location near a river or a lake in summer to enjoy the view and get away from the hustle and bustle of city life.",
+                    "alternative_answer": "It varies. While I do enjoy going on holidays, I don't necessarily go on a vacation every summer. Factors such as personal commitments, financial considerations, and availability of time off from work or studies play a role in determining whether I can go on a summer holiday or not. However, I do make it a point to take breaks and plan trips whenever circumstances allow, as I believe vacations are essential for relaxation, rejuvenation, and exploring new places."
+                }
+            ]
+        }
+    ],
+    "part_2_sample_answers": [
+        {
+            "question": "Describe a rule that is important in your school or at work. \n You should say: \n what the rule is about \n how this rule helps \n how you feel about this rule \n and explain why this is such an important rule for your school or your workplace.",
+            "answer1" : "I’d like to describe a rule at my college that I believe is crucial for creating a productive and focused learning environment. I hope you will also agree with me that this rule is really important. The rule is simple: no electronic gadgets, such as mobile phones, tablets, or laptops, are allowed to be used during class unless they are required for the lesson and permitted by the class teacher. The intention behind this rule is to ensure that students remain focused and engaged during lectures without the distractions that personal devices often bring. I believe this rule plays a significant role in maintaining a conducive learning environment in our college. By limiting the use of electronic gadgets, students are encouraged to concentrate fully on the lecture, participate in discussions, and interact with their peers and instructors without the constant pull of social media or personal notifications. Personally, I support and like this rule. While I understand the importance of staying connected in today’s digital world, I believe that the classroom is a space where focus and attention are paramount. When I’m in class, I want to make the most of the learning experience, and using gadgets can be a major distraction. I’ve noticed that when students are allowed to use their phones or laptops freely, it can lead to side conversations, browsing unrelated content, and a general decline in class participation. This rule, however, ensures that everyone is on the same page and that the class runs smoothly without interruptions. This rule is particularly important in my college because it upholds the quality of education. The college prides itself on fostering a focused, intellectual environment, and this rule helps maintain that atmosphere. In a place where students are expected to engage in deep discussions, analyze complex topics, and retain vast amounts of information, having distractions like electronic gadgets can be counterproductive. Moreover, this rule encourages a sense of discipline and respect for both the instructors and fellow students. It sets clear boundaries for the appropriate use of technology, teaching students to be mindful of when and where devices should be used.",
+            "answer2": "Well, the rule I'd like to discuss is quite common in many professional environments, and it's about restricting internet usage only to work-related tasks. At my office, this means that the internet connection is constantly monitored, and access to non-work-related websites, particularly social media platforms and streaming services, is blocked. We're expected to use the internet solely for work, research, communication with clients and colleagues, and accessing company resources. This rule significantly helps maintain a focused and productive work environment. For example, it ensures that employees aren't spending valuable company time browsing personal social media feeds, watching videos, or engaging in other non-work-related online activities. It also helps in protecting company data and network security, as accessing unverified or personal websites can sometimes pose risks. When this rule was first implemented, I'll admit, my initial reaction was a mix of slight frustration and surprise. Like many people, I was accustomed to having open internet access, and the idea of being restricted felt a bit intrusive. However, as time went on, my feelings shifted considerably. I quickly realised the immense benefit it brought to my personal productivity. Without the constant temptation of notifications or the urge to 'just quickly check' something irrelevant, I, at the office, found myself getting through tasks much faster and with greater concentration. Ultimately, I think this is an incredibly important rule for our workplace. Its primary importance lies in its ability to minimise distractions and ensure that company resources – including time, bandwidth, and equipment – are used as efficiently as possible. In today's hyper-connected world, where digital distractions are abundant, such a rule creates a conducive environment for focused work and high-quality output. It fosters a culture of professionalism and efficiency, making sure that everyone is contributing to the company's goals without unnecessary diversions."
+        },
+        {
+            "question": "Describe a place you visited that has beautiful views. \n You should say: \n where this place is \n when and why you visited it \n what views you can see from this place \n and explain why you think these views are so beautiful.",
+            "answer1" : "I'd like to describe a mesmerizing place that left a lasting impression on me due to its breathtaking scenery. The place I am talking about is the Banff National Park, located in the province of Alberta, Canada. It is a renowned destination for nature enthusiasts and is famous for its stunning landscapes, majestic mountains, and crystal-clear lakes. I visited Banff National Park last summer during my holiday break. I had heard a lot about the beauty of this place from friends and saw countless photos online. So, I decided to visit with a group of friends who also love exploring nature. Our plan was to spend a few days hiking, camping, and immersing ourselves in the natural beauty of the Canadian Rockies. The views from Banff are absolutely mesmerizing. One of the most iconic sights is the turquoise-blue Lake Louise, surrounded by snow-capped mountains and dense evergreen forests. The towering peaks of Mount Rundle and Sulphur Mountain are also visible, creating a dramatic backdrop. We took a gondola ride up the mountain, and the panoramic view from the top was nothing short of spectacular. We could see endless stretches of lush valleys, glittering lakes, and rugged mountains stretching as far as the eye could see. I think the views from Banff National Park are so beautiful because of the perfect combination of natural elements. The vibrant colours of the lakes, the pristine white snow on the peaks, and the green valleys all come together to create a picture-perfect scene. Moreover, the tranquil atmosphere and the feeling of being surrounded by untouched nature made the experience even more surreal. The beauty of this place left me in awe, and I couldn’t stop taking pictures to capture every moment. It felt like stepping into a postcard, and I would love to visit again someday to relive those enchanting views.",
+            "answer2": "Thank you for this great topic, and I'd like to share a memorable experience of visiting a place that has stunning views. It was a remarkable journey that left a lasting impression on me and I hope you will also be interested in visiting this place after you hear it from me. The place I am going to talk about is a beautiful sea beach located on the coastline of my country. It is a popular destination for both locals and tourists, known for its vast sandy stretches and calming waves. The beach is not far from the city, making it an ideal spot for weekend getaways. I visited this beach about a year ago with my family during our summer vacation. We were looking for a peaceful and relaxing place to unwind from our busy lives, and the beach seemed like the perfect choice. The idea was to spend quality time together, enjoy the fresh sea breeze, and indulge in some beach activities. The views from the beach were absolutely captivating. The vast expanse of golden sand stretched endlessly along the shoreline, while the waves gently crashed onto the shore, creating a soothing rhythm. The crystal-clear water glistened under the sunlight, and in the distance, fishing boats sailed gracefully across the horizon. As the sun began to set, the sky turned into a palette of warm hues – shades of orange, pink, and purple reflecting off the water, making the whole scene look surreal. I found the views incredibly beautiful because of their natural simplicity and tranquillity. The sound of the waves, the cool breeze, and the vibrant colours of the sunset made me feel at peace. It was as if time had slowed down, allowing me to fully immerse myself in the beauty around me. I enjoyed every moment, feeling grateful for the chance to escape from the hectic pace of city life. The picturesque scenery, combined with the refreshing atmosphere, made it one of the most beautiful places I have ever visited."
+        }
+    ],
+    "part_3_sample_answers": [
+        {
+            "topic": "Family",
+            "questions": [
+                {
+                    "question": "Is family important in your country?",
+                    "answer": "Yes, in my view family is extremely important in my country. People have strong emotional ties with their family members, and they consider their family as the foundation of support, love, and guidance. Most individuals prioritise their family’s well-being over personal ambitions, and it is common for family members to help each other in difficult times. Even though modern life has made people busier, family gatherings and traditions are still valued and celebrated widely in my country and many parts of the world.",
+                    "alternative_answer": "Thank you for this question. Well, people in my country believe that family comes first and they put their family ahead of anything else. They would do anything for the family, and I am proud that family bonding in my country is quite strong."
+                },
+                {
+                    "question": "How has the size of the family changed in the last few decades in your country?",
+                    "answer": "Over the past few decades, the size of families in my country has significantly decreased. In the past, joint families, where multiple generations lived together under one roof, were the norm. However, with urbanisation, changing lifestyles, and economic pressures, nuclear families have become more common. People are moving to cities for jobs, and the cost of living has made it difficult to maintain large families. As a result, families today typically consist of just parents and their children, rather than extended relatives. Single-parent families - comprising of only a mom or dad and children have also increased.",
+                    "alternative_answer": "From my experience, I can say that my grandfather had an extended family and people at that time used to live together with close relatives. As far as I have heard, their forefathers also lived in a joint family and the number of family members was sometimes more than twenty! However, the trend of living in an extended family has changed remarkably in cities where most of the families are nuclear in nature. The villages in my country still have large families who live together but the number is shrinking day by day."
+                },
+                {
+                    "question": "How do you think the family will change in the future?",
+                    "answer": "In the future, I think families will continue to become smaller, and more people may choose to live independently. With technological advancements, virtual communication may replace traditional family gatherings to some extent. Additionally, the concept of family may become more flexible, with more acceptance of single-parent families, same-sex couples raising children, and even friends living together as a form of chosen family. However, despite these changes, emotional connections and the need for family support will always remain essential in people’s lives.",
+                    "alternative_answer": "I believe more people will have a nuclear family and the size of the family will be small in the future. Many people, in our country, do not like to have more than two children nowadays and who knows they will consider having one baby policy in the distant future. The very norm that a man gets married to a woman and has their own children to form a family is being challenged by the concept of same-sex marriage and this trend will increase in the future. I also believe that the number of single-parent families will increase in the future."
+                }
+            ]
+        }
+    ]
+}

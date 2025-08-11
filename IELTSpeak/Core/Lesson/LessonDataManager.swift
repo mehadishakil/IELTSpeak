@@ -11,6 +11,7 @@ class LessonDataManager: ObservableObject {
     @Published var newVocabularyItems: [NewVocabularyItem] = []
     @Published var realIdiomsSubcategories: [RealIdiomSubcategory] = []
     @Published var realPhrasalVerbsSubcategories: [RealPhrasalVerbSubcategory] = []
+    @Published var sampleAnswersData: SampleAnswersData?
     
     private var lessonData: LessonData?
     private var rawNewVocabularyData: [NewVocabularyItemData] = []
@@ -56,11 +57,21 @@ class LessonDataManager: ObservableObject {
                     self.rawRealPhrasalVerbsData = nil
                 }
                 
+                // Load sample answers data separately
+                var loadedSampleAnswersData: SampleAnswersData?
+                do {
+                    loadedSampleAnswersData = try self.loadSampleAnswersDataFromJSON()
+                } catch {
+                    print("Warning: Could not load sample_answers.json: \(error.localizedDescription)")
+                    loadedSampleAnswersData = nil
+                }
+                
                 DispatchQueue.main.async {
                     self.categories = self.convertToViewModels()
                     self.newVocabularyItems = self.rawNewVocabularyData.map { NewVocabularyItem(from: $0) }
                     self.realIdiomsSubcategories = self.convertRealIdiomsToSubcategories()
                     self.realPhrasalVerbsSubcategories = self.convertRealPhrasalVerbsToSubcategories()
+                    self.sampleAnswersData = loadedSampleAnswersData
                     self.isLoading = false
                 }
             } catch {
@@ -122,6 +133,19 @@ class LessonDataManager: ObservableObject {
         return try decoder.decode(RealPhrasalVerbsData.self, from: data)
     }
     
+    func loadSampleAnswersDataFromJSON() throws -> SampleAnswersData {
+        guard let path = Bundle.main.path(forResource: "sample_answers", ofType: "json") else {
+            throw DataError.sampleAnswersFileNotFound
+        }
+        
+        guard let data = NSData(contentsOfFile: path) as Data? else {
+            throw DataError.sampleAnswersFileNotFound
+        }
+        
+        let decoder = JSONDecoder()
+        return try decoder.decode(SampleAnswersData.self, from: data)
+    }
+    
     // MARK: - Data Conversion
     private func convertToViewModels() -> [LessonCategory] {
         guard let lessonData = lessonData else { return [] }
@@ -152,6 +176,8 @@ class LessonDataManager: ObservableObject {
             return getRealIdiomsSubcategories()
         } else if categoryId == "phrasal-verbs" {
             return getRealPhrasalVerbsSubcategories()
+        } else if categoryId == "sample-answers" {
+            return getSampleAnswerSubcategories()
         }
         
         guard let lessonData = lessonData else { return [] }
@@ -461,6 +487,44 @@ class LessonDataManager: ObservableObject {
         return Array(Set(items.map { $0.subTopic })).sorted()
     }
     
+    // MARK: - Sample Answers Subcategories
+    func getSampleAnswerSubcategories() -> [Subcategory] {
+        // Return basic subcategories even if data isn't loaded yet
+        let part1Count = sampleAnswersData?.part_1_sample_answers.reduce(0) { $0 + $1.questions.count } ?? 0
+        let part2Count = sampleAnswersData?.part_2_sample_answers.count ?? 0
+        let part3Count = sampleAnswersData?.part_3_sample_answers.reduce(0) { $0 + $1.questions.count } ?? 0
+        
+        return [
+            Subcategory(
+                id: "sample-answers-part1",
+                title: "Part 1: Introduction & Interview",
+                description: "Personal questions about familiar topics",
+                itemCount: part1Count,
+                progress: 0.0,
+                color: .blue,
+                isLocked: false
+            ),
+            Subcategory(
+                id: "sample-answers-part2", 
+                title: "Part 2: Individual Long Turn",
+                description: "2-minute talk on a given topic",
+                itemCount: part2Count,
+                progress: 0.0,
+                color: .green,
+                isLocked: false
+            ),
+            Subcategory(
+                id: "sample-answers-part3",
+                title: "Part 3: Two-way Discussion", 
+                description: "Abstract and complex questions",
+                itemCount: part3Count,
+                progress: 0.0,
+                color: .purple,
+                isLocked: false
+            )
+        ]
+    }
+    
     func getFilteredVocabulary(topic: String? = nil, subTopic: String? = nil, cefrLevel: CEFRLevel? = nil) -> [NewVocabularyItem] {
         var filtered = newVocabularyItems
         
@@ -616,6 +680,7 @@ enum DataError: LocalizedError {
     case vocabularyFileNotFound
     case idiomsFileNotFound
     case phrasalVerbsFileNotFound
+    case sampleAnswersFileNotFound
     case loadingFailed(String)
     case parsingError
     
@@ -629,6 +694,8 @@ enum DataError: LocalizedError {
             return "Idioms data file not found"
         case .phrasalVerbsFileNotFound:
             return "Phrasal verbs data file not found"
+        case .sampleAnswersFileNotFound:
+            return "Sample answers data file not found"
         case .loadingFailed(let message):
             return "Failed to load data: \(message)"
         case .parsingError:

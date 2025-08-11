@@ -35,25 +35,7 @@
       "colorHex": "#FF804D",
       "lessonCount": 150,
       "illustration": "\ud83c\udf7d\ufe0f"
-    },
-    {
-      "id": "pronunciation",
-      "title": "Pronunciation",
-      "description": "Perfect your pronunciation and intonation",
-      "icon": "waveform",
-      "colorHex": "#9966E6",
-      "lessonCount": 100,
-      "illustration": "\u2708\ufe0f"
-    },
-    {
-        "id": "grammar",
-        "title": "Grammar",
-        "description": "Master English grammar structures for accuracy and clarity",
-        "icon": "textformat.abc",
-        "colorHex": "#FFA94D",
-        "lessonCount": 130,
-        "illustration": "📚"
-      }
+    }
   ],
   "subcategories": [
     {
