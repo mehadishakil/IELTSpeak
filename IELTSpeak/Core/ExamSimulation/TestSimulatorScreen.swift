@@ -13,6 +13,7 @@ struct TestSimulatorScreen: View {
 
     var body: some View {
         NavigationStack {
+            
             ZStack {
                 Color(.systemBackground)
                     .ignoresSafeArea()

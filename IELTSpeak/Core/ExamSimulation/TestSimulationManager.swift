@@ -16,6 +16,18 @@ private enum TestConstants {
     static let nextQuestionDelay: TimeInterval = 1.0
 }
 
+struct ValidationResult {
+    let isValid: Bool
+    let errors: [String]
+    let warnings: [String]
+    
+    init(isValid: Bool, errors: [String] = [], warnings: [String] = []) {
+        self.isValid = isValid
+        self.errors = errors
+        self.warnings = warnings
+    }
+}
+
 class TestSimulationManager: ObservableObject {
     @Published var currentPhase: TestPhase = .preparation
     @Published var currentPart: Int = 1
@@ -30,9 +42,8 @@ class TestSimulationManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var backendResults: TestResults?
     @Published var isUploadingResponses = false
-    private var questionIds: [String] = [] // Store question IDs from backend
-    private var questionIdMapping: [String: String] = [:]
     private var uploadedQuestions = Set<String>() // store questionId strings
+    private var activeUploadTasks = Set<Task<Void, Never>>() // Keep strong references to upload tasks
 
 
     // MARK: - Audio Managers
@@ -56,7 +67,6 @@ class TestSimulationManager: ObservableObject {
         
         logQuestionsStructure()
         setupBindings()
-        buildQuestionIdMapping()
     }
 
     private func setupBindings() {
@@ -103,8 +113,19 @@ class TestSimulationManager: ObservableObject {
     private func requestPermissionsAndStart() async {
         let permissionsGranted = await requestAudioAndSpeechPermissions()
         if permissionsGranted {
-            print("TestSimulationManager: Permissions granted. Starting conversation flow.")
-            startConversationFlow()
+            print("TestSimulationManager: Permissions granted. Running pre-test validation...")
+            
+            // Run comprehensive validation before starting test
+            let validationResults = await runPreTestValidation()
+            
+            if validationResults.isValid {
+                print("✅ Pre-test validation passed. Starting conversation flow.")
+                startConversationFlow()
+            } else {
+                print("❌ Pre-test validation failed: \(validationResults.errors.joined(separator: ", "))")
+                errorMessage = "Test validation failed: \(validationResults.errors.first ?? "Unknown error")"
+                currentPhase = .preparation
+            }
         } else {
             errorMessage = "Microphone and Speech Recognition permissions are required."
             currentPhase = .preparation
@@ -125,6 +146,149 @@ class TestSimulationManager: ObservableObject {
         }
         
         return microphoneGranted && speechGranted == .authorized
+    }
+    
+    // MARK: - Pre-Test Validation
+    
+    /// Comprehensive validation before starting test to ensure all uploads will succeed
+    private func runPreTestValidation() async -> ValidationResult {
+        var errors: [String] = []
+        var warnings: [String] = []
+        
+        print("🔍 Running comprehensive pre-test validation...")
+        
+        // 1. Validate question structure
+        let questionValidation = validateQuestionStructure()
+        errors.append(contentsOf: questionValidation.errors)
+        warnings.append(contentsOf: questionValidation.warnings)
+        
+        // 2. Validate question ID mappings
+        let mappingValidation = validateQuestionIdMappings()
+        errors.append(contentsOf: mappingValidation.errors)
+        warnings.append(contentsOf: mappingValidation.warnings)
+        
+        // 3. Validate backend connectivity
+        let backendValidation = await validateBackendConnectivity()
+        errors.append(contentsOf: backendValidation.errors)
+        warnings.append(contentsOf: backendValidation.warnings)
+        
+        // 4. Validate audio subsystem
+        let audioValidation = validateAudioSubsystem()
+        errors.append(contentsOf: audioValidation.errors)
+        warnings.append(contentsOf: audioValidation.warnings)
+        
+        let isValid = errors.isEmpty
+        
+        print("📊 Validation Results:")
+        print("   Valid: \(isValid ? "✅" : "❌")")
+        print("   Errors: \(errors.count)")
+        print("   Warnings: \(warnings.count)")
+        
+        if !errors.isEmpty {
+            print("   🚨 Critical Issues:")
+            for (index, error) in errors.enumerated() {
+                print("     \(index + 1). \(error)")
+            }
+        }
+        
+        if !warnings.isEmpty {
+            print("   ⚠️ Warnings:")
+            for (index, warning) in warnings.enumerated() {
+                print("     \(index + 1). \(warning)")
+            }
+        }
+        
+        return ValidationResult(isValid: isValid, errors: errors, warnings: warnings)
+    }
+    
+    private func validateQuestionStructure() -> ValidationResult {
+        var errors: [String] = []
+        var warnings: [String] = []
+        
+        // Check if we have questions for all expected parts
+        let expectedParts = [0, 1, 2] // Frontend uses 0-based indexing
+        for part in expectedParts {
+            guard let partQuestions = questions[part], !partQuestions.isEmpty else {
+                errors.append("Missing questions for Part \(part + 1)")
+                continue
+            }
+            
+            // Validate individual questions
+            for (index, question) in partQuestions.enumerated() {
+                if question.id.isEmpty {
+                    errors.append("Question \(index + 1) in Part \(part + 1) has empty ID")
+                }
+                
+                if question.questionText.isEmpty {
+                    warnings.append("Question \(index + 1) in Part \(part + 1) has empty text")
+                }
+                
+                if question.audioFile.isEmpty {
+                    errors.append("Question \(index + 1) in Part \(part + 1) has no audio data")
+                }
+            }
+        }
+        
+        return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
+    }
+    
+    private func validateQuestionIdMappings() -> ValidationResult {
+        var errors: [String] = []
+        var warnings: [String] = []
+        
+        // Simple validation: ensure all questions have valid IDs
+        for (partKey, partQuestions) in questions {
+            for (index, question) in partQuestions.enumerated() {
+                if question.id.isEmpty {
+                    errors.append("Question \(index + 1) in Part \(partKey + 1) has empty ID")
+                }
+            }
+        }
+        
+        return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
+    }
+    
+    private func validateBackendConnectivity() async -> ValidationResult {
+        var errors: [String] = []
+        var warnings: [String] = []
+        
+        // Check if we have an active session
+        if SupabaseService.shared.currentSession == nil {
+            errors.append("No active backend session")
+        }
+        
+        // Validate network connectivity by attempting a lightweight operation
+        do {
+            let sessionId = SupabaseService.shared.currentSession?.id ?? "test"
+            _ = try await SupabaseService.shared.checkSessionStatus(sessionId: sessionId)
+        } catch {
+            warnings.append("Backend connectivity check failed: \(error.localizedDescription)")
+        }
+        
+        return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
+    }
+    
+    private func validateAudioSubsystem() -> ValidationResult {
+        var errors: [String] = []
+        var warnings: [String] = []
+        
+        // Check audio session availability
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            if !audioSession.isInputAvailable {
+                errors.append("Audio input not available")
+            }
+        } catch {
+            errors.append("Audio session validation failed: \(error.localizedDescription)")
+        }
+        
+        // Check speech recognition availability
+        guard SFSpeechRecognizer.authorizationStatus() == .authorized else {
+            errors.append("Speech recognition not authorized")
+            return ValidationResult(isValid: false, errors: errors, warnings: warnings)
+        }
+        
+        return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
     }
 
     func startConversationFlow() {
@@ -311,7 +475,7 @@ class TestSimulationManager: ObservableObject {
         
         stopUserResponseAndSave(
             part: part,
-            order: currentQuestionIndex,
+            order: currentQuestionIndex + 1,  // Convert to 1-based indexing
             questionText: questionText,
             transcript: transcript
         )
@@ -376,7 +540,7 @@ class TestSimulationManager: ObservableObject {
         print("TestSimulationManager: Part 2: 2-minute speaking limit reached. Stopping recording.")
         part2SpeakingTimer?.invalidate()
         part2SpeakingTimer = nil
-        stopUserResponseAndSave(part: currentPart, order: currentQuestionIndex, questionText: currentQuestionText)
+        stopUserResponseAndSave(part: currentPart, order: currentQuestionIndex + 1, questionText: currentQuestionText)  // Convert to 1-based indexing
         print("TestSimulationManager: SIMULATING PROMPT: Thank you, that's enough.")
         DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.nextQuestionDelay) {
             self.nextQuestionOrPart()
@@ -405,10 +569,11 @@ class TestSimulationManager: ObservableObject {
                         print("TestSimulationManager: Part \(part): User stopped speaking. Saving and proceeding.")
                         self.stopUserResponseAndSave(
                             part: part,
-                            order: self.currentQuestionIndex,
+                            order: self.currentQuestionIndex + 1,  // Convert to 1-based indexing
                             questionText: questionText,
                             transcript: transcript
                         )
+                        print("🔄 CALLING nextQuestionOrPart() after saving Part \(part), Order \(self.currentQuestionIndex + 1)")
                         self.nextQuestionOrPart()
                     }
                 }
@@ -423,10 +588,23 @@ class TestSimulationManager: ObservableObject {
         speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
 
         let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
+        
+        // 🔍 CRITICAL DEBUG: Track this specific call
+        print("🎯 STOP_USER_RESPONSE_AND_SAVE CALLED:")
+        print("   Part: \(part), Order: \(order)")
+        print("   Question: \(questionText.prefix(50))...")
+        print("   Current state - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
+        print("   Audio URL: \(recordedURL?.path ?? "nil")")
+        print("   Thread: \(Thread.isMainThread ? "Main" : "Background")")
 
         // Save locally (existing logic)
         DispatchQueue.global(qos: .background).async { [weak self] in
-            guard let self = self else { return }
+            guard let self = self else { 
+                print("❌ Self is nil in stopUserResponseAndSave background task")
+                return 
+            }
+            
+            print("🔄 Background task started for Part \(part), Order \(order)")
             
             let newConversation = Conversation(
                 part: part,
@@ -437,19 +615,29 @@ class TestSimulationManager: ObservableObject {
             )
             DispatchQueue.main.async {
                 self.conversations.append(newConversation)
-                print("TestSimulationManager: Saved conversation for Part \(part)")
+                print("✅ Saved conversation locally for Part \(part), Order \(order)")
             }
             
             // Upload to backend with comprehensive logging
-            print("🔍 Checking upload prerequisites for Part \(part), Order \(order)")
+            print("🔍 DETAILED UPLOAD CHECK for Part \(part), Order \(order):")
             let audioExists = recordedURL != nil
             let sessionExists = SupabaseService.shared.currentSession?.id != nil
+            let sessionId = SupabaseService.shared.currentSession?.id
             let questionId = self.getQuestionId(part: part, order: order)
             let questionIdExists = questionId != nil
             
-            print("   Audio URL: \(audioExists ? "✅" : "❌")")
-            print("   Session ID: \(sessionExists ? "✅" : "❌")")
-            print("   Question ID: \(questionIdExists ? "✅" : "❌") [\(questionId ?? "nil")]")
+            print("   📱 Current App State:")
+            print("     - Current Part: \(self.currentPart)")
+            print("     - Current Question Index: \(self.currentQuestionIndex)")
+            print("     - Current Phase: \(self.currentPhase)")
+            print("   📋 Upload Prerequisites:")
+            print("     - Audio URL: \(audioExists ? "✅" : "❌") [\(recordedURL?.path ?? "nil")]")
+            print("     - Session ID: \(sessionExists ? "✅" : "❌") [\(sessionId ?? "nil")]")
+            print("     - Question ID: \(questionIdExists ? "✅" : "❌") [\(questionId ?? "nil")]")
+            print("   🎯 Target Upload:")
+            print("     - Upload Part: \(part)")
+            print("     - Upload Order: \(order)")
+            print("     - Question Text: \(questionText.prefix(30))...")
             
             if let audioURL = recordedURL,
                let sessionId = SupabaseService.shared.currentSession?.id,
@@ -457,15 +645,30 @@ class TestSimulationManager: ObservableObject {
                 
                 // ✅ Duplicate prevention
                 if self.uploadedQuestions.contains(questionId) {
-                    print("⏩ Skipping duplicate upload for questionId: \(questionId)")
+                    print("⏩ DUPLICATE UPLOAD PREVENTION: Skipping questionId: \(questionId)")
+                    print("   Already uploaded questions: \(self.uploadedQuestions)")
                     return
                 }
+                
+                print("🚀 INITIATING UPLOAD for Part \(part), Question \(order)")
+                print("   Question ID: \(questionId)")
+                print("   Session ID: \(sessionId)")
+                print("   Audio Path: \(audioURL.path)")
+                print("   File Size: \(try? FileManager.default.attributesOfItem(atPath: audioURL.path)[.size] ?? "unknown") bytes")
+                print("   Uploaded Questions Before: \(self.uploadedQuestions)")
+                
                 self.uploadedQuestions.insert(questionId)
                 
-                print("🚀 Starting upload for Part \(part), Question \(order)")
+                // 🔒 CRITICAL FIX: Create strong reference to upload task to prevent cancellation
+                let uploadTaskId = "upload_\(part)_\(order)_\(Date().timeIntervalSince1970)"
+                print("🔒 Creating upload task with ID: \(uploadTaskId)")
                 
-                Task {
+                let uploadTask = Task {
+                    print("📤 UPLOAD TASK STARTED: \(uploadTaskId)")
+                    print("   Current thread: \(Thread.current)")
+                    
                     do {
+                        print("📡 Calling SupabaseService.uploadResponse...")
                         try await SupabaseService.shared.uploadResponse(
                             sessionId: sessionId,
                             questionId: questionId,
@@ -473,14 +676,49 @@ class TestSimulationManager: ObservableObject {
                             part: part,
                             order: order
                         )
-                        print("✅ Successfully uploaded response for Part \(part), Question \(order)")
-                    } catch {
-                        print("❌ Upload failed for Part \(part), Question \(order): \(error)")
+                        print("✅ UPLOAD SUCCESS: Part \(part), Question \(order) [Task: \(uploadTaskId)]")
+                        
+                        // Mark as successfully uploaded
                         await MainActor.run {
-                            self.errorMessage = "Upload failed: \(error.localizedDescription)"
-                            // Allow retry if failed
-                            self.uploadedQuestions.remove(questionId)
+                            if let currentError = self.errorMessage, currentError.contains("Upload failed") {
+                                self.errorMessage = nil // Clear upload errors on success
+                            }
                         }
+                        
+                    } catch {
+                        print("❌ UPLOAD FAILED: Part \(part), Question \(order) [Task: \(uploadTaskId)]")
+                        print("   Error: \(error)")
+                        print("   Error type: \(type(of: error))")
+                        
+                        await MainActor.run {
+                            // Remove from uploaded set to allow retry
+                            self.uploadedQuestions.remove(questionId)
+                            
+                            // Set user-visible error message
+                            let errorMsg = "Upload failed for Part \(part), Q\(order): \(error.localizedDescription)"
+                            self.errorMessage = errorMsg
+                            
+                            print("🔄 Removed questionId \(questionId) from uploaded set to allow retry")
+                        }
+                        
+                        // Schedule automatic retry after a delay
+                        Task {
+                            try? await Task.sleep(nanoseconds: 5_000_000_000) // Wait 5 seconds
+                            await self.retryUpload(sessionId: sessionId, questionId: questionId, audioURL: audioURL, part: part, order: order)
+                        }
+                    }
+                }
+                
+                // Store task reference to prevent deallocation - this is crucial!
+                self.activeUploadTasks.insert(uploadTask)
+                print("🔒 Task stored in activeUploadTasks (\(self.activeUploadTasks.count) total active)")
+                
+                // Remove task from active set when complete (in background to avoid blocking)
+                Task.detached { [weak self] in
+                    await uploadTask.value // Wait for completion
+                    await MainActor.run {
+                        self?.activeUploadTasks.remove(uploadTask)
+                        print("🗑️ Removed completed upload task. Active tasks: \(self?.activeUploadTasks.count ?? 0)")
                     }
                 }
             } else {
@@ -500,35 +738,106 @@ class TestSimulationManager: ObservableObject {
 
     
     private func getQuestionId(part: Int, order: Int) -> String? {
-        let possibleKeys = generatePossibleKeys(part: part, order: order)
+        // Simple direct access: part and order are 1-based, convert to 0-based for array access
+        let partIndex = part - 1      // Convert 1,2,3 -> 0,1,2
+        let questionIndex = order - 1 // Convert 1,2,3 -> 0,1,2
         
-        for key in possibleKeys {
-            if let questionId = questionIdMapping[key] {
-                print("🔍 Found question ID for part \(part), order \(order) using key '\(key)': \(questionId.prefix(8))...")
-                return questionId
-            }
+        guard let partQuestions = questions[partIndex],
+              questionIndex >= 0 && questionIndex < partQuestions.count else {
+            print("⚠️ No question found for part \(part), order \(order) (partIndex: \(partIndex), questionIndex: \(questionIndex))")
+            return nil
         }
         
-        logQuestionIdNotFound(part: part, order: order, keys: possibleKeys)
-        return nil
+        let questionId = partQuestions[questionIndex].id
+        print("✅ Found question ID for part \(part), order \(order): \(questionId.prefix(8))...")
+        return questionId
     }
     
-    private func generatePossibleKeys(part: Int, order: Int) -> [String] {
-        return [
-            "\(part)_\(order)",           // Current format
-            "\(part-1)_\(order)",         // Normalized format
-            "\(part)_\(order+1)",         // Index-based
-            "\(part-1)_\(order+1)"        // Normalized index-based
-        ]
+    
+    
+    // MARK: - Upload Retry Logic
+    
+    /// Retry mechanism for failed uploads with exponential backoff
+    private func retryUpload(sessionId: String, questionId: String, audioURL: URL, part: Int, order: Int, attempt: Int = 1) async {
+        let maxRetries = 3
+        
+        guard attempt <= maxRetries else {
+            print("❌ Max retries (\(maxRetries)) reached for Part \(part), Question \(order). Giving up.")
+            await MainActor.run {
+                self.errorMessage = "Upload failed permanently for Part \(part), Q\(order) after \(maxRetries) attempts"
+            }
+            return
+        }
+        
+        print("🔄 Retry attempt \(attempt)/\(maxRetries) for Part \(part), Question \(order)")
+        
+        // Check if file still exists
+        guard FileManager.default.fileExists(atPath: audioURL.path) else {
+            print("❌ Audio file no longer exists for retry: \(audioURL.path)")
+            await MainActor.run {
+                self.errorMessage = "Audio file missing for Part \(part), Q\(order) retry"
+            }
+            return
+        }
+        
+        // Prevent duplicate retries
+        if uploadedQuestions.contains(questionId) {
+            print("⏩ Question \(questionId) already uploaded, skipping retry")
+            return
+        }
+        
+        // Mark as being retried
+        uploadedQuestions.insert(questionId)
+        
+        do {
+            try await SupabaseService.shared.uploadResponse(
+                sessionId: sessionId,
+                questionId: questionId,
+                audioURL: audioURL,
+                part: part,
+                order: order
+            )
+            
+            print("✅ Retry successful: Part \(part), Question \(order) uploaded on attempt \(attempt)")
+            
+            await MainActor.run {
+                // Clear error message on successful retry
+                if let currentError = self.errorMessage, currentError.contains("Part \(part), Q\(order)") {
+                    self.errorMessage = nil
+                }
+            }
+            
+        } catch {
+            print("❌ Retry \(attempt) failed for Part \(part), Question \(order): \(error)")
+            
+            // Remove from uploaded set for next retry
+            uploadedQuestions.remove(questionId)
+            
+            await MainActor.run {
+                self.errorMessage = "Upload retry \(attempt)/\(maxRetries) failed for Part \(part), Q\(order)"
+            }
+            
+            // Schedule next retry with exponential backoff
+            if attempt < maxRetries {
+                let backoffDelay = pow(2.0, Double(attempt)) * 3.0 // 3s, 6s, 12s delays
+                let nanoseconds = UInt64(backoffDelay * 1_000_000_000)
+                
+                Task {
+                    try? await Task.sleep(nanoseconds: nanoseconds)
+                    await self.retryUpload(sessionId: sessionId, questionId: questionId, audioURL: audioURL, part: part, order: order, attempt: attempt + 1)
+                }
+            }
+        }
     }
     
-    private func logQuestionIdNotFound(part: Int, order: Int, keys: [String]) {
-        print("❌ No question ID found for part \(part), order \(order). Tried keys: \(keys)")
-        print("   Available mappings: \(questionIdMapping.keys.sorted().joined(separator: ", "))")
-    }
+    
+    
     
     
     private func nextQuestionOrPart() {
+        print("🔄 NEXT_QUESTION_OR_PART CALLED:")
+        print("   Before - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
+        
         // Clean up all timers and audio operations
         preparationTimer?.invalidate()
         preparationTimer = nil
@@ -541,7 +850,9 @@ class TestSimulationManager: ObservableObject {
         speechRecognizerManager.stopSpeechRecognition()
         
         if currentPart == 1 {
+            print("   Processing Part 1 transition...")
             currentQuestionIndex += 1
+            print("   After increment - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
             if currentQuestionIndex < (questions[0]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 1. Index: \(currentQuestionIndex)")
                 // Add a small delay to ensure clean state transition
@@ -549,22 +860,28 @@ class TestSimulationManager: ObservableObject {
                     self.startConversationFlow()
                 }
             } else {
-                print("TestSimulationManager: All Part 1 questions covered. Initiating Part 2 transition.")
+                print("   🎯 PART 1 -> 2 TRANSITION:")
+                print("     All Part 1 questions covered. Moving to Part 2.")
                 currentPart = 2
                 currentQuestionIndex = 0
+                print("     After transition - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.stateTransitionDelay) {
                     self.startConversationFlow()
                 }
             }
         } else if currentPart == 2 {
-            print("TestSimulationManager: Moving from Part 2 to Part 3.")
+            print("   🎯 PART 2 -> 3 TRANSITION:")
+            print("     Moving from Part 2 to Part 3.")
             currentPart = 3
             currentQuestionIndex = 0
+            print("     After transition - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.startConversationFlow()
             }
         } else if currentPart == 3 {
+            print("   Processing Part 3 transition...")
             currentQuestionIndex += 1
+            print("   After increment - Part: \(currentPart), QuestionIndex: \(currentQuestionIndex)")
             if currentQuestionIndex < (questions[2]?.count ?? 0) {
                 print("TestSimulationManager: Moving to next question in Part 3. Index: \(currentQuestionIndex)")
                 DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.stateTransitionDelay) {
@@ -584,7 +901,30 @@ class TestSimulationManager: ObservableObject {
         currentPhase = .processing
         
         Task {
-            // Wait a moment for final uploads to complete
+            // Wait for all active upload tasks to complete before proceeding
+            print("🔄 Finalizing test - waiting for \(activeUploadTasks.count) active upload tasks to complete...")
+            
+            if !activeUploadTasks.isEmpty {
+                let startTime = Date()
+                
+                // Wait for all uploads with timeout
+                await withTaskGroup(of: Void.self) { group in
+                    for task in activeUploadTasks {
+                        group.addTask {
+                            await task.value
+                        }
+                    }
+                    // Add timeout task
+                    group.addTask {
+                        try? await Task.sleep(nanoseconds: 30_000_000_000) // 30 second timeout
+                    }
+                }
+                
+                let elapsed = Date().timeIntervalSince(startTime)
+                print("⏱️ Waited \(String(format: "%.2f", elapsed))s for uploads to complete")
+            }
+            
+            // Additional delay for final uploads to complete
             try? await Task.sleep(nanoseconds: UInt64(TestConstants.finalUploadDelay * 1_000_000_000))
             
             // Process with backend
@@ -657,58 +997,6 @@ extension TestSimulationManager {
         }
     }
     
-    private func stopUserResponseAndSaveWithBackend(
-        part: Int,
-        order: Int,
-        questionId: String,
-        questionText: String,
-        transcript: String = ""
-    ) {
-        let recordedURL = audioRecorderManager.stopRecording()
-        speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
-
-        let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
-
-        // Save locally first (existing logic)
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            let newConversation = Conversation(
-                part: part,
-                order: order,
-                question: questionText,
-                answer: answerText,
-                errors: []
-            )
-            
-            DispatchQueue.main.async {
-                self?.conversations.append(newConversation)
-                print("TestSimulationManager: Saved conversation locally for Part \(part)")
-            }
-            
-            // Upload to backend if we have audio and session
-            if let audioURL = recordedURL,
-               let sessionId = SupabaseService.shared.currentSession?.id {
-                
-                Task {
-                    do {
-                        try await SupabaseService.shared.uploadResponse(
-                            sessionId: sessionId,
-                            questionId: questionId,
-                            audioURL: audioURL,
-                            part: part,
-                            order: order
-                        )
-                        print("✅ Uploaded response for Part \(part), Question \(order)")
-                    } catch {
-                        print("❌ Failed to upload response: \(error)")
-                        DispatchQueue.main.async {
-                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     func processTestWithBackend() async -> TestResults? {
             guard let sessionId = SupabaseService.shared.currentSession?.id else {
                 print("❌ No active session for processing")
@@ -768,117 +1056,7 @@ extension TestSimulationManager {
 
 extension TestSimulationManager {
     
-    // MARK: - Enhanced Initialization with Question ID Mapping
     
-    convenience init(questionsWithBackend questions: [Int: [QuestionItem]]) {
-        self.init(questions: questions)
-        buildQuestionIdMapping()
-    }
-    
-    private func buildQuestionIdMapping() {
-        questionIdMapping.removeAll()
-        
-        for (normalizedPart, items) in questions {
-            // Convert normalized part (0,1,2) back to database part (1,2,3)
-            let databasePart = normalizedPart + 1
-            
-            for (index, item) in items.enumerated() {
-                // Try multiple key formats to ensure mapping works
-                let keys = [
-                    "\(databasePart)_\(item.order)",  // Database format: "1_1", "1_2", etc.
-                    "\(normalizedPart)_\(item.order)", // Normalized format: "0_1", "0_2", etc.
-                    "\(databasePart)_\(index + 1)",   // Index-based: "1_1", "1_2", etc.
-                    "\(normalizedPart)_\(index + 1)"  // Normalized index: "0_1", "0_2", etc.
-                ]
-                
-                // Map all possible key formats to the same question ID
-                for key in keys {
-                    questionIdMapping[key] = item.id
-                    // Mapping logged in batch below
-                }
-            }
-        }
-        
-        print("✅ Question ID mapping completed: \(questionIdMapping.count) mappings")
-        
-        // Debug: Print unique mappings only
-        let uniqueQuestionIds = Set(questionIdMapping.values)
-        print("📊 Mapped \(uniqueQuestionIds.count) unique questions with \(questionIdMapping.count) total key mappings")
-        
-        // Show a sample of mappings
-        let sampleMappings = questionIdMapping.sorted(by: { $0.key < $1.key }).prefix(10)
-        for (key, questionId) in sampleMappings {
-            print("   \(key) -> \(questionId.prefix(8))...")
-        }
-    }
-    
-    // MARK: - Enhanced Response Saving with Proper Question IDs
-    
-    private func stopUserResponseAndSaveWithBackend(
-        part: Int,
-        order: Int,
-        questionText: String,
-        transcript: String = ""
-    ) {
-        let recordedURL = audioRecorderManager.stopRecording()
-        speechRecognizerManager.stopSpeechRecognition(shouldCallCompletion: false)
-
-        let answerText = transcript.isEmpty ? "(No speech detected or transcribed)" : transcript
-
-        // Save locally first (existing logic)
-        DispatchQueue.global(qos: .background).async { [weak self] in
-            let newConversation = Conversation(
-                part: part,
-                order: order,
-                question: questionText,
-                answer: answerText,
-                errors: []
-            )
-            
-            DispatchQueue.main.async {
-                self?.conversations.append(newConversation)
-                print("TestSimulationManager: Saved conversation locally for Part \(part)")
-            }
-            
-            // Upload to backend if we have audio and session
-            print("🔍 Checking upload prerequisites for Part \(part), Order \(order)")
-            let audioExists = recordedURL != nil
-            let sessionExists = SupabaseService.shared.currentSession?.id != nil
-            let questionId = self?.getQuestionId(part: part, order: order)
-            let questionIdExists = questionId != nil
-            
-            print("   Audio URL: \(audioExists ? "✅" : "❌")")
-            print("   Session ID: \(sessionExists ? "✅" : "❌")")
-            print("   Question ID: \(questionIdExists ? "✅" : "❌") [\(questionId ?? "nil")]")
-            
-            if let audioURL = recordedURL,
-               let sessionId = SupabaseService.shared.currentSession?.id,
-               let questionId = questionId {
-                
-                print("🚀 Starting upload for Part \(part), Question \(order)")
-                
-                Task {
-                    do {
-                        try await SupabaseService.shared.uploadResponse(
-                            sessionId: sessionId,
-                            questionId: questionId,
-                            audioURL: audioURL,
-                            part: part,
-                            order: order
-                        )
-                        print("✅ Successfully uploaded response for Part \(part), Question \(order)")
-                    } catch {
-                        print("❌ Upload failed for Part \(part), Question \(order): \(error)")
-                        await MainActor.run {
-                            self?.errorMessage = "Upload failed: \(error.localizedDescription)"
-                        }
-                    }
-                }
-            } else {
-                print("❌ Cannot upload Part \(part), Question \(order) - missing prerequisites")
-            }
-        }
-    }
     
 }
 

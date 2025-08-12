@@ -307,8 +307,8 @@ struct BackendEnabledTestSimulatorScreen: View {
     
     init(questions: [Int: [QuestionItem]]) {
         self.questions = questions
-        // Use the backend-enabled initializer
-        _testManager = StateObject(wrappedValue: TestSimulationManager(questionsWithBackend: questions))
+        // Use the regular initializer
+        _testManager = StateObject(wrappedValue: TestSimulationManager(questions: questions))
     }
 
     var body: some View {
