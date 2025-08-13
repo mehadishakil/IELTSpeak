@@ -909,6 +909,25 @@ class TestSimulationManager: ObservableObject {
             // Additional delay for final uploads to complete
             try? await Task.sleep(nanoseconds: UInt64(TestConstants.finalUploadDelay * 1_000_000_000))
             
+            // Mark session as completed to trigger backend evaluation
+            if let sessionId = SupabaseService.shared.currentSession?.id {
+                do {
+                    print("🎯 Marking session as completed to trigger evaluation...")
+                    try await SupabaseService.shared.markSessionAsCompleted(sessionId: sessionId)
+                    print("✅ Session marked as completed, backend evaluation should start automatically")
+                } catch {
+                    print("❌ Failed to mark session as completed: \(error)")
+                    await MainActor.run {
+                        self.errorMessage = "Failed to trigger evaluation: \(error.localizedDescription)"
+                    }
+                }
+            } else {
+                print("❌ No active session to mark as completed")
+                await MainActor.run {
+                    self.errorMessage = "No active session found for evaluation"
+                }
+            }
+            
             // Process with backend
             if let results = await processTestWithBackend() {
                 await MainActor.run {

@@ -24,6 +24,12 @@ struct CreateResponseRequest: Codable {
     let audio_file_path: String
 }
 
+struct UpdateSessionRequest: Codable {
+    let status: String
+    let all_responses_uploaded: Bool
+    let completed_at: String
+}
+
 struct SessionStatusResponse: Codable {
     let status: String
     let all_responses_uploaded: Bool?
@@ -235,6 +241,31 @@ class SupabaseService: ObservableObject {
         )
     }
     
+    /// Mark session as completed to trigger evaluation
+    func markSessionAsCompleted(sessionId: String) async throws {
+        print("🔄 Marking session as completed: \(sessionId)")
+        
+        let updateData = UpdateSessionRequest(
+            status: "completed",
+            all_responses_uploaded: true,
+            completed_at: Date().toISOString()
+        )
+        
+        do {
+            try await supabase
+                .from("test_sessions")
+                .update(updateData)
+                .eq("id", value: sessionId)
+                .execute()
+            
+            print("✅ Session marked as completed: \(sessionId)")
+            
+        } catch {
+            print("❌ Failed to mark session as completed: \(error)")
+            throw error
+        }
+    }
+    
     /// Poll for results until processing is complete
     func waitForResults(sessionId: String) async throws -> TestResults {
         print("🔄 Waiting for results for session: \(sessionId)")
@@ -278,5 +309,14 @@ enum SupabaseError: LocalizedError {
         case .bucketNotFound:
             return "Storage bucket not found. Please contact support."
         }
+    }
+}
+
+// MARK: - Extensions
+extension Date {
+    func toISOString() -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter.string(from: self)
     }
 }
