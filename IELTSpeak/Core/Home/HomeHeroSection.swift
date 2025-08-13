@@ -40,7 +40,6 @@ struct HomeHeroSection: View {
     }
 }
 
-// MARK: - Hero Button Background
 struct HeroButtonBackground: View {
     var body: some View {
         LinearGradient(
@@ -55,7 +54,6 @@ struct HeroButtonBackground: View {
     }
 }
 
-// MARK: - Hero Button Content
 struct HeroButtonContent: View {
     var body: some View {
         VStack(spacing: 12) {
@@ -67,7 +65,6 @@ struct HeroButtonContent: View {
     }
 }
 
-// MARK: - Hero Button Icon
 struct HeroButtonIcon: View {
     var body: some View {
         ZStack {
@@ -82,7 +79,6 @@ struct HeroButtonIcon: View {
     }
 }
 
-// MARK: - Hero Button Text
 struct HeroButtonText: View {
     var body: some View {
         VStack(spacing: 4) {
@@ -97,7 +93,18 @@ struct HeroButtonText: View {
     }
 }
 
-// MARK: - Hero Button Details
+
+struct TestDetailLabel: View {
+    let text: String
+    let icon: String
+    
+    var body: some View {
+        Label(text, systemImage: icon)
+            .font(.custom("Fredoka-Regular", size: 14))
+            .foregroundColor(.white.opacity(0.8))
+    }
+}
+
 struct HeroButtonDetails: View {
     var body: some View {
         HStack(spacing: 20) {

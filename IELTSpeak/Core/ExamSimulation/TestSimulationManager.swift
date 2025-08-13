@@ -8,7 +8,7 @@ private enum TestConstants {
     static let part2PreparationTime: TimeInterval = 60
     static let part2SpeakingTime: TimeInterval = 120
     static let defaultSilenceDuration: TimeInterval = 2.0
-    static let part3SilenceDuration: TimeInterval = 3.5
+    static let part3SilenceDuration: TimeInterval = 3.0
     static let part2SilenceDuration: TimeInterval = 3.0
     static let stateTransitionDelay: TimeInterval = 0.5
     static let finalUploadDelay: TimeInterval = 4.0
@@ -42,20 +42,14 @@ class TestSimulationManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var backendResults: TestResults?
     @Published var isUploadingResponses = false
-    private var uploadedQuestions = Set<String>() // store questionId strings
-    private var activeUploadTasks = Set<Task<Void, Never>>() // Keep strong references to upload tasks
+    private var uploadedQuestions = Set<String>()
+    private var activeUploadTasks = Set<Task<Void, Never>>()
 
-
-    // MARK: - Audio Managers
     let audioPlayerManager = AudioPlayerManager()
     let audioRecorderManager = AudioRecorderManager()
     let speechRecognizerManager = SpeechRecognizerManager()
-
-    // MARK: - Test Data
     var conversations: [Conversation] = []
     private let questions: [Int: [QuestionItem]]
-    
-    // MARK: - State Management
     private var currentRecordedAudioURL: URL?
     private var currentQuestionStartTime: Date?
     private var preparationTimer: Timer?
@@ -93,8 +87,6 @@ class TestSimulationManager: ObservableObject {
             }
             .store(in: &cancellables)
     }
-    
-    // MARK: - Public Methods
     
     /// Starts the IELTS speaking test with backend initialization and permission requests
     func startTest() {
@@ -148,8 +140,7 @@ class TestSimulationManager: ObservableObject {
         return microphoneGranted && speechGranted == .authorized
     }
     
-    // MARK: - Pre-Test Validation
-    
+    /// Pre-Test Validation
     /// Comprehensive validation before starting test to ensure all uploads will succeed
     private func runPreTestValidation() async -> ValidationResult {
         var errors: [String] = []
@@ -547,7 +538,7 @@ class TestSimulationManager: ObservableObject {
         }
     }
 
-    // MARK: - User Response Handling
+    // User Response Handling
     private func startUserResponseRecording(silenceDuration: TimeInterval, part: Int, questionText: String, isPart2: Bool = false) {
         currentQuestionStartTime = Date()
         do {
@@ -735,7 +726,6 @@ class TestSimulationManager: ObservableObject {
             }
         }
     }
-
     
     private func getQuestionId(part: Int, order: Int) -> String? {
         // Simple direct access: part and order are 1-based, convert to 0-based for array access
@@ -753,11 +743,7 @@ class TestSimulationManager: ObservableObject {
         return questionId
     }
     
-    
-    
-    // MARK: - Upload Retry Logic
-    
-    /// Retry mechanism for failed uploads with exponential backoff
+    // Upload Retry Logic - Retry mechanism for failed uploads with exponential backoff
     private func retryUpload(sessionId: String, questionId: String, audioURL: URL, part: Int, order: Int, attempt: Int = 1) async {
         let maxRetries = 3
         
@@ -829,10 +815,6 @@ class TestSimulationManager: ObservableObject {
             }
         }
     }
-    
-    
-    
-    
     
     private func nextQuestionOrPart() {
         print("🔄 NEXT_QUESTION_OR_PART CALLED:")
@@ -944,9 +926,7 @@ class TestSimulationManager: ObservableObject {
         }
     }
     
-    // MARK: - Waveform Generation
-    
-    /// Generates visual waveform data for examiner audio playback
+    // Generates visual waveform data for examiner audio playback
     func generateVisualWaveformData(for currentTime: TimeInterval, duration: TimeInterval, isSpeaking: Bool) -> [Double] {
         guard isSpeaking && duration > 0 else { return Array(repeating: 0.0, count: 50) }
         let progress = currentTime / duration
@@ -1054,11 +1034,7 @@ extension TestSimulationManager {
     }
 }
 
-extension TestSimulationManager {
-    
-    
-    
-}
+
 
 #Preview {
     // Create dummy audio data for preview purposes

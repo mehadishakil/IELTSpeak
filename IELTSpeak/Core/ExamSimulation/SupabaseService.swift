@@ -101,10 +101,9 @@ class SupabaseService: ObservableObject {
         order: Int
     ) async throws {
         // 1. Generate unique filename with .wav extension
-        let filename = "\(sessionId)_part\(part)_q\(order).wav"  // Changed from .m4a to .wav
+        let filename = "\(sessionId)_part\(part)_q\(order).wav"
         let storagePath = "responses/\(filename)"
         
-        // 2. Read and validate audio data
         let audioData = try Data(contentsOf: audioURL)
         let fileSizeMB = Double(audioData.count) / (1024 * 1024)
         
@@ -127,7 +126,7 @@ class SupabaseService: ObservableObject {
                     path: storagePath,
                     file: audioData,
                     options: FileOptions(
-                        contentType: "audio/wav",  // Changed from "audio/m4a" to "audio/wav"
+                        contentType: "audio/wav",
                         upsert: true  // Allow overwrite if exists
                     )
                 )

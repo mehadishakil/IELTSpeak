@@ -60,30 +60,7 @@ struct HomeScreen: View {
             }
         }
     }
-    
-//    private func startTest() {
-//        isLoading = true
-//        Task {
-//            do {
-//                testQuestions = try await TestService.shared.fetchTestQuestions(testId: 1)
-//                isLoading = false
-//                showTestingView = true
-//                
-//                let part1Questions = testQuestions[0] ?? []
-//                let part2Questions = testQuestions[1] ?? []
-//                let part3Questions = testQuestions[2] ?? []
-//                 print("\(part1Questions) \(part2Questions) \(part3Questions)")
-//            } catch {
-//                print("❌ Failed to fetch test: \(error)")
-//                isLoading = false
-//            }
-//        }
-//    }
-//    
-//    private func selectTest(_ result: TestResult) {
-//        selectedTestResult = result
-//        showFeedbackScreen = true
-//    }
+
     private func startTest() {
             print("HomeScreen: Start test button pressed")
             isLoading = true
@@ -121,146 +98,24 @@ struct HomeScreen: View {
             }
         }
         
-        private func selectTest(_ result: TestResult) {
-            selectedTestResult = result
-            showFeedbackScreen = true
-        }
-}
-
-//struct BandDescriptorsNavigationCard: View {
-//    @State private var showBandDescriptors = false
-//    
-//    var body: some View {
-//        Button(action: {
-//            showBandDescriptors = true
-//        }) {
-//            HStack(spacing: 16) {
-//                // Icon Section
-//                ZStack {
-//                    Circle()
-//                        .fill(
-//                            LinearGradient(
-//                                colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
-//                                startPoint: .topLeading,
-//                                endPoint: .bottomTrailing
-//                            )
-//                        )
-//                        .frame(width: 50, height: 50)
-//                    
-//                    Image(systemName: "chart.bar.doc.horizontal")
-//                        .font(.title2)
-//                        .foregroundColor(.white)
-//                        .fontWeight(.semibold)
-//                }
-//                
-//                // Content Section
-//                VStack(alignment: .leading, spacing: 4) {
-//                    Text("Band Descriptors")
-//                        .font(.custom("Fredoka-Medium", size: 18))
-//                        .foregroundColor(.primary)
-//                    
-//                    Text("Learn about IELTS scoring criteria")
-//                        .font(.custom("Fredoka-Regular", size: 14))
-//                        .foregroundColor(.secondary)
-//                        .multilineTextAlignment(.leading)
-//                }
-//                
-//                Spacer()
-//                
-//                // Arrow Icon
-//                Image(systemName: "chevron.right")
-//                    .font(.caption)
-//                    .foregroundColor(.secondary)
-//                    .fontWeight(.semibold)
-//            }
-//            .padding(20)
-//            .background(
-//                RoundedRectangle(cornerRadius: 16)
-//                    .fill(Color(UIColor.secondarySystemBackground))
-//                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-//            )
-//        }
-//        .buttonStyle(PlainButtonStyle())
-//        .scaleEffect(showBandDescriptors ? 0.98 : 1.0)
-//        .animation(.easeInOut(duration: 0.1), value: showBandDescriptors)
-//        .sheet(isPresented: $showBandDescriptors) {
-//            IELTSSpeakingBandDescriptorsView()
-//        }
-//    }
-//}
-//
-//// MARK: - Information Section
-//struct InformationSection: View {
-//    var body: some View {
-//        VStack(alignment: .leading, spacing: 16) {
-//            HStack {
-//                Text("Information")
-//                    .font(.custom("Fredoka-Medium", size: 20))
-//                    .foregroundColor(.primary)
-//                
-//                Spacer()
-//            }
-//            
-//            VStack(spacing: 12) {
-//                BandDescriptorsNavigationCard()
-//                
-//                // You can add more information cards here in the future
-//                // ExamTipsCard()
-//                // StudyGuideCard()
-//            }
-//        }
-//    }
-//}
-
-
-// MARK: - Test Detail Label
-struct TestDetailLabel: View {
-    let text: String
-    let icon: String
-    
-    var body: some View {
-        Label(text, systemImage: icon)
-            .font(.custom("Fredoka-Regular", size: 14))
-            .foregroundColor(.white.opacity(0.8))
+    private func selectTest(_ result: TestResult) {
+        selectedTestResult = result
+        showFeedbackScreen = true
     }
 }
 
-// MARK: - Test Navigation Overlay
-//struct TestNavigationOverlay: View {
-//    let isLoading: Bool
-//    let testQuestions: [Int: [QuestionItem]]
-//    @Binding var showTestingView: Bool
-//    @Binding var navigationTrigger: Bool
-//    
-//    var body: some View {
-//        NavigationLink(
-//            destination: destinationView,
-//            isActive: $showTestingView
-//        ) {
-//            EmptyView()
-//        }
-//        .hidden()
-//        .overlay {
-//            if isLoading {
-//                LoadingOverlay()
-//            }
-//        }
-//    }
-//    
-//    @ViewBuilder
-//    private var destinationView: some View {
-//        if navigationTrigger && !testQuestions.isEmpty {
-//            TestSimulatorScreen(questions: testQuestions)
-//        } else {
-//            // Fallback view - this shouldn't happen if everything works correctly
-//            Text("Loading test...")
-//                .onAppear {
-//                    print("TestNavigationOverlay: Fallback view appeared - this indicates an issue")
-//                }
-//        }
-//    }
-//}
-
+struct LoadingOverlay: View {
+    var body: some View {
+        ProgressView("Preparing test...")
+            .frame(
+                width: 200,
+                height: 200,
+                alignment: .center
+            )
+            .background(Color.white)
+            .cornerRadius(12)
+    }
+}
 
 struct TestNavigationOverlay: View {
     let isLoading: Bool
@@ -296,8 +151,6 @@ struct TestNavigationOverlay: View {
         }
     }
 }
-
-// MARK: - Backend-Enabled Test Simulator Screen
 
 struct BackendEnabledTestSimulatorScreen: View {
     @StateObject private var testManager: TestSimulationManager
@@ -404,65 +257,6 @@ struct BackendEnabledTestSimulatorScreen: View {
         return data
     }
 }
-// MARK: - Loading Overlay
-struct LoadingOverlay: View {
-    var body: some View {
-        ProgressView("Preparing test...")
-            .frame(
-                width: 200,
-                height: 200,
-                alignment: .center
-            )
-            .background(Color.white)
-            .cornerRadius(12)
-    }
-}
-
-// MARK: - Test Service (Extracted Business Logic)
-//class TestService {
-//    static let shared = TestService()
-//    private init() {}
-//    
-//    func fetchTestQuestions(testId: Int = 1) async throws -> [Int: [QuestionItem]] {
-//        // Fetch and decode into QuestionRow
-//        let response = try await supabase
-//            .from("qns")
-//            .select()
-//            .eq("test_id", value: testId)
-//            .order("part", ascending: true)
-//            .order("order", ascending: true)
-//            .execute()
-//            .value as [QuestionRow]
-//        
-//        print(response.count)
-//        
-//        var parts: [Int: [QuestionItem]] = [:]
-//        
-//        for row in response {
-//            do {
-//                // Download audio file from Supabase Storage
-//                let audioData = try await supabase.storage
-//                    .from("audio-question-set")
-//                    .download(path: row.audio_url)
-//                
-//                let item = QuestionItem(
-//                    id: row.id, part: row.part,
-//                    order: row.order,
-//                    questionText: row.question_text,
-//                    audioFile: audioData
-//                )
-//                
-////                print(item)
-//                
-//                let normalizedPart = row.part - 1
-//                parts[normalizedPart, default: []].append(item)
-//            } catch {
-//                print("⚠️ Failed to download audio: \(row.audio_url) - \(error.localizedDescription)")
-//            }
-//        }
-//        return parts
-//    }
-//}
 
 
 class TestService {
@@ -476,22 +270,22 @@ class TestService {
         let response = try await supabase
             .from("questions")
             .select()
-            .eq("test_template_id", value: testTemplateId)  // Use UUID string instead of integer
-            .order("part_number", ascending: true) // Changed from part to part_number
-            .order("question_order", ascending: true) // Changed from order to question_order
+            .eq("test_template_id", value: testTemplateId)
+            .order("part_number", ascending: true)
+            .order("question_order", ascending: true)
             .execute()
             .value as [QuestionRow]
         
-        print("📥 Fetched \(response.count) question rows from database")
-        
-        // Debug: Print first row structure
-        if let firstRow = response.first {
-            print("🔍 First row structure:")
-            print("   ID: \(firstRow.id) (type: \(type(of: firstRow.id)))")
-            print("   Part: \(firstRow.part)")
-            print("   Order: \(firstRow.order)")
-            print("   Audio URL: \(firstRow.audio_url)")
-        }
+//        print("📥 Fetched \(response.count) question rows from database")
+//        
+//        // Debug: Print first row structure
+//        if let firstRow = response.first {
+//            print("🔍 First row structure:")
+//            print("   ID: \(firstRow.id) (type: \(type(of: firstRow.id)))")
+//            print("   Part: \(firstRow.part)")
+//            print("   Order: \(firstRow.order)")
+//            print("   Audio URL: \(firstRow.audio_url)")
+//        }
         
         var parts: [Int: [QuestionItem]] = [:]
         
@@ -534,7 +328,6 @@ class TestService {
     }
 }
 
-// MARK: - Previews
 struct HomeScreen_Previews: PreviewProvider {
     static var previews: some View {
         HomeScreen()
