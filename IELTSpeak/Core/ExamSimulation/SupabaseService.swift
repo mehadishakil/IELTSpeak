@@ -30,6 +30,13 @@ struct UpdateSessionRequest: Codable {
     let completed_at: String
 }
 
+struct EvaluationTriggerRequest: Codable {
+    let session_id: String
+    let user_id: String
+    let template_id: String
+    let triggered_at: String
+}
+
 struct SessionStatusResponse: Codable {
     let status: String
     let all_responses_uploaded: Bool?
@@ -241,7 +248,7 @@ class SupabaseService: ObservableObject {
         )
     }
     
-    /// Mark session as completed to trigger evaluation
+    /// Mark session as completed and trigger evaluation directly
     func markSessionAsCompleted(sessionId: String) async throws {
         print("🔄 Marking session as completed: \(sessionId)")
         
@@ -260,9 +267,42 @@ class SupabaseService: ObservableObject {
             
             print("✅ Session marked as completed: \(sessionId)")
             
+            // Directly call edge function to trigger evaluation
+            try await triggerEvaluation(sessionId: sessionId)
+            
         } catch {
             print("❌ Failed to mark session as completed: \(error)")
             throw error
+        }
+    }
+    
+    /// Directly call the evaluate-session edge function
+    private func triggerEvaluation(sessionId: String) async throws {
+        print("🚀 Triggering evaluation for session: \(sessionId)")
+        
+        guard let currentUser = try? await supabase.auth.user() else {
+            throw SupabaseError.noUser
+        }
+        
+        let payload = EvaluationTriggerRequest(
+            session_id: sessionId,
+            user_id: currentUser.id.uuidString,
+            template_id: "550e8400-e29b-41d4-a716-446655440000",
+            triggered_at: Date().toISOString()
+        )
+        
+        do {
+            try await supabase.functions
+                .invoke("evaluate-session", options: FunctionInvokeOptions(
+                    body: payload
+                ))
+            
+            print("✅ Evaluation triggered successfully")
+            
+        } catch {
+            print("❌ Failed to trigger evaluation: \(error)")
+            // Don't throw here - evaluation might still work via trigger
+            // Just log the error
         }
     }
     
