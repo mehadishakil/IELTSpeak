@@ -19,8 +19,8 @@ IELTSpeak solves this problem by acting as your **personal speaking companion**.
 
 Whether you’re preparing for a high band score or just want to build confidence in English speaking, IELTSpeak makes the process **accessible, interactive, and personalized**.  
 
----
-/Users/mehadishakil/Downloads/asdfasdfasdfsdf.png
+<img width="6392" height="5000" alt="asdfasdfasdfsdf" src="https://github.com/user-attachments/assets/10f838a2-52f7-4a96-bfd6-71cdfac4c419" />
+
 
 ## ⚙️ How It Works  
 1. **Choose a Speaking Test Section**  
