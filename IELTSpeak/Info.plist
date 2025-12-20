@@ -11,7 +11,9 @@
 		<string>Fredoka-Bold.ttf</string>
 	</array>
 	<key>GIDClientID</key>
-	<string>986461187914-3ni8i1ncpcgfcr2v7bmjk8scl6g97buk.apps.googleusercontent.com</string>
+	<string>YOUR_IOS_CLIENT_ID_HERE.apps.googleusercontent.com</string>
+	<!-- IMPORTANT: Replace above with your iOS Client ID from Google Cloud Console -->
+	<!-- Example: 123456789-abcdefg.apps.googleusercontent.com -->
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -29,7 +31,8 @@
 			<string></string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.986461187914-3ni8i1ncpcgfcr2v7bmjk8scl6g97buk</string>
+				<string>com.googleusercontent.apps.YOUR_IOS_CLIENT_ID_HERE</string>
+				<!-- IMPORTANT: Replace above to match your iOS Client ID (without .apps.googleusercontent.com) -->
 			</array>
 		</dict>
 	</array>

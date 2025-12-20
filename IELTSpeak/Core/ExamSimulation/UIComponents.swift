@@ -28,7 +28,7 @@ struct AIAvatarView: View {
                 .font(.system(size: 32))
                 .foregroundColor(color)
         }
-        .padding(.top, 20)
+        
     }
 }
 
@@ -45,7 +45,8 @@ struct SpeakingIndicator: View {
                 .animation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true), value: true)
             
             Text(text)
-                .font(.caption)
+                .font(.footnote)
+                .fontWeight(.medium)
                 .foregroundColor(color)
         }
     }
@@ -106,56 +107,33 @@ struct WaveformView: View {
 }
 
 
-
 struct ProgressBarDivider: View {
     let currentPart: Int
-    
+
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 0) {
+            // Thick progress bar with text inside
+            HStack(spacing: 4) {
                 ForEach(1...3, id: \.self) { partNumber in
-                    Rectangle()
-                        .fill(partNumber <= currentPart ?
-                              LinearGradient(
-                                gradient: Gradient(colors: [Color.blue, Color.purple]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                              ) :
-                                LinearGradient(
-                                    gradient: Gradient(colors: [Color.gray.opacity(0.3)]),
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                        )
-                        .frame(height: 4)
-                    
-                    if partNumber < 3 {
-                        Rectangle()
-                            .fill(Color(.systemBackground))
-                            .frame(width: 2, height: 4)
-                    }
-                }
-            }
-            .clipShape(RoundedRectangle(cornerRadius: 2))
-            .padding(.horizontal, 20)
-            .padding(.vertical, 8)
-            
-            HStack {
-                ForEach(1...3, id: \.self) { partNumber in
-                    VStack(spacing: 2) {
+                    ZStack {
+                        // Background bar
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(partNumber <= currentPart ?
+                                  Color.secondary :
+                                  Color.gray.opacity(0.3)
+                            )
+                            .frame(height: 44)
+
+                        // Text inside the bar
                         Text("Part \(partNumber)")
-                            .font(.caption)
-                            .fontWeight(partNumber == currentPart ? .semibold : .medium)
-                            .foregroundColor(partNumber <= currentPart ? .blue : .secondary)
+                            .font(.system(size: 15, weight: partNumber == currentPart ? .bold : .semibold))
+                            .foregroundColor(partNumber <= currentPart ? .white : .gray)
                     }
                     .frame(maxWidth: .infinity)
                 }
             }
             .padding(.horizontal, 20)
-            .padding(.bottom, 8)
         }
-        .background(Color(.systemBackground))
     }
 }
-
 

@@ -113,49 +113,59 @@ class SupabaseService: ObservableObject {
         part: Int,
         order: Int
     ) async throws {
-        // 1. Generate unique filename with .wav extension
-        let filename = "\(sessionId)_part\(part)_q\(order).wav"
+        // OLD WAV FORMAT (COMMENTED OUT)
+        // // 1. Generate unique filename with .wav extension
+        // let filename = "\(sessionId)_part\(part)_q\(order).wav"
+        // let storagePath = "responses/\(filename)"
+
+        // NEW M4A FORMAT
+        // 1. Generate unique filename with .m4a extension
+        let filename = "\(sessionId)_part\(part)_q\(order).m4a"
         let storagePath = "responses/\(filename)"
-        
+
         let audioData = try Data(contentsOf: audioURL)
         let fileSizeMB = Double(audioData.count) / (1024 * 1024)
-        
+
         print("📊 Audio file size: \(String(format: "%.2f", fileSizeMB)) MB (\(audioData.count) bytes)")
-        
-        // 3. Check file size limits (WAV files will be larger than M4A)
-        let maxSizeMB: Double = 25.0  // Increased from 10MB to 25MB for WAV files
+
+        // 3. Check file size limits (M4A files are smaller due to compression)
+        // let maxSizeMB: Double = 25.0  // Increased from 10MB to 25MB for WAV files (OLD)
+        let maxSizeMB: Double = 10.0  // 10MB should be sufficient for M4A compressed audio
         guard fileSizeMB <= maxSizeMB else {
             print("❌ Audio file too large: \(String(format: "%.2f", fileSizeMB))MB > \(maxSizeMB)MB")
             throw SupabaseError.fileTooLarge(fileSizeMB)
         }
-        
+
         // 4. Upload to Supabase Storage with correct content type
         do {
-            print("📤 Uploading WAV audio file: \(storagePath)")
-            
+            // print("📤 Uploading WAV audio file: \(storagePath)") // OLD WAV FORMAT
+            print("📤 Uploading M4A audio file: \(storagePath)")
+
             try await supabase.storage
                 .from("audio-responses")
                 .upload(
                     path: storagePath,
                     file: audioData,
                     options: FileOptions(
-                        contentType: "audio/wav",
+                        // contentType: "audio/wav",  // OLD WAV FORMAT
+                        contentType: "audio/mp4",     // M4A uses audio/mp4 MIME type
                         upsert: true  // Allow overwrite if exists
                     )
                 )
-            
-            print("✅ Uploaded WAV audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)")
-            
+
+            // print("✅ Uploaded WAV audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)") // OLD
+            print("✅ Uploaded M4A audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)")
+
         } catch {
             print("❌ Storage upload failed: \(error)")
-            
+
             // More specific error handling
             if let storageError = error as? StorageError {
                 if storageError.message.contains("Bucket not found") == true {
                     throw SupabaseError.bucketNotFound
                 }
             }
-            
+
             throw error
         }
         

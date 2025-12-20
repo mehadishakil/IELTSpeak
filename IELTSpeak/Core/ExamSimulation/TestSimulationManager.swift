@@ -45,6 +45,9 @@ class TestSimulationManager: ObservableObject {
     private var uploadedQuestions = Set<String>()
     private var activeUploadTasks = Set<Task<Void, Never>>()
 
+    // Guest mode tracking
+    @AppStorage("isGuestMode") private var isGuestMode = false
+
     let audioPlayerManager = AudioPlayerManager()
     let audioRecorderManager = AudioRecorderManager()
     let speechRecognizerManager = SpeechRecognizerManager()
@@ -242,20 +245,27 @@ class TestSimulationManager: ObservableObject {
     private func validateBackendConnectivity() async -> ValidationResult {
         var errors: [String] = []
         var warnings: [String] = []
-        
+
+        // Skip backend validation in guest mode
+        if isGuestMode {
+            print("ℹ️ Guest mode: Skipping backend connectivity validation")
+            return ValidationResult(isValid: true, errors: [], warnings: ["Running in guest mode - backend features disabled"])
+        }
+
         // Check if we have an active session
         if SupabaseService.shared.currentSession == nil {
             errors.append("No active backend session")
         }
-        
+
         // Validate network connectivity by attempting a lightweight operation
         do {
-            let sessionId = SupabaseService.shared.currentSession?.id ?? "test"
-            _ = try await SupabaseService.shared.checkSessionStatus(sessionId: sessionId)
+            if let sessionId = SupabaseService.shared.currentSession?.id {
+                _ = try await SupabaseService.shared.checkSessionStatus(sessionId: sessionId)
+            }
         } catch {
             warnings.append("Backend connectivity check failed: \(error.localizedDescription)")
         }
-        
+
         return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
     }
     
@@ -609,6 +619,12 @@ class TestSimulationManager: ObservableObject {
                 print("✅ Saved conversation locally for Part \(part), Order \(order)")
             }
             
+            // Skip backend upload in guest mode
+            if self.isGuestMode {
+                print("ℹ️ Guest mode: Skipping backend upload for Part \(part), Order \(order)")
+                return
+            }
+
             // Upload to backend with comprehensive logging
             print("🔍 DETAILED UPLOAD CHECK for Part \(part), Order \(order):")
             let audioExists = recordedURL != nil
@@ -745,8 +761,14 @@ class TestSimulationManager: ObservableObject {
     
     // Upload Retry Logic - Retry mechanism for failed uploads with exponential backoff
     private func retryUpload(sessionId: String, questionId: String, audioURL: URL, part: Int, order: Int, attempt: Int = 1) async {
+        // Skip retries in guest mode
+        if isGuestMode {
+            print("ℹ️ Guest mode: Skipping retry upload")
+            return
+        }
+
         let maxRetries = 3
-        
+
         guard attempt <= maxRetries else {
             print("❌ Max retries (\(maxRetries)) reached for Part \(part), Question \(order). Giving up.")
             await MainActor.run {
@@ -985,6 +1007,25 @@ class TestSimulationManager: ObservableObject {
 extension TestSimulationManager {
     
     func initializeBackendSession() async {
+        // Check authentication status
+        let authStatus = await checkAuthenticationStatus()
+        print("🔐 Authentication Status Check:")
+        print("   Guest Mode Flag: \(isGuestMode)")
+        print("   Supabase Auth: \(authStatus)")
+
+        // Skip backend session creation in guest mode
+        if isGuestMode {
+            print("ℹ️ Guest mode: Skipping backend session creation")
+            return
+        }
+
+        // Verify user is actually authenticated
+        guard authStatus else {
+            print("⚠️ Warning: Not in guest mode but no authenticated user found!")
+            print("   This might indicate an authentication issue.")
+            return
+        }
+
         do {
             let session = try await SupabaseService.shared.createTestSession()
             print("✅ Backend session created: \(session.id)")
@@ -995,8 +1036,25 @@ extension TestSimulationManager {
             }
         }
     }
+
+    // Helper to check if user is authenticated
+    private func checkAuthenticationStatus() async -> Bool {
+        do {
+            let _ = try await supabase.auth.user()
+            return true
+        } catch {
+            print("❌ Auth check failed: \(error.localizedDescription)")
+            return false
+        }
+    }
     
     func processTestWithBackend() async -> TestResults? {
+            // Skip backend processing in guest mode
+            if isGuestMode {
+                print("ℹ️ Guest mode: Skipping backend processing")
+                return nil
+            }
+
             guard let sessionId = SupabaseService.shared.currentSession?.id else {
                 print("❌ No active session for processing")
                 return nil

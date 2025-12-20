@@ -192,19 +192,32 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
             throw error // Propagate error if session cannot be activated
         }
 
-        // Changed file extension from .m4a to .wav
-        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".wav")
+        // WAV Format (Commented out - now using AAC .m4a)
+        // let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".wav")
+        // currentRecordedAudioURL = audioFilename
+
+        // WAV PCM settings - mono, 16kHz (COMMENTED OUT)
+        // let settings = [
+        //     AVFormatIDKey: Int(kAudioFormatLinearPCM),        // Changed to Linear PCM
+        //     AVSampleRateKey: 16000,                           // 16kHz sample rate
+        //     AVNumberOfChannelsKey: 1,                         // Mono
+        //     AVLinearPCMBitDepthKey: 16,                       // 16-bit depth
+        //     AVLinearPCMIsBigEndianKey: false,                 // Little endian
+        //     AVLinearPCMIsFloatKey: false,                     // Integer samples
+        //     AVLinearPCMIsNonInterleaved: false                // Interleaved
+        // ] as [String : Any]
+
+        // AAC .m4a format (Apple default - optimized for size and quality)
+        let audioFilename = getDocumentsDirectory().appendingPathComponent(UUID().uuidString + ".m4a")
         currentRecordedAudioURL = audioFilename
 
-        // WAV PCM settings - mono, 16kHz
+        // AAC settings - mono, 16kHz, optimized compression
         let settings = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM),        // Changed to Linear PCM
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),         // AAC format
             AVSampleRateKey: 16000,                           // 16kHz sample rate
             AVNumberOfChannelsKey: 1,                         // Mono
-            AVLinearPCMBitDepthKey: 16,                       // 16-bit depth
-            AVLinearPCMIsBigEndianKey: false,                 // Little endian
-            AVLinearPCMIsFloatKey: false,                     // Integer samples
-            AVLinearPCMIsNonInterleaved: false                // Interleaved
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,  // High quality
+            AVEncoderBitRateKey: 32000                        // 32kbps bitrate
         ] as [String : Any]
 
         do {
@@ -218,7 +231,8 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
                 recordingTime = 0
                 startRecordingTimer()
                 print("AudioRecorderManager: Recording started to: \(audioFilename.lastPathComponent)")
-                print("AudioRecorderManager: Using WAV PCM - 16kHz, mono, 16-bit")
+                // print("AudioRecorderManager: Using WAV PCM - 16kHz, mono, 16-bit") // OLD WAV FORMAT
+                print("AudioRecorderManager: Using AAC .m4a - 16kHz, mono, 32kbps")
             } else {
                 isRecording = false
                 print("AudioRecorderManager: Failed to start recording (record() returned false).")
