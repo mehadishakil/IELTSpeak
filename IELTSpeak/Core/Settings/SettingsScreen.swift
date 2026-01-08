@@ -979,9 +979,12 @@ struct SettingsScreen: View {
     
     private func signOut() async {
         do {
+            print("🔄 Attempting to sign out...")
             try await supabase.auth.signOut()
+            print("✅ Sign out successful - auth state should update")
             // Navigation back to auth screen should be handled by your app's auth state management
         } catch {
+            print("❌ Error signing out: \(error)")
             debugPrint("Error signing out: \(error)")
         }
     }

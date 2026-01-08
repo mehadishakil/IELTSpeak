@@ -7,10 +7,14 @@ struct MainView: View {
   @State var isAuthenticated = false
   @AppStorage("isGuestMode") private var isGuestMode = false
   @State private var showingSignOutAlert = false
+  @State private var isCheckingAuth = true
 
   var body: some View {
     Group {
-      if isAuthenticated || isGuestMode {
+      if isCheckingAuth {
+        // Show loading indicator while checking auth state
+        ProgressView()
+      } else if isAuthenticated || isGuestMode {
           ContentView()
             .toolbar {
               ToolbarItem(placement: .navigationBarTrailing) {
@@ -39,14 +43,41 @@ struct MainView: View {
       }
     }
     .task {
+      // Check initial auth state
+      await checkInitialAuthState()
+
+      // Listen for auth state changes
       for await state in supabase.auth.authStateChanges {
+        print("🔔 Auth state changed: \(state.event)")
         if [.initialSession, .signedIn, .signedOut].contains(state.event) {
-          isAuthenticated = state.session != nil
-          // Clear guest mode if user signs in
-          if isAuthenticated {
-            isGuestMode = false
+          await MainActor.run {
+            isAuthenticated = state.session != nil
+            print("🔄 Updated isAuthenticated to: \(isAuthenticated)")
+            // Clear guest mode if user signs in
+            if isAuthenticated {
+              isGuestMode = false
+            }
           }
         }
+      }
+    }
+  }
+
+  func checkInitialAuthState() async {
+    print("🔍 Checking initial auth state...")
+    do {
+      let session = try await supabase.auth.session
+      print("✅ Found active session")
+      await MainActor.run {
+        isAuthenticated = true
+        isCheckingAuth = false
+      }
+    } catch {
+      // No active session
+      print("❌ No active session found")
+      await MainActor.run {
+        isAuthenticated = false
+        isCheckingAuth = false
       }
     }
   }
