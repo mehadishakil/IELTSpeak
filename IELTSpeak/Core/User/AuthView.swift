@@ -6,38 +6,200 @@ struct AuthView: View {
   @State var email = ""
   @State var isLoading = false
   @State var result: Result<Void, Error>?
+  @Environment(\.colorScheme) var colorScheme
 
   var body: some View {
-    Form {
-      Section {
-        TextField("Email", text: $email)
-          .textContentType(.emailAddress)
-          .autocorrectionDisabled()
-        #if os(iOS)
-          .textInputAutocapitalization(.never)
-        #endif
-      }
+    ZStack {
+      // Light gradient background
+      LinearGradient(
+        gradient: Gradient(colors: [
+          Color(red: 0.92, green: 0.98, blue: 0.87),     // Soft lime green
+          Color(red: 0.90, green: 0.97, blue: 0.85),     // Light green
+          Color(red: 0.93, green: 0.99, blue: 0.88)      // Soft mint green
+        ]),
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+      )
+      .ignoresSafeArea()
 
-      Section {
-        Button("Sign in") {
-          signInButtonTapped()
-        }
+      VStack(spacing: 0) {
+        Spacer()
 
-        if isLoading {
-          ProgressView()
-        }
-      }
-        
-      if let result {
-        Section {
-          switch result {
-          case .success: Text("Check you inbox.")
-          case let .failure(error): Text(error.localizedDescription).foregroundStyle(.red)
+        // App Logo/Title
+        VStack(spacing: 12) {
+          // Icon with vibrant gradient
+          ZStack {
+            Circle()
+              .fill(
+                LinearGradient(
+                  gradient: Gradient(colors: [
+                    Color.brandGreen,
+                    Color.primaryVariant
+                  ]),
+                  startPoint: .topLeading,
+                  endPoint: .bottomTrailing
+                )
+              )
+              .frame(width: 100, height: 100)
+              .shadow(color: Color.brandGreen.opacity(0.4), radius: 20, x: 0, y: 10)
+
+            Image(systemName: "mic.fill")
+              .font(.system(size: 45))
+              .foregroundColor(.white)
           }
+
+          Text("IELTSpeak")
+            .font(.system(size: 36, weight: .bold, design: .rounded))
+            .foregroundStyle(
+              LinearGradient(
+                gradient: Gradient(colors: [
+                  Color.primaryVariant,
+                  Color.brandGreen
+                ]),
+                startPoint: .leading,
+                endPoint: .trailing
+              )
+            )
+
+          Text("Master Your Speaking Skills")
+            .font(.system(size: 16, weight: .medium))
+            .foregroundColor(Color.textGray)
         }
+        .padding(.bottom, 50)
+
+        // Auth Card
+        VStack(spacing: 24) {
+          // Welcome Text
+          Text("Welcome!")
+            .font(.system(size: 28, weight: .bold))
+            .foregroundColor(Color.textGray)
+
+          // Email Input Section
+          VStack(spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+              Text("Email Address")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(Color.textGray)
+
+              TextField("", text: $email)
+                .textContentType(.emailAddress)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .padding()
+                .background(Color.white)
+                .cornerRadius(12)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(red: 0.5, green: 0.85, blue: 0.3), lineWidth: 2)
+                )
+                .foregroundColor(Color.textGray)
+                .shadow(color: Color.brandGreen.opacity(0.15), radius: 10, x: 0, y: 4)
+                .placeholder(when: email.isEmpty) {
+                  Text("your.email@example.com")
+                    .foregroundColor(Color.textGray.opacity(0.5))
+                    .padding(.leading, 16)
+                }
+            }
+
+            // Sign In Button
+            Button(action: signInButtonTapped) {
+              HStack(spacing: 12) {
+                if isLoading {
+                  ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                } else {
+                  Image(systemName: "envelope.fill")
+                    .font(.system(size: 18, weight: .medium))
+
+                  Text("Sign in with Email")
+                    .font(.system(size: 16, weight: .semibold))
+                }
+              }
+              .foregroundColor(.white)
+              .frame(maxWidth: .infinity)
+              .frame(height: 54)
+              .background(
+                LinearGradient(
+                  gradient: Gradient(colors: [
+                    Color.brandGreen,
+                    Color.primaryVariant
+                  ]),
+                  startPoint: .leading,
+                  endPoint: .trailing
+                )
+              )
+              .cornerRadius(12)
+              .shadow(color: Color.primaryVariant.opacity(0.4), radius: 15, x: 0, y: 8)
+            }
+            .disabled(isLoading || email.isEmpty)
+            .opacity((isLoading || email.isEmpty) ? 0.5 : 1.0)
+          }
+
+          // Result Message
+          if let result {
+            VStack(spacing: 8) {
+              switch result {
+              case .success:
+                HStack(spacing: 8) {
+                  Image(systemName: "checkmark.circle.fill")
+                    .font(.system(size: 20))
+                  Text("Check your inbox!")
+                    .font(.system(size: 15, weight: .medium))
+                }
+                .foregroundColor(Color.primaryVariant)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(red: 0.90, green: 0.98, blue: 0.83))
+                .cornerRadius(12)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.brandGreen.opacity(0.7), lineWidth: 2)
+                )
+
+                Text("We've sent you a magic link. Click the link in your email to sign in.")
+                  .font(.system(size: 13))
+                  .foregroundColor(Color.textGray)
+                  .multilineTextAlignment(.center)
+
+              case let .failure(error):
+                HStack(spacing: 8) {
+                  Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 20))
+                  Text(error.localizedDescription)
+                    .font(.system(size: 14, weight: .medium))
+                }
+                .foregroundColor(Color.errorRed)
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(Color(red: 1.0, green: 0.92, blue: 0.92))
+                .cornerRadius(12)
+                .overlay(
+                  RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.errorRed.opacity(0.5), lineWidth: 2)
+                )
+              }
+            }
+            .transition(.opacity.combined(with: .scale))
+          }
+
+          // Info Text
+          Text("We'll send you a secure sign-in link via email")
+            .font(.system(size: 13))
+            .foregroundColor(Color.textGray)
+            .multilineTextAlignment(.center)
+        }
+        .padding(32)
+        .background(
+          RoundedRectangle(cornerRadius: 25)
+            .fill(Color.white)
+            .shadow(color: Color.primaryVariant.opacity(0.2), radius: 25, x: 0, y: 12)
+        )
+        .padding(.horizontal, 30)
+
+        Spacer()
+        Spacer()
       }
     }
-    .onMac { $0.padding() }
     .onOpenURL(perform: { url in
       Task {
         do {
@@ -48,8 +210,8 @@ struct AuthView: View {
       }
     })
   }
-    
-    
+
+
   func signInButtonTapped() {
     Task {
       isLoading = true
@@ -60,10 +222,28 @@ struct AuthView: View {
           email: email,
           redirectTo: URL(string: "io.supabase.user-management://login-callback")
         )
-        result = .success(())
+        withAnimation {
+          result = .success(())
+        }
       } catch {
-        result = .failure(error)
+        withAnimation {
+          result = .failure(error)
+        }
       }
+    }
+  }
+}
+
+// Helper extension for placeholder text
+extension View {
+  func placeholder<Content: View>(
+    when shouldShow: Bool,
+    alignment: Alignment = .leading,
+    @ViewBuilder placeholder: () -> Content) -> some View {
+
+    ZStack(alignment: alignment) {
+      placeholder().opacity(shouldShow ? 1 : 0)
+      self
     }
   }
 }

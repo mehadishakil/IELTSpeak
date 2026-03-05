@@ -40,23 +40,23 @@ struct StatsCardsRow: View {
                 title: "Average Score",
                 value: String(format: "%.1f", averageScore),
                 subtitle: "Band Score",
-                color: .blue,
+                color: .brandGreen,
                 icon: "chart.line.uptrend.xyaxis"
             )
-            
+
             StatCard(
                 title: "Tests Taken",
                 value: "\(testCount)",
                 subtitle: "Total",
-                color: .green,
+                color: .infoBlue,
                 icon: "checkmark.circle.fill"
             )
-            
+
             StatCard(
                 title: "Improvement",
                 value: "+1.5",
                 subtitle: "This Month",
-                color: .orange,
+                color: .warningOrange,
                 icon: "arrow.up.circle.fill"
             )
         }

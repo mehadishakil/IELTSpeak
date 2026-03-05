@@ -534,7 +534,7 @@ struct SettingsScreen: View {
             ZStack {
                 Circle()
                     .fill(LinearGradient(
-                        colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.8)],
+                        colors: [Color.brandGreen, Color.primaryVariant],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ))
@@ -598,10 +598,10 @@ struct SettingsScreen: View {
                             }
                             .frame(minWidth: 100)
                             .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.red)
+                            .foregroundColor(.errorRed)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(Color.red.opacity(0.1))
+                            .background(Color.errorRed.opacity(0.1))
                             .cornerRadius(20)
                         }
                         .transition(.opacity)
@@ -642,10 +642,10 @@ struct SettingsScreen: View {
                             }
                         }
                         .frame(minWidth: 100) // Keep consistent button width
-                        .foregroundColor(.blue)
+                        .foregroundColor(.brandGreen)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(Color.blue.opacity(0.1))
+                        .background(Color.brandGreen.opacity(0.1))
                         .cornerRadius(20)
                     }
                     .disabled(isLoading)
@@ -711,7 +711,7 @@ struct SettingsScreen: View {
                 settingsRow(
                     icon: "bell.fill",
                     title: "Notifications",
-                    iconColor: .orange,
+                    iconColor: .warningOrange,
                     content: {
                         Toggle("", isOn: $isNotificationEnabled)
                             .labelsHidden()
@@ -724,7 +724,7 @@ struct SettingsScreen: View {
                 settingsRow(
                     icon: "circle.lefthalf.filled",
                     title: "Appearance",
-                    iconColor: .indigo,
+                    iconColor: .infoBlue,
                     content: {
                         HStack(spacing: 8) {
                             Text(userTheme.rawValue.capitalized)
@@ -746,7 +746,7 @@ struct SettingsScreen: View {
                 settingsRow(
                     icon: "globe",
                     title: "Language",
-                    iconColor: .green,
+                    iconColor: .brandGreen,
                     content: {
                         HStack(spacing: 8) {
                             Text(language.rawValue)
@@ -781,7 +781,7 @@ struct SettingsScreen: View {
                     settingsRow(
                         icon: "lightbulb.fill",
                         title: "Request Feature",
-                        iconColor: .yellow,
+                        iconColor: .rewardYellow,
                         content: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -797,7 +797,7 @@ struct SettingsScreen: View {
                     settingsRow(
                         icon: "headphones",
                         title: "Contact & Support",
-                        iconColor: .blue,
+                        iconColor: .lightBlue,
                         content: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -820,7 +820,7 @@ struct SettingsScreen: View {
                     settingsRow(
                         icon: "doc.text.fill",
                         title: "Terms of Use",
-                        iconColor: .gray,
+                        iconColor: .textGray,
                         content: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -836,7 +836,7 @@ struct SettingsScreen: View {
                     settingsRow(
                         icon: "shield.fill",
                         title: "Privacy Policy",
-                        iconColor: .green,
+                        iconColor: .brandGreen,
                         content: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -852,7 +852,7 @@ struct SettingsScreen: View {
                     settingsRow(
                         icon: "info.circle.fill",
                         title: "About",
-                        iconColor: .purple,
+                        iconColor: .primaryVariant,
                         content: {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -872,7 +872,7 @@ struct SettingsScreen: View {
                 settingsRow(
                     icon: "arrow.right.square",
                     title: "Sign Out",
-                    iconColor: .red,
+                    iconColor: .errorRed,
                     content: {
                         Image(systemName: "chevron.right")
                             .font(.system(size: 12, weight: .medium))

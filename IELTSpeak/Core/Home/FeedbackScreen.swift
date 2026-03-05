@@ -302,8 +302,8 @@ struct FeedbackScreen: View {
         .background(
             LinearGradient(
                 gradient: Gradient(colors: [
-                    Color.blue.opacity(0.8),
-                    Color.purple.opacity(0.6)
+                    Color.brandGreen,
+                    Color.primaryVariant
                 ]),
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -385,15 +385,15 @@ struct FeedbackScreen: View {
                 VStack {
                     Image(systemName: "lightbulb.fill") // Icon for AI Feedback
                         .font(.callout)
-                        .foregroundColor(selectedTab == 0 ? .blue : .secondary)
+                        .foregroundColor(selectedTab == 0 ? .brandGreen : .secondary)
                     Text("Feedback")
                         .font(.caption)
                         .fontWeight(selectedTab == 0 ? .bold : .regular)
-                        .foregroundColor(selectedTab == 0 ? .blue : .secondary)
+                        .foregroundColor(selectedTab == 0 ? .brandGreen : .secondary)
                 }
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .background(selectedTab == 0 ? Color.blue.opacity(0.1) : Color.clear)
+                .background(selectedTab == 0 ? Color.brandGreen.opacity(0.1) : Color.clear)
                 .cornerRadius(8)
             }
 
@@ -401,15 +401,15 @@ struct FeedbackScreen: View {
                 VStack {
                     Image(systemName: "message.fill") // Icon for Conversation
                         .font(.callout)
-                        .foregroundColor(selectedTab == 1 ? .blue : .secondary)
+                        .foregroundColor(selectedTab == 1 ? .brandGreen : .secondary)
                     Text("Conversations")
                         .font(.caption)
                         .fontWeight(selectedTab == 1 ? .bold : .regular)
-                        .foregroundColor(selectedTab == 1 ? .blue : .secondary)
+                        .foregroundColor(selectedTab == 1 ? .brandGreen : .secondary)
                 }
                 .padding(.vertical, 8)
                 .frame(maxWidth: .infinity)
-                .background(selectedTab == 1 ? Color.blue.opacity(0.2) : Color.clear)
+                .background(selectedTab == 1 ? Color.brandGreen.opacity(0.2) : Color.clear)
                 .cornerRadius(8)
             }
         }
@@ -499,10 +499,10 @@ struct FeedbackScreen: View {
                         .padding(16)
                         .background(
                             RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.blue.opacity(0.1))
+                                .fill(Color.brandGreen.opacity(0.1))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                                        .stroke(Color.brandGreen.opacity(0.3), lineWidth: 1)
                                 )
                         )
                 }
@@ -515,9 +515,9 @@ struct FeedbackScreen: View {
                         .foregroundColor(.primary)
 
                     VStack(alignment: .leading, spacing: 8) {
-                        RecommendationRow(icon: "book.fill", text: "Practice advanced vocabulary daily", color: .blue)
-                        RecommendationRow(icon: "waveform", text: "Work on pronunciation clarity", color: .orange)
-                        RecommendationRow(icon: "timer", text: "Reduce speaking hesitations", color: .green)
+                        RecommendationRow(icon: "book.fill", text: "Practice advanced vocabulary daily", color: .infoBlue)
+                        RecommendationRow(icon: "waveform", text: "Work on pronunciation clarity", color: .warningOrange)
+                        RecommendationRow(icon: "timer", text: "Reduce speaking hesitations", color: .brandGreen)
                     }
                 }
 
@@ -547,9 +547,9 @@ struct FeedbackScreen: View {
 
     private func scoreColor(_ score: Double) -> Color {
         switch score {
-        case 7.0...9.0: return .green
-        case 6.0..<7.0: return .orange
-        default: return .red
+        case 7.0...9.0: return .brandGreen
+        case 6.0..<7.0: return .warningOrange
+        default: return .errorRed
         }
     }
 }

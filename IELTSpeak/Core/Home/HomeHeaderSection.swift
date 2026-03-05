@@ -16,7 +16,7 @@ struct HomeHeaderSection: View {
             HStack {
                 Text("Practice IELTS Speaking")
                     .font(.custom("Fredoka-Semibold", size: 28))
-                    .foregroundColor(.purple.opacity(0.9))
+                    .foregroundColor(.brandGreen)
             }
             .padding(.horizontal, 20)
             .padding(.bottom, 30)

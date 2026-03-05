@@ -41,6 +41,8 @@ struct MainView: View {
       } else {
         AuthView()
       }
+        
+        
     }
     .task {
       // Check initial auth state

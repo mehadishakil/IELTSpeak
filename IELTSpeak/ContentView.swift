@@ -19,7 +19,7 @@ struct ContentView: View {
         }
         .background(.ultraThinMaterial)
         .edgesIgnoringSafeArea(.bottom)
-        .tint(.primary)
+        .tint(.brandGreen)
         .preferredColorScheme(userTheme.colorScheme)
     }
 }

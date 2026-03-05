@@ -4,7 +4,6 @@ import Supabase
 struct HomeScreen: View {
     @State private var isStartingTest = false
     @State private var selectedTestResult: TestResult? = nil
-    @State private var showFeedbackScreen = false
     @State private var showPreparationSheet = false
     @State private var showTestingView = false
     @State private var isLoading = false
@@ -53,10 +52,8 @@ struct HomeScreen: View {
                 }
             }
             .navigationBarHidden(true)
-            .sheet(isPresented: $showFeedbackScreen) {
-                if let selectedResult = selectedTestResult {
-                    FeedbackScreen(testResult: selectedResult)
-                }
+            .sheet(item: $selectedTestResult) { result in
+                FeedbackScreen(testResult: result)
             }
         }
     }
@@ -100,7 +97,6 @@ struct HomeScreen: View {
         
     private func selectTest(_ result: TestResult) {
         selectedTestResult = result
-        showFeedbackScreen = true
     }
 }
 

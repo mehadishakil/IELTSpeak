@@ -589,16 +589,16 @@ struct IELTSSpeakingBandDescriptorsView: View {
     
     private func colorForBand(_ band: Int) -> Color {
         switch band {
-        case 9: return .green
-        case 8: return Color(red: 0.6, green: 0.8, blue: 0.2)
-        case 7: return .blue
-        case 6: return Color(red: 0.2, green: 0.6, blue: 0.8)
-        case 5: return .orange
+        case 9: return .brandGreen
+        case 8: return .primaryVariant
+        case 7: return .infoBlue
+        case 6: return .lightBlue
+        case 5: return .warningOrange
         case 4: return Color(red: 0.9, green: 0.6, blue: 0.2)
-        case 3: return .red
+        case 3: return .errorRed
         case 2: return Color(red: 0.8, green: 0.2, blue: 0.2)
         case 1: return Color(red: 0.6, green: 0.1, blue: 0.1)
-        default: return .gray
+        default: return .textGray
         }
     }
 }
@@ -631,16 +631,16 @@ struct BandButton: View {
     
     private func colorForBand(_ band: Int) -> Color {
         switch band {
-        case 9: return .green
-        case 8: return Color(red: 0.6, green: 0.8, blue: 0.2)
-        case 7: return .blue
-        case 6: return Color(red: 0.2, green: 0.6, blue: 0.8)
-        case 5: return .orange
+        case 9: return .brandGreen
+        case 8: return .primaryVariant
+        case 7: return .infoBlue
+        case 6: return .lightBlue
+        case 5: return .warningOrange
         case 4: return Color(red: 0.9, green: 0.6, blue: 0.2)
-        case 3: return .red
+        case 3: return .errorRed
         case 2: return Color(red: 0.8, green: 0.2, blue: 0.2)
         case 1: return Color(red: 0.6, green: 0.1, blue: 0.1)
-        default: return .gray
+        default: return .textGray
         }
     }
 }
@@ -660,7 +660,7 @@ struct CriteriaButton: View {
                 .padding(.vertical, 8)
                 .background(
                     Capsule()
-                        .fill(isSelected ? Color.blue : Color(UIColor.tertiarySystemFill))
+                        .fill(isSelected ? Color.brandGreen : Color(.tertiarySystemFill))
                 )
         }
         .animation(.easeInOut(duration: 0.2), value: isSelected)
@@ -681,7 +681,7 @@ struct BandDescriptorsNavigationCard: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
+                                colors: [Color.brandGreen, Color.primaryVariant],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -741,7 +741,7 @@ struct BandDescriptorsCompactButton: View {
             HStack(spacing: 12) {
                 Image(systemName: "chart.bar.doc.horizontal")
                     .font(.title3)
-                    .foregroundColor(.blue)
+                    .foregroundColor(.brandGreen)
                     .fontWeight(.medium)
                 
                 Text("Band Descriptors")
@@ -762,7 +762,7 @@ struct BandDescriptorsCompactButton: View {
                     .fill(Color(UIColor.tertiarySystemBackground))
                     .overlay(
                         RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue.opacity(0.2), lineWidth: 1)
+                            .stroke(Color.brandGreen.opacity(0.2), lineWidth: 1)
                     )
             )
         }

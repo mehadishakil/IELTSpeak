@@ -24,7 +24,7 @@ struct HomeHeroSection: View {
             .disabled(isLoading)
             .scaleEffect(isPressed ? 0.95 : 1.0)
             .animation(.easeInOut(duration: 0.2), value: isPressed)
-            .shadow(color: .blue.opacity(0.3), radius: 20, x: 0, y: 10)
+            .shadow(color: .primaryVariant.opacity(0.3), radius: 20, x: 0, y: 10)
             .onLongPressGesture(minimumDuration: 0) { 
                 withAnimation(.easeInOut(duration: 0.1)) {
                     isPressed = true
@@ -44,8 +44,8 @@ struct HeroButtonBackground: View {
     var body: some View {
         LinearGradient(
             gradient: Gradient(colors: [
-                Color.blue,
-                Color.purple
+                Color.brandGreen,
+                Color.primaryVariant
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing

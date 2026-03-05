@@ -18,11 +18,11 @@ struct LeaderboardView: View {
                     }
                     Spacer()
                     Image(systemName: "chevron.right.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(.brandGreen)
                         .font(.title3)
                 }
                 .padding()
-                .background(Color.blue.opacity(0.1))
+                .background(Color.brandGreen.opacity(0.1))
                 .cornerRadius(16)
                 .padding(.horizontal)
                 
@@ -32,17 +32,17 @@ struct LeaderboardView: View {
                         icon: "textformat.abc",
                         value: "52",
                         label: "Words Spoken",
-                        color: .green
+                        color: .brandGreen
                     )
-                    statRow(icon: "text.bubble", value: "29", label: "Sentences Spoken", color: .yellow)
-                    statRow(icon: "star.fill", value: "3", label: "Stars Conquered", color: .pink)
+                    statRow(icon: "text.bubble", value: "29", label: "Sentences Spoken", color: .rewardYellow)
+                    statRow(icon: "star.fill", value: "3", label: "Stars Conquered", color: .rewardYellow)
                     statRow(
                         icon: "calendar",
                         value: "2",
                         label: "Days Practicing",
-                        color: .mint
-                )
-                    statRow(icon: "flame", value: "1", label: "Longest Streak", color: .purple)
+                        color: .lightBlue
+                    )
+                    statRow(icon: "flame", value: "1", label: "Longest Streak", color: .primaryVariant)
                 }
                 .padding(.horizontal)
             }
@@ -54,11 +54,11 @@ struct LeaderboardView: View {
         VStack(spacing: 15) {
             HStack {
                 Circle()
-                    .fill(Color.orange.opacity(0.2))
+                    .fill(Color.warningOrange.opacity(0.2))
                     .frame(width: 40, height: 40)
                     .overlay(
                         Image(systemName: "flame.fill")
-                            .foregroundColor(.orange)
+                            .foregroundColor(.warningOrange)
                             .font(.system(size: 20))
                     )
                 
@@ -80,7 +80,7 @@ struct LeaderboardView: View {
                 ForEach(0..<7) { index in
                     VStack(spacing: 8) {
                         Circle()
-                            .fill(index == 0 ? Color.orange : Color.gray.opacity(0.2))
+                            .fill(index == 0 ? Color.brandGreen : Color.textGray.opacity(0.2))
                             .frame(width: 35, height: 35)
                             .overlay(
                                 Image(systemName: index == 0 ? "checkmark" : "multiply")
@@ -95,7 +95,7 @@ struct LeaderboardView: View {
                 }
             }
             .padding()
-            .background(.orange.opacity(0.2))
+            .background(Color.warningOrange.opacity(0.2))
             .cornerRadius(12)
         }
         .padding(20)

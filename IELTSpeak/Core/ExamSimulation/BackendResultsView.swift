@@ -49,10 +49,10 @@ struct ResultsHeaderSection: View {
     
     private var bandScoreColor: Color {
         switch results.overallBandScore {
-        case 8.0...9.0: return .green
-        case 6.5..<8.0: return .blue
-        case 5.0..<6.5: return .orange
-        default: return .red
+        case 8.0...9.0: return .brandGreen
+        case 6.5..<8.0: return .infoBlue
+        case 5.0..<6.5: return .warningOrange
+        default: return .errorRed
         }
     }
     
@@ -101,10 +101,10 @@ struct ScoreRow: View {
     
     private var scoreColor: Color {
         switch score {
-        case 8.0...9.0: return .green
-        case 6.5..<8.0: return .blue
-        case 5.0..<6.5: return .orange
-        default: return .red
+        case 8.0...9.0: return .brandGreen
+        case 6.5..<8.0: return .infoBlue
+        case 5.0..<6.5: return .warningOrange
+        default: return .errorRed
         }
     }
     
@@ -179,8 +179,8 @@ struct TranscriptCard: View {
                         .font(.caption)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
-                        .background(Color.blue.opacity(0.2))
-                        .foregroundColor(.blue)
+                        .background(Color.lightBlue.opacity(0.2))
+                        .foregroundColor(.lightBlue)
                         .clipShape(RoundedRectangle(cornerRadius: 8))
                 }
             }
@@ -218,13 +218,13 @@ struct TranscriptCard: View {
                 ScorePill(
                     title: "Fluency",
                     score: response.fluencyScore,
-                    color: .blue
+                    color: .infoBlue
                 )
-                
+
                 ScorePill(
-                    title: "Pronunciation", 
+                    title: "Pronunciation",
                     score: response.pronunciationScore,
-                    color: .green
+                    color: .brandGreen
                 )
                 
                 Spacer()

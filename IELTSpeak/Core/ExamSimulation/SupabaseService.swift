@@ -98,10 +98,10 @@ class SupabaseService: ObservableObject {
                 startedAt: Date()
             )
             
-            DispatchQueue.main.async {
+            await MainActor.run {
                 self.currentSession = session
             }
-            
+
             print("✅ Created test session: \(session.id)")
             return session
         }
