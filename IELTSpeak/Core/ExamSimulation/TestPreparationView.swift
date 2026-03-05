@@ -193,23 +193,38 @@ import AVFoundation
 
 struct TestPreparationView: View {
     let onStartTest: () -> Void
+    var onCancel: (() -> Void)? = nil
     @State private var showMicDeniedAlert = false
-    
+
     var body: some View {
         ScrollView {
             VStack(spacing: 30) {
                 PreparationHeaderSection()
-                
+
                 QuestionDisplayToggle()
-                
+
                 TestPartsOverview()
-                
+
                 StartTestButton(
                     onStartTest: onStartTest,
                     showMicDeniedAlert: $showMicDeniedAlert
                 )
             }
             .padding(.top, 30)
+        }
+        .overlay(alignment: .topTrailing) {
+            if let onCancel {
+                Button(action: onCancel) {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.secondary)
+                        .frame(width: 32, height: 32)
+                        .background(Color(.systemGray5))
+                        .clipShape(Circle())
+                }
+                .padding(.top, 14)
+                .padding(.trailing, 20)
+            }
         }
         .alert("Microphone Access Required", isPresented: $showMicDeniedAlert) {
             Button("OK", role: .cancel) {}

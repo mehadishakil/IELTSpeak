@@ -13,24 +13,179 @@ struct StudentSection: View {
     let isRecording: Bool
     let recordingTime: TimeInterval
     let userWaveformData: [Double]
+    var onCancel: (() -> Void)? = nil
+
+    @State private var isFlipped = false
+    @State private var showConfirmation = false
+    private var isActive: Bool { isUserSpeaking || isRecording }
+    private let activeBackground = Color(red: 237/255, green: 236/255, blue: 255/255) // #EDECFF
+    private let activeStroke = Color(red: 180/255, green: 178/255, blue: 240/255)
 
     var body: some View {
-        VStack(spacing: 0) {
-            StudentHeader(
-                isRecording: isRecording,
-                recordingTime: recordingTime,
-                isUserSpeaking: isUserSpeaking
-            )
+        ZStack {
+            // Front side
+            VStack(spacing: 0) {
+                StudentHeader(
+                    isRecording: isRecording,
+                    recordingTime: recordingTime,
+                    isUserSpeaking: isUserSpeaking
+                )
 
-            StudentContent(
-                isUserSpeaking: isUserSpeaking,
-                isRecording: isRecording,
-                waveformData: userWaveformData
+                StudentContent(
+                    isUserSpeaking: isUserSpeaking,
+                    isRecording: isRecording,
+                    waveformData: userWaveformData
+                )
+            }
+            .background(isActive ? activeBackground : Color.white)
+            .cornerRadius(32)
+            .overlay(
+                RoundedRectangle(cornerRadius: 32)
+                    .stroke(isActive ? activeStroke : Color.clear, lineWidth: 1.5)
             )
+            .opacity(isFlipped ? 0 : 1)
+
+            // Back side
+            StudentCardBack(onCancel: onCancel, showConfirmation: $showConfirmation)
+                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+                .opacity(isFlipped ? 1 : 0)
         }
-        .background(Color(.systemGray6))
-        .cornerRadius(16)
+        .rotation3DEffect(.degrees(isFlipped ? 180 : 0), axis: (x: 0, y: 1, z: 0))
+        .onTapGesture {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                isFlipped.toggle()
+            }
+            if !isFlipped {
+                scheduleAutoFlipBack()
+            }
+        }
+        .onChange(of: isFlipped) { flipped in
+            if flipped {
+                scheduleAutoFlipBack()
+            }
+        }
+        .onChange(of: showConfirmation) { confirming in
+            if !confirming && isFlipped {
+                scheduleAutoFlipBack()
+            }
+        }
         .padding(.horizontal, 16)
+    }
+
+    private func scheduleAutoFlipBack() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if isFlipped && !showConfirmation {
+                withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                    isFlipped = false
+                }
+            }
+        }
+    }
+}
+
+struct StudentCardBack: View {
+    var onCancel: (() -> Void)? = nil
+    @Binding var showConfirmation: Bool
+
+    var body: some View {
+        ZStack {
+            // Main card content
+            VStack(spacing: 16) {
+                Spacer()
+
+//                Text("End Test")
+//                    .font(.headline)
+//                    .foregroundColor(.primary)
+
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        showConfirmation = true
+                    }
+                }) {
+                    Text("Cancel Test")
+                        .font(.body)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(Color.red)
+                        .cornerRadius(14)
+                }
+                .padding(.horizontal, 32)
+
+                Text("Unfinished tests will not be evaluated.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+
+                Spacer()
+
+                Text("Tap to go back")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .padding(.bottom, 16)
+            }
+            .opacity(showConfirmation ? 0.3 : 1)
+
+            // Inline confirmation overlay
+            if showConfirmation {
+                VStack(spacing: 12) {
+                    Text("Cancel Test?")
+                        .font(.headline)
+                        .foregroundColor(.primary)
+
+                    Text("Your progress will be lost and this test will not be evaluated.")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+
+                    HStack(spacing: 12) {
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showConfirmation = false
+                            }
+                        }) {
+                            Text("Cancel")
+                                .font(.subheadline)
+                                .fontWeight(.medium)
+                                .foregroundColor(.secondary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.gray.opacity(0.15))
+                                .cornerRadius(12)
+                        }
+
+                        Button(action: {
+                            onCancel?()
+                        }) {
+                            Text("Confirm")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(Color.red)
+                                .cornerRadius(12)
+                        }
+                    }
+                }
+                .padding(20)
+                .background(Color.white)
+                .cornerRadius(16)
+                .shadow(color: .black.opacity(0.1), radius: 8, y: 2)
+                .padding(.horizontal, 24)
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: UIScreen.main.bounds.height * 0.32 + 44)
+        .background(Color.white)
+        .cornerRadius(32)
+        .overlay(
+            RoundedRectangle(cornerRadius: 32)
+                .stroke(Color.gray.opacity(0.2), lineWidth: 1.5)
+        )
     }
 }
 

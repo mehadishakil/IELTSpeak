@@ -237,7 +237,7 @@ struct PronunciationItem: Identifiable {
 //        .padding(.vertical, 20)
 //        .background(
 //            RoundedRectangle(cornerRadius: 20)
-//                .fill(Color(.systemBackground))
+//                .fill(Color.white)
 //                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
 //        )
 //        .padding(.top, -10)
@@ -485,7 +485,7 @@ struct SubcategoryCard: View {
 //        .padding()
 //        .navigationTitle(subcategory.title)
 //        .navigationBarTitleDisplayMode(.inline)
-//        .background(Color(.systemGroupedBackground))
+//        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
 //        .onTapGesture {
 //            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
 //                isFlipped.toggle()
@@ -652,33 +652,68 @@ struct LearningCard: View {
     let item: Any
     let isFlipped: Bool
     let subcategory: Subcategory
-    
+
     var body: some View {
-        VStack(spacing: 20) {
-            if let vocabItem = item as? VocabularyItem {
-                VocabularyCardContent(item: vocabItem, isFlipped: isFlipped, color: subcategory.color)
-            } else if let idiomItem = item as? IdiomItem {
-                IdiomCardContent(item: idiomItem, isFlipped: isFlipped, color: subcategory.color)
-            } else if let realIdiomItem = item as? RealIdiomItemViewModel {
-                RealIdiomCardContent(item: realIdiomItem, isFlipped: isFlipped, color: subcategory.color)
-            } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
-                RealPhrasalVerbCardContent(item: realPhrasalVerbItem, isFlipped: isFlipped, color: subcategory.color)
-            } else if let phrasalItem = item as? PhrasalVerbItem {
-                PhrasalVerbCardContent(item: phrasalItem, isFlipped: isFlipped, color: subcategory.color)
-            }
+        ZStack {
+            // Front
+            frontContent
+                .opacity(isFlipped ? 0 : 1)
+
+            // Back
+            backContent
+                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+                .opacity(isFlipped ? 1 : 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .padding(24)
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+            RoundedRectangle(cornerRadius: 28)
+                .fill(Color.white)
+                .shadow(color: subcategory.color.opacity(0.12), radius: 20, y: 10)
         )
-        .frame(height: 300)
+        .overlay(
+            RoundedRectangle(cornerRadius: 28)
+                .stroke(subcategory.color.opacity(0.1), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 28))
         .rotation3DEffect(
             .degrees(isFlipped ? 180 : 0),
             axis: (x: 0, y: 1, z: 0)
         )
+        .onTapGesture {
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+                // handled by parent
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var frontContent: some View {
+        if let vocabItem = item as? VocabularyItem {
+            VocabularyCardContent(item: vocabItem, isFlipped: false, color: subcategory.color)
+        } else if let idiomItem = item as? IdiomItem {
+            IdiomCardContent(item: idiomItem, isFlipped: false, color: subcategory.color)
+        } else if let realIdiomItem = item as? RealIdiomItemViewModel {
+            RealIdiomCardContent(item: realIdiomItem, isFlipped: false, color: subcategory.color)
+        } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
+            RealPhrasalVerbCardContent(item: realPhrasalVerbItem, isFlipped: false, color: subcategory.color)
+        } else if let phrasalItem = item as? PhrasalVerbItem {
+            PhrasalVerbCardContent(item: phrasalItem, isFlipped: false, color: subcategory.color)
+        }
+    }
+
+    @ViewBuilder
+    private var backContent: some View {
+        if let vocabItem = item as? VocabularyItem {
+            VocabularyCardContent(item: vocabItem, isFlipped: true, color: subcategory.color)
+        } else if let idiomItem = item as? IdiomItem {
+            IdiomCardContent(item: idiomItem, isFlipped: true, color: subcategory.color)
+        } else if let realIdiomItem = item as? RealIdiomItemViewModel {
+            RealIdiomCardContent(item: realIdiomItem, isFlipped: true, color: subcategory.color)
+        } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
+            RealPhrasalVerbCardContent(item: realPhrasalVerbItem, isFlipped: true, color: subcategory.color)
+        } else if let phrasalItem = item as? PhrasalVerbItem {
+            PhrasalVerbCardContent(item: phrasalItem, isFlipped: true, color: subcategory.color)
+        }
     }
 }
 
@@ -747,57 +782,104 @@ struct IdiomCardContent: View {
     let item: IdiomItem
     let isFlipped: Bool
     let color: Color
-    
+
     var body: some View {
-        VStack(spacing: 16) {
-            if !isFlipped {
-                VStack(spacing: 12) {
-                    Text(item.idiom)
-                        .font(.custom("Fredoka-SemiBold", size: 24))
-                        .foregroundColor(color)
-                        .multilineTextAlignment(.center)
-                    
-                    Text(item.difficulty)
-                        .font(.custom("Fredoka-SemiBold", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(color.opacity(0.8))
-                        .clipShape(Capsule())
-                }
-                
-                Spacer()
-                
-                Text("Tap to see meaning")
-                    .font(.custom("Fredoka-SemiBold", size: 14))
-                    .foregroundColor(.secondary)
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Meaning")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        Text(item.meaning)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.primary)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Example")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        Text(item.example)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.secondary)
-                            .italic()
-                    }
-                    
+        if !isFlipped {
+            // Front
+            VStack(spacing: 0) {
+                HStack {
+                    BadgePill(text: item.difficulty, color: color)
                     Spacer()
                 }
-                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
+                Spacer()
+
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.12))
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "text.quote")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundColor(color)
+                    }
+
+                    Text(item.idiom)
+                        .font(.custom("Fredoka-Bold", size: 26))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see meaning")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .padding(.bottom, 16)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            // Back
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text(item.idiom)
+                        .font(.custom("Fredoka-SemiBold", size: 18))
+                        .foregroundColor(color)
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+
+                Divider().padding(.horizontal, 24)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Meaning")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.meaning)
+                                .font(.custom("Fredoka-Medium", size: 16))
+                                .foregroundColor(.primary.opacity(0.85))
+                                .lineSpacing(4)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Example")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.example)
+                                .font(.custom("Fredoka-Medium", size: 15))
+                                .foregroundColor(.primary.opacity(0.7))
+                                .italic()
+                                .lineSpacing(4)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                }
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see idiom")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -806,57 +888,102 @@ struct PhrasalVerbCardContent: View {
     let item: PhrasalVerbItem
     let isFlipped: Bool
     let color: Color
-    
+
     var body: some View {
-        VStack(spacing: 16) {
-            if !isFlipped {
-                VStack(spacing: 12) {
-                    Text(item.verb)
-                        .font(.custom("Fredoka-SemiBold", size: 24))
-                        .foregroundColor(color)
-                        .multilineTextAlignment(.center)
-                    
-                    Text(item.difficulty)
-                        .font(.custom("Fredoka-SemiBold", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(color.opacity(0.8))
-                        .clipShape(Capsule())
-                }
-                
-                Spacer()
-                
-                Text("Tap to see meaning")
-                    .font(.custom("Fredoka-SemiBold", size: 14))
-                    .foregroundColor(.secondary)
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Meaning")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        Text(item.meaning)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.primary)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Example")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        Text(item.example)
-                            .font(.custom("Fredoka-SemiBold", size: 16))
-                            .foregroundColor(.secondary)
-                            .italic()
-                    }
-                    
+        if !isFlipped {
+            VStack(spacing: 0) {
+                HStack {
+                    BadgePill(text: item.difficulty, color: color)
                     Spacer()
                 }
-                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
+                Spacer()
+
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.12))
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "arrow.triangle.branch")
+                            .font(.system(size: 24, weight: .semibold))
+                            .foregroundColor(color)
+                    }
+
+                    Text(item.verb)
+                        .font(.custom("Fredoka-Bold", size: 26))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see meaning")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .padding(.bottom, 16)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text(item.verb)
+                        .font(.custom("Fredoka-SemiBold", size: 18))
+                        .foregroundColor(color)
+                    Spacer()
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+
+                Divider().padding(.horizontal, 24)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Meaning")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.meaning)
+                                .font(.custom("Fredoka-Medium", size: 16))
+                                .foregroundColor(.primary.opacity(0.85))
+                                .lineSpacing(4)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Example")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.example)
+                                .font(.custom("Fredoka-Medium", size: 15))
+                                .foregroundColor(.primary.opacity(0.7))
+                                .italic()
+                                .lineSpacing(4)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                }
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see verb")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -865,72 +992,117 @@ struct RealIdiomCardContent: View {
     let item: RealIdiomItemViewModel
     let isFlipped: Bool
     let color: Color
-    
+
     var body: some View {
-        VStack(spacing: 16) {
-            if !isFlipped {
-                VStack(spacing: 12) {
-                    Text(item.idiom)
-                        .font(.custom("Fredoka-SemiBold", size: 24))
-                        .foregroundColor(color)
-                        .multilineTextAlignment(.center)
-                    
-                    Text(item.difficulty)
-                        .font(.custom("Fredoka-SemiBold", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(color.opacity(0.8))
-                        .clipShape(Capsule())
-                    
+        if !isFlipped {
+            VStack(spacing: 0) {
+                HStack {
                     Text(item.category)
-                        .font(.custom("Fredoka-Medium", size: 12))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(color.opacity(0.1))
-                        .clipShape(Capsule())
+                        .font(.custom("Fredoka-SemiBold", size: 16))
+                        .foregroundColor(color.opacity(0.7))
+                    Spacer()
+                    BadgePill(text: item.difficulty, color: color)
                 }
-                
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
                 Spacer()
-                
-                Text("Tap to see meaning")
-                    .font(.custom("Fredoka-SemiBold", size: 14))
-                    .foregroundColor(.secondary)
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Meaning")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
+
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.12))
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "text.quote")
+                            .font(.system(size: 24, weight: .semibold))
                             .foregroundColor(color)
-                        
-                        Text(item.meaning)
-                            .font(.custom("Fredoka-Medium", size: 16))
-                            .foregroundColor(.primary)
                     }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Examples")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
-                                    Text("• \(example)")
-                                        .font(.custom("Fredoka-Medium", size: 14))
-                                        .foregroundColor(.primary.opacity(0.8))
-                                        .italic()
+
+                    Text(item.idiom)
+                        .font(.custom("Fredoka-Bold", size: 26))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see meaning")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text(item.idiom)
+                        .font(.custom("Fredoka-SemiBold", size: 18))
+                        .foregroundColor(color)
+                    Spacer()
+                    BadgePill(text: item.difficulty, color: color)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+
+                Divider().padding(.horizontal, 24)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Meaning")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.meaning)
+                                .font(.custom("Fredoka-Medium", size: 16))
+                                .foregroundColor(.primary.opacity(0.85))
+                                .lineSpacing(4)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Examples")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+
+                            ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
+                                HStack(alignment: .top, spacing: 12) {
+                                    Text("\(index + 1)")
+                                        .font(.custom("Fredoka-Bold", size: 14))
+                                        .foregroundColor(.white)
+                                        .frame(width: 26, height: 26)
+                                        .background(Circle().fill(color.opacity(0.7 + Double(index) * 0.1)))
+                                    Text(example)
+                                        .font(.custom("Fredoka-Medium", size: 15))
+                                        .foregroundColor(.primary.opacity(0.7))
+                                        .lineSpacing(4)
+                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                             }
                         }
-                        .frame(maxHeight: 120)
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
                 }
-                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see idiom")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 16)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -939,72 +1111,117 @@ struct RealPhrasalVerbCardContent: View {
     let item: RealPhrasalVerbItemViewModel
     let isFlipped: Bool
     let color: Color
-    
+
     var body: some View {
-        VStack(spacing: 16) {
-            if !isFlipped {
-                VStack(spacing: 12) {
-                    Text(item.phrasalVerb)
-                        .font(.custom("Fredoka-SemiBold", size: 24))
-                        .foregroundColor(color)
-                        .multilineTextAlignment(.center)
-                    
-                    Text(item.difficulty)
-                        .font(.custom("Fredoka-SemiBold", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(color.opacity(0.8))
-                        .clipShape(Capsule())
-                    
+        if !isFlipped {
+            VStack(spacing: 0) {
+                HStack {
                     Text(item.category)
-                        .font(.custom("Fredoka-Medium", size: 12))
-                        .foregroundColor(.secondary)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(color.opacity(0.1))
-                        .clipShape(Capsule())
+                        .font(.custom("Fredoka-SemiBold", size: 16))
+                        .foregroundColor(color.opacity(0.7))
+                    Spacer()
+                    BadgePill(text: item.difficulty, color: color)
                 }
-                
+                .padding(.horizontal, 24)
+                .padding(.top, 16)
+
                 Spacer()
-                
-                Text("Tap to see definition")
-                    .font(.custom("Fredoka-SemiBold", size: 14))
-                    .foregroundColor(.secondary)
-            } else {
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Definition")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
+
+                VStack(spacing: 16) {
+                    ZStack {
+                        Circle()
+                            .fill(color.opacity(0.12))
+                            .frame(width: 64, height: 64)
+                        Image(systemName: "arrow.triangle.branch")
+                            .font(.system(size: 24, weight: .semibold))
                             .foregroundColor(color)
-                        
-                        Text(item.definition)
-                            .font(.custom("Fredoka-Medium", size: 16))
-                            .foregroundColor(.primary)
                     }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Examples")
-                            .font(.custom("Fredoka-SemiBold", size: 20))
-                            .foregroundColor(color)
-                        
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: 8) {
-                                ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
-                                    Text("• \(example)")
-                                        .font(.custom("Fredoka-Medium", size: 14))
-                                        .foregroundColor(.primary.opacity(0.8))
-                                        .italic()
+
+                    Text(item.phrasalVerb)
+                        .font(.custom("Fredoka-Bold", size: 26))
+                        .foregroundColor(.primary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
+
+                Spacer()
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see definition")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .padding(.bottom, 16)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } else {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Text(item.phrasalVerb)
+                        .font(.custom("Fredoka-SemiBold", size: 18))
+                        .foregroundColor(color)
+                    Spacer()
+                    BadgePill(text: item.difficulty, color: color)
+                }
+                .padding(.horizontal, 24)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
+
+                Divider().padding(.horizontal, 24)
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Definition")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+                            Text(item.definition)
+                                .font(.custom("Fredoka-Medium", size: 16))
+                                .foregroundColor(.primary.opacity(0.85))
+                                .lineSpacing(4)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Examples")
+                                .font(.custom("Fredoka-SemiBold", size: 16))
+                                .foregroundColor(color)
+
+                            ForEach(Array(item.examples.enumerated()), id: \.offset) { index, example in
+                                HStack(alignment: .top, spacing: 12) {
+                                    Text("\(index + 1)")
+                                        .font(.custom("Fredoka-Bold", size: 14))
+                                        .foregroundColor(.white)
+                                        .frame(width: 26, height: 26)
+                                        .background(Circle().fill(color.opacity(0.7 + Double(index) * 0.1)))
+                                    Text(example)
+                                        .font(.custom("Fredoka-Medium", size: 15))
+                                        .foregroundColor(.primary.opacity(0.7))
+                                        .lineSpacing(4)
+                                        .fixedSize(horizontal: false, vertical: true)
                                 }
                             }
                         }
-                        .frame(maxHeight: 120)
                     }
-                    
-                    Spacer()
+                    .padding(.horizontal, 24)
+                    .padding(.top, 16)
+                    .padding(.bottom, 8)
                 }
-                .rotation3DEffect(.degrees(180), axis: (x: 0, y: 1, z: 0))
+
+                Spacer(minLength: 0)
+
+                HStack(spacing: 6) {
+                    Image(systemName: "hand.tap")
+                        .font(.system(size: 13))
+                    Text("Tap to see verb")
+                        .font(.custom("Fredoka-Medium", size: 14))
+                }
+                .foregroundColor(.secondary.opacity(0.6))
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 16)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 }
@@ -1051,7 +1268,7 @@ struct SubcategoryListView: View {
                     }
                     .navigationTitle(categoryTitle)
                     .navigationBarTitleDisplayMode(.large)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(red: 245/255, green: 245/255, blue: 245/255))
                 }
             }
         }
@@ -1077,7 +1294,7 @@ struct SubcategoryListView: View {
                     }
                     .navigationTitle("Sample Answers")
                     .navigationBarTitleDisplayMode(.large)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(red: 245/255, green: 245/255, blue: 245/255))
                 }
             }
         }
@@ -1125,7 +1342,7 @@ struct SubcategoryListView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemBackground))
+                        .fill(Color.white)
                         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                 )
             }
@@ -1162,7 +1379,7 @@ struct SubcategoryListView: View {
                 }
                 .navigationTitle("Sample Answer")
                 .navigationBarTitleDisplayMode(.inline)
-                .background(Color(.systemGroupedBackground))
+                .background(Color(red: 245/255, green: 245/255, blue: 245/255))
             }
         }
 
@@ -1230,7 +1447,7 @@ struct SubcategoryListView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemBackground))
+                        .fill(Color.white)
                         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                 )
                 .padding(.horizontal)
@@ -1256,7 +1473,7 @@ struct SubcategoryListView: View {
                     }
                     .navigationTitle("Pronunciation")
                     .navigationBarTitleDisplayMode(.large)
-                    .background(Color(.systemGroupedBackground))
+                    .background(Color(red: 245/255, green: 245/255, blue: 245/255))
                 }
             }
         }
@@ -1299,7 +1516,7 @@ struct SubcategoryListView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemBackground))
+                        .fill(Color.white)
                         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                 )
             }
@@ -1323,7 +1540,7 @@ struct SubcategoryListView: View {
                 }
                 .navigationTitle(topic.title)
                 .navigationBarTitleDisplayMode(.inline)
-                .background(Color(.systemGroupedBackground))
+                .background(Color(red: 245/255, green: 245/255, blue: 245/255))
             }
         }
 
@@ -1384,7 +1601,7 @@ struct SubcategoryListView: View {
                 .padding(20)
                 .background(
                     RoundedRectangle(cornerRadius: 16)
-                        .fill(Color(.systemBackground))
+                        .fill(Color.white)
                         .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
                 )
             }

@@ -9,24 +9,27 @@ struct ExamTestView: View {
     let recordingTime: TimeInterval
     let waveformData: [Double]
     let userWaveformData: [Double]
-    
+    var onCancel: (() -> Void)? = nil
+
     var body: some View {
         VStack(spacing: 0) {
             ProgressBarDivider(currentPart: currentPart)
-            
+
             ExaminerSection(
                 currentQuestionText: currentQuestionText,
                 isExaminerSpeaking: isExaminerSpeaking,
                 waveformData: waveformData
             )
-            
+
             StudentSection(
                 isUserSpeaking: isUserSpeaking,
                 isRecording: isRecording,
                 recordingTime: recordingTime,
-                userWaveformData: userWaveformData
+                userWaveformData: userWaveformData,
+                onCancel: onCancel
             )
         }
+        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
     }
 }
 

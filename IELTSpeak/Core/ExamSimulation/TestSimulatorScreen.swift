@@ -4,6 +4,7 @@ struct TestSimulatorScreen: View {
     @StateObject private var testManager: TestSimulationManager
     @Environment(\.dismiss) private var dismiss
     @State private var showQuestions = true
+    @State private var showPreparationSheet = true
     let questions: [Int: [QuestionItem]]
     
     init(questions: [Int: [QuestionItem]]) {
@@ -15,21 +16,14 @@ struct TestSimulatorScreen: View {
         NavigationStack {
             
             ZStack {
-                Color(.systemBackground)
+                Color(red: 245/255, green: 245/255, blue: 245/255)
                     .ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    TestHeaderView(
-                        currentPhase: testManager.currentPhase,
-                        currentPart: testManager.currentPart,
-                        onDismiss: { dismiss() }
-                    )
-
                     switch testManager.currentPhase {
                     case .preparation:
-                        TestPreparationView(
-                            onStartTest: testManager.startTest
-                        )
+                        Color(red: 245/255, green: 245/255, blue: 245/255)
+                            .ignoresSafeArea()
                     case .testing:
                         ExamTestView(
                             currentPart: testManager.currentPart,
@@ -39,7 +33,8 @@ struct TestSimulatorScreen: View {
                             isRecording: testManager.isRecording,
                             recordingTime: testManager.recordingTime,
                             waveformData: testManager.audioPlayerManager.isPlaying ? testManager.generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
-                            userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30))
+                            userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30),
+                            onCancel: { dismiss() })
                         case .completed:
                             if let backendResults = testManager.backendResults {
                                 BackendResultsView(
@@ -75,6 +70,21 @@ struct TestSimulatorScreen: View {
         }
         .ignoresSafeArea(.all)
         .toolbar(.hidden, for: .tabBar)
+        .sheet(isPresented: $showPreparationSheet) {
+            TestPreparationView(
+                onStartTest: {
+                    showPreparationSheet = false
+                    testManager.startTest()
+                },
+                onCancel: {
+                    showPreparationSheet = false
+                    dismiss()
+                }
+            )
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+            .interactiveDismissDisabled()
+        }
     }
 
 }

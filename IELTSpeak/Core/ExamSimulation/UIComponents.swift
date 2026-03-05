@@ -110,30 +110,31 @@ struct WaveformView: View {
 struct ProgressBarDivider: View {
     let currentPart: Int
 
-    var body: some View {
-        VStack(spacing: 0) {
-            // Thick progress bar with text inside
-            HStack(spacing: 4) {
-                ForEach(1...3, id: \.self) { partNumber in
-                    ZStack {
-                        // Background bar
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(partNumber <= currentPart ?
-                                  Color.secondary :
-                                  Color.gray.opacity(0.3)
-                            )
-                            .frame(height: 44)
+    private let activeColor = Color(red: 237/255, green: 236/255, blue: 255/255) // #EDECFF
+    private let activeStroke = Color(red: 180/255, green: 178/255, blue: 240/255)
 
-                        // Text inside the bar
-                        Text("Part \(partNumber)")
-                            .font(.system(size: 15, weight: partNumber == currentPart ? .bold : .semibold))
-                            .foregroundColor(partNumber <= currentPart ? .white : .gray)
-                    }
-                    .frame(maxWidth: .infinity)
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(1...3, id: \.self) { partNumber in
+                let isActive = partNumber == currentPart
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(isActive ? activeColor : Color.white)
+                        .frame(height: 42)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(isActive ? activeStroke : Color.clear, lineWidth: 1.5)
+                        )
+
+                    Text("Part \(partNumber)")
+                        .font(.system(size: 15, weight: isActive ? .bold : .medium))
+                        .foregroundColor(isActive ? Color(red: 100/255, green: 96/255, blue: 180/255) : .gray)
                 }
+                .frame(maxWidth: .infinity)
             }
-            .padding(.horizontal, 20)
         }
+        .padding(.horizontal, 20)
+        .animation(.easeInOut(duration: 0.3), value: currentPart)
     }
 }
 
