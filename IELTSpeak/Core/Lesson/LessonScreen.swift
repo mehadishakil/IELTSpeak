@@ -206,14 +206,14 @@ struct LessonScreen: View {
         )
         .padding(.top, -10)
         .transition(.asymmetric(
-            insertion: .opacity.combined(with: .scale(scale: 0.95)),
-            removal: .opacity.combined(with: .scale(scale: 0.95))
+            insertion: .opacity.combined(with: .scale(scale: 0.99)),
+            removal: .opacity.combined(with: .scale(scale: 0.99))
         ))
     }
     
     private func handleCategoryTap(_ category: LessonCategory) {
         // Expand/collapse to show subcategories for all categories
-        withAnimation(.spring(response: 0.6, dampingFraction: 0.8)) {
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.95)) {
             if expandedCategory == category.id {
                 expandedCategory = nil
             } else {

@@ -9,24 +9,24 @@ import SwiftUI
 
 struct Part3SampleAnswersView: View {
     let data: [Part3SampleAnswer]
-    
+
     @State private var searchText = ""
     @State private var selectedTopic: String? = nil
-    
+
+    private let accentIndigo = Color(red: 88/255, green: 86/255, blue: 214/255)
+
     private var availableTopics: [String] {
         let topics = data.map { $0.topic }.sorted()
         return ["All Topics"] + topics
     }
-    
+
     private var filteredData: [Part3SampleAnswer] {
         var filtered = data
-        
-        // Filter by topic
+
         if let selectedTopic = selectedTopic, selectedTopic != "All Topics" {
             filtered = filtered.filter { $0.topic == selectedTopic }
         }
-        
-        // Filter by search text
+
         if !searchText.isEmpty {
             filtered = filtered.filter { answer in
                 answer.topic.localizedCaseInsensitiveContains(searchText) ||
@@ -36,85 +36,101 @@ struct Part3SampleAnswersView: View {
                 }
             }
         }
-        
+
         return filtered
     }
-    
+
+    private var totalQuestionCount: Int {
+        filteredData.reduce(0) { $0 + $1.questions.count }
+    }
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Search and Filter Section
-            VStack(spacing: 16) {
+        ScrollView {
+            VStack(spacing: 0) {
                 // Search Bar
-                HStack {
+                HStack(spacing: 12) {
                     Image(systemName: "magnifyingglass")
+                        .font(.system(size: 16, weight: .medium))
                         .foregroundColor(.secondary)
-                    
+
                     TextField("Search questions or answers...", text: $searchText)
                         .font(.custom("Fredoka-Regular", size: 16))
+
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 16))
+                                .foregroundColor(.secondary)
+                        }
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
+                    RoundedRectangle(cornerRadius: 14)
                         .fill(Color(.systemGray6))
                 )
-                
-                // Topic Filter
+                .padding(.horizontal, 20)
+                .padding(.top, 12)
+
+                // Topic Filter Pills
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 10) {
                         ForEach(availableTopics, id: \.self) { topic in
-                            Part3TopicFilterChip(
+                            TopicFilterChip(
                                 title: topic,
-                                isSelected: selectedTopic == topic
+                                isSelected: selectedTopic == topic,
+                                accentColor: accentIndigo
                             ) {
-                                if selectedTopic == topic {
-                                    selectedTopic = nil
-                                } else {
-                                    selectedTopic = topic
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    selectedTopic = (selectedTopic == topic) ? nil : topic
                                 }
                             }
                         }
                     }
                     .padding(.horizontal, 20)
+                    .padding(.vertical, 14)
                 }
-                
-                // Info Banner
-                HStack {
+
+                // Info Banner + Stats
+                HStack(spacing: 10) {
                     Image(systemName: "bubble.left.and.bubble.right.fill")
-                        .foregroundColor(.purple)
-                    
-                    Text("Part 3: Two-way Discussion - Abstract and complex questions related to Part 2 topic")
-                        .font(.custom("Fredoka-Medium", size: 14))
+                        .font(.system(size: 13))
+                        .foregroundColor(accentIndigo)
+
+                    Text("\(filteredData.count) topics")
+                        .font(.custom("Fredoka-Medium", size: 13))
                         .foregroundColor(.secondary)
-                        .multilineTextAlignment(.leading)
-                    
+
+                    Circle()
+                        .fill(Color.secondary.opacity(0.4))
+                        .frame(width: 4, height: 4)
+
+                    Text("\(totalQuestionCount) discussion questions")
+                        .font(.custom("Fredoka-Medium", size: 13))
+                        .foregroundColor(.secondary)
+
                     Spacer()
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 12)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.purple.opacity(0.1))
-                )
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 16)
-            .background(Color(.systemGroupedBackground))
-            
-            // Content
-            ScrollView {
-                LazyVStack(spacing: 16) {
+                .padding(.horizontal, 24)
+                .padding(.bottom, 8)
+
+                // Content
+                LazyVStack(spacing: 14) {
                     ForEach(filteredData) { topicData in
-                        Part3TopicCard(topicData: topicData)
+                        Part3TopicCard(topicData: topicData, accentColor: accentIndigo)
                     }
                 }
                 .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .padding(.vertical, 12)
+                .padding(.bottom, 80)
             }
         }
         .navigationTitle("Part 3 Sample Answers")
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color(.systemGroupedBackground))
+        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
         .onAppear {
             if selectedTopic == nil {
                 selectedTopic = "All Topics"
@@ -123,218 +139,235 @@ struct Part3SampleAnswersView: View {
     }
 }
 
-struct Part3TopicFilterChip: View {
-    let title: String
-    let isSelected: Bool
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.custom("Fredoka-Medium", size: 14))
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(isSelected ? Color.purple : Color(.systemGray5))
-                )
-        }
-        .buttonStyle(PlainButtonStyle())
-    }
-}
-
 struct Part3TopicCard: View {
     let topicData: Part3SampleAnswer
+    var accentColor: Color = Color(red: 88/255, green: 86/255, blue: 214/255)
     @State private var isExpanded = false
-    
+
+    private var topicIcon: String {
+        let topic = topicData.topic.lowercased()
+        if topic.contains("food") || topic.contains("cook") { return "fork.knife" }
+        if topic.contains("sport") || topic.contains("exercise") { return "figure.run" }
+        if topic.contains("music") || topic.contains("song") { return "music.note" }
+        if topic.contains("travel") || topic.contains("holiday") { return "airplane" }
+        if topic.contains("work") || topic.contains("job") { return "briefcase.fill" }
+        if topic.contains("study") || topic.contains("school") || topic.contains("education") { return "graduationcap.fill" }
+        if topic.contains("home") || topic.contains("house") || topic.contains("indoor") { return "house.fill" }
+        if topic.contains("friend") || topic.contains("people") || topic.contains("family") { return "person.2.fill" }
+        if topic.contains("book") || topic.contains("read") { return "book.fill" }
+        if topic.contains("weather") || topic.contains("season") || topic.contains("environment") { return "cloud.sun.fill" }
+        if topic.contains("shop") || topic.contains("cloth") || topic.contains("fashion") { return "bag.fill" }
+        if topic.contains("health") || topic.contains("medicine") { return "heart.fill" }
+        if topic.contains("money") || topic.contains("econom") || topic.contains("business") { return "chart.line.uptrend.xyaxis" }
+        if topic.contains("technolog") || topic.contains("internet") || topic.contains("computer") { return "desktopcomputer" }
+        if topic.contains("art") || topic.contains("culture") || topic.contains("museum") { return "paintpalette.fill" }
+        if topic.contains("city") || topic.contains("urban") || topic.contains("transport") { return "building.2.fill" }
+        if topic.contains("law") || topic.contains("crime") || topic.contains("justice") { return "scalemass.fill" }
+        return "bubble.left.and.bubble.right.fill"
+    }
+
+    private var topicColor: Color {
+        let hash = abs(topicData.topic.hashValue)
+        let colors: [Color] = [
+            Color(red: 88/255, green: 86/255, blue: 214/255),   // indigo
+            Color(red: 0/255, green: 150/255, blue: 136/255),   // teal
+            Color(red: 233/255, green: 30/255, blue: 99/255),   // pink
+            Color(red: 255/255, green: 152/255, blue: 0/255),   // orange
+            Color(red: 66/255, green: 165/255, blue: 245/255),  // blue
+            Color(red: 156/255, green: 39/255, blue: 176/255),  // purple
+        ]
+        return colors[hash % colors.count]
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
+            Button {
+                withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     isExpanded.toggle()
                 }
-            }) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
+            } label: {
+                HStack(spacing: 14) {
+                    // Icon
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(topicColor.opacity(0.12))
+                            .frame(width: 48, height: 48)
+
+                        Image(systemName: topicIcon)
+                            .font(.system(size: 20))
+                            .foregroundColor(topicColor)
+                    }
+
+                    // Title & count
+                    VStack(alignment: .leading, spacing: 3) {
                         Text(topicData.topic)
-                            .font(.custom("Fredoka-SemiBold", size: 18))
+                            .font(.custom("Fredoka-SemiBold", size: 17))
                             .foregroundColor(.primary)
                             .multilineTextAlignment(.leading)
-                        
+
                         Text("\(topicData.questions.count) discussion questions")
-                            .font(.custom("Fredoka-Medium", size: 14))
+                            .font(.custom("Fredoka-Medium", size: 13))
                             .foregroundColor(.secondary)
                     }
-                    
+
                     Spacer()
-                    
-                    Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption)
+
+                    // Expand icon
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.secondary)
                         .rotationEffect(.degrees(isExpanded ? 180 : 0))
-                        .animation(.easeInOut(duration: 0.3), value: isExpanded)
+                        .padding(10)
+                        .background(
+                            Circle()
+                                .fill(Color(.systemGray6))
+                        )
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
+                .padding(.horizontal, 18)
+                .padding(.vertical, 14)
             }
             .buttonStyle(PlainButtonStyle())
-            
+
             // Questions (Expandable)
             if isExpanded {
-                VStack(spacing: 12) {
-                    ForEach(topicData.questions) { question in
-                        Part3QuestionCard(question: question)
+                VStack(spacing: 0) {
+                    Rectangle()
+                        .fill(Color(.systemGray5))
+                        .frame(height: 1)
+                        .padding(.horizontal, 18)
+
+                    VStack(spacing: 12) {
+                        ForEach(Array(topicData.questions.enumerated()), id: \.element.id) { index, question in
+                            Part3QuestionCard(
+                                question: question,
+                                index: index + 1,
+                                accentColor: topicColor
+                            )
+                        }
                     }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 14)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 16)
-                .transition(.asymmetric(
-                    insertion: .opacity.combined(with: .scale(scale: 0.95)),
-                    removal: .opacity.combined(with: .scale(scale: 0.95))
-                ))
+                .transition(.opacity)
             }
         }
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(Color(.systemBackground))
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+                .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
         )
+        .clipShape(RoundedRectangle(cornerRadius: 20))
     }
 }
 
 struct Part3QuestionCard: View {
     let question: Part3Question
+    var index: Int = 1
+    var accentColor: Color = Color(red: 88/255, green: 86/255, blue: 214/255)
     @State private var showAlternativeAnswer = false
-    
+
+    private let altAnswerColor = Color(red: 0/255, green: 150/255, blue: 136/255)
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            // Question
-            Text(question.question)
-                .font(.custom("Fredoka-SemiBold", size: 16))
-                .foregroundColor(.primary)
-                .multilineTextAlignment(.leading)
-            
-            // Main Answer
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Sample Answer")
-                        .font(.custom("Fredoka-Medium", size: 12))
-                        .foregroundColor(.purple)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(Color.purple.opacity(0.1))
-                        )
-                    
-                    Spacer()
-                }
-                
-                Text(question.answer)
-                    .font(.custom("Fredoka-Regular", size: 14))
+            // Question header
+            HStack(alignment: .top, spacing: 10) {
+                Text("Q\(index)")
+                    .font(.custom("Fredoka-Bold", size: 12))
+                    .foregroundColor(.white)
+                    .frame(width: 32, height: 24)
+                    .background(
+                        Capsule()
+                            .fill(accentColor)
+                    )
+
+                Text(question.question)
+                    .font(.custom("Fredoka-SemiBold", size: 15))
                     .foregroundColor(.primary)
                     .multilineTextAlignment(.leading)
-                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 12)
+
+            // Sample Answer
+            VStack(alignment: .leading, spacing: 8) {
+                Label {
+                    Text("Sample Answer")
+                        .font(.custom("Fredoka-Medium", size: 12))
+                } icon: {
+                    Image(systemName: "text.quote")
+                        .font(.system(size: 10))
+                }
+                .foregroundColor(accentColor)
+
+                Text(question.answer)
+                    .font(.custom("Fredoka-Regular", size: 14))
+                    .foregroundColor(.primary.opacity(0.85))
+                    .multilineTextAlignment(.leading)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(.systemGray6))
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(accentColor.opacity(0.06))
             )
-            
-            // Alternative Answer (if available)
+
+            // Alternative Answer
             if let alternativeAnswer = question.alternative_answer, !alternativeAnswer.isEmpty {
                 VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                showAlternativeAnswer.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Text("Alternative Answer")
-                                    .font(.custom("Fredoka-Medium", size: 12))
-                                    .foregroundColor(.indigo)
-                                
-                                Image(systemName: showAlternativeAnswer ? "chevron.up" : "chevron.down")
-                                    .font(.caption2)
-                                    .foregroundColor(.indigo)
-                            }
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(
-                                RoundedRectangle(cornerRadius: 6)
-                                    .fill(Color.indigo.opacity(0.1))
-                            )
+                    Button {
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                            showAlternativeAnswer.toggle()
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        Spacer()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "sparkles")
+                                .font(.system(size: 11))
+
+                            Text("Alternative Answer")
+                                .font(.custom("Fredoka-Medium", size: 12))
+
+                            Spacer()
+
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 10, weight: .semibold))
+                                .rotationEffect(.degrees(showAlternativeAnswer ? 180 : 0))
+                        }
+                        .foregroundColor(altAnswerColor)
                     }
-                    
+                    .buttonStyle(PlainButtonStyle())
+
                     if showAlternativeAnswer {
                         Text(alternativeAnswer)
                             .font(.custom("Fredoka-Regular", size: 14))
-                            .foregroundColor(.primary)
+                            .foregroundColor(.primary.opacity(0.85))
                             .multilineTextAlignment(.leading)
-                            .lineLimit(nil)
-                            .transition(.asymmetric(
-                                insertion: .opacity.combined(with: .scale(scale: 0.95)),
-                                removal: .opacity.combined(with: .scale(scale: 0.95))
-                            ))
+                            .lineSpacing(3)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .transition(.opacity)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 12)
+                .padding(14)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.indigo.opacity(0.05))
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(altAnswerColor.opacity(0.06))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.indigo.opacity(0.2), lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(altAnswerColor.opacity(0.15), lineWidth: 1)
                         )
                 )
             }
-            
-            // Speaking Tips for Part 3
-            VStack(alignment: .leading, spacing: 6) {
-                HStack {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.orange)
-                        .font(.caption2)
-                    
-                    Text("Part 3 Tips")
-                        .font(.custom("Fredoka-SemiBold", size: 11))
-                        .foregroundColor(.orange)
-                }
-                
-                Text("• Give detailed, analytical responses • Use examples and explanations • Show complex thinking • Connect ideas logically")
-                    .font(.custom("Fredoka-Regular", size: 11))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.leading)
-            }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
-            .background(
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.orange.opacity(0.05))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.orange.opacity(0.2), lineWidth: 0.5)
-                    )
-            )
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 16)
+        .padding(14)
         .background(
-            RoundedRectangle(cornerRadius: 12)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(Color(.systemBackground))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(.systemGray5), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color(.systemGray5).opacity(0.8), lineWidth: 1)
                 )
         )
     }

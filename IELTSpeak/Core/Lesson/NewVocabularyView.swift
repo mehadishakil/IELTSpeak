@@ -63,28 +63,26 @@ struct NewVocabularyView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                headerView
+        VStack(spacing: 0) {
+            headerView
 
-                if dataManager.isLoading {
-                    loadingView
-                } else if filteredVocabulary.isEmpty {
-                    emptyStateView
-                } else {
-                    contentView
-                }
+            if dataManager.isLoading {
+                loadingView
+            } else if filteredVocabulary.isEmpty {
+                emptyStateView
+            } else {
+                contentView
             }
-            .navigationTitle(navigationTitle)
-            .navigationBarTitleDisplayMode(.inline)
-            .background(Color(red: 245/255, green: 245/255, blue: 245/255))
-            .sheet(isPresented: $showingFilters) {
-                filterSheet
-            }
-            .onAppear {
-                if dataManager.newVocabularyItems.isEmpty {
-                    dataManager.loadData()
-                }
+        }
+        .navigationTitle(navigationTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
+        .sheet(isPresented: $showingFilters) {
+            filterSheet
+        }
+        .onAppear {
+            if dataManager.newVocabularyItems.isEmpty {
+                dataManager.loadData()
             }
         }
     }
