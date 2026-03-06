@@ -76,7 +76,8 @@ struct NewVocabularyView: View {
         }
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 245/255, green: 245/255, blue: 245/255).ignoresSafeArea())
         .sheet(isPresented: $showingFilters) {
             filterSheet
         }

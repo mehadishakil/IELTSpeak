@@ -1,1 +1,4 @@
 .env.example
+.mcp.json
+.vscode
+MEMORY.md

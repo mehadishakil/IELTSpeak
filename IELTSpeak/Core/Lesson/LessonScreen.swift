@@ -314,7 +314,8 @@ struct CardLearningView: View {
                     .padding(.top, 16)
             }
         }
-        .background(Color(red: 245/255, green: 245/255, blue: 245/255))
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 245/255, green: 245/255, blue: 245/255).ignoresSafeArea())
         .navigationTitle(subcategory.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
