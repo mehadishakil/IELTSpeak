@@ -11,11 +11,11 @@ import SwiftUI
 struct RecentTestsSection: View {
     let testResults: [TestResult]
     let onTestSelected: (TestResult) -> Void
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             RecentTestsHeader()
-            
+
             if testResults.isEmpty {
                 EmptyTestsState()
             } else {
@@ -31,18 +31,18 @@ struct RecentTestsSection: View {
 // MARK: - Recent Tests Header
 struct RecentTestsHeader: View {
     var body: some View {
-        HStack {
+        HStack(alignment: .bottom) {
             Text("Recent Tests")
-                .font(.custom("Fredoka-Medium", size: 18))
+                .font(.custom("Fredoka-SemiBold", size: 20))
                 .foregroundColor(.primary)
-            
+
             Spacer()
-            
+
             Button("View All") {
                 // Handle view all
             }
-            .font(.custom("Fredoka-Regular", size: 14))
-            .foregroundColor(.blue)
+            .font(.custom("Fredoka-Medium", size: 14))
+            .foregroundColor(.brandGreen)
         }
     }
 }
@@ -51,7 +51,7 @@ struct RecentTestsHeader: View {
 struct TestResultsList: View {
     let testResults: [TestResult]
     let onTestSelected: (TestResult) -> Void
-    
+
     var body: some View {
         LazyVStack(spacing: 12) {
             ForEach(testResults) { result in
@@ -67,27 +67,32 @@ struct TestResultsList: View {
 struct EmptyTestsState: View {
     var body: some View {
         VStack(spacing: 16) {
-            Image(systemName: "waveform.badge.mic")
-                .font(.system(size: 60))
-                .foregroundColor(.gray.opacity(0.6))
-            
+            ZStack {
+                Circle()
+                    .fill(Color.brandGreen.opacity(0.1))
+                    .frame(width: 80, height: 80)
+
+                Image(systemName: "waveform.badge.mic")
+                    .font(.system(size: 34))
+                    .foregroundColor(.brandGreen)
+            }
+
             Text("No tests yet")
-                .font(.title3)
-                .fontWeight(.semibold)
+                .font(.custom("Fredoka-SemiBold", size: 20))
                 .foregroundColor(.primary)
-            
-            Text("Take your first speaking test to get AI feedback and track your progress")
-                .font(.subheadline)
+
+            Text("Take your first speaking test to get\nAI feedback and track your progress")
+                .font(.custom("Fredoka-Regular", size: 14))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+                .lineSpacing(2)
         }
         .padding(.vertical, 40)
         .frame(maxWidth: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.systemGray6))
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.05), radius: 10, x: 0, y: 4)
         )
     }
 }
-
-

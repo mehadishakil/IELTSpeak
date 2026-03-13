@@ -13,39 +13,47 @@ struct StatCard: View {
     let subtitle: String
     let color: Color
     let icon: String
-    
+
     var body: some View {
-        VStack {
-            Image(systemName: icon)
-                .font(.title2)
-                .foregroundColor(color)
-            
-            Spacer()
-            
+        VStack(spacing: 10) {
+            // Icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(color.opacity(0.12))
+                    .frame(width: 36, height: 36)
+
+                Image(systemName: icon)
+                    .font(.system(size: 16))
+                    .foregroundColor(color)
+            }
+
+            // Value
             Text(value)
-                .font(.custom("Fredoka-Medium", size: 22))
-                .foregroundColor(.primary.opacity(0.8))
-            
-            Spacer()
-            
-            Text(subtitle)
-                .font(.custom("Fredoka-Regular", size: 10))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.bottom, 0.2)
-            
-            Text(title)
-                .font(.custom("Fredoka-Regular", size: 12))
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                .font(.custom("Fredoka-Bold", size: 22))
+                .foregroundColor(.primary)
+
+            // Labels
+            VStack(spacing: 2) {
+                Text(subtitle)
+                    .font(.custom("Fredoka-Regular", size: 10))
+                    .foregroundColor(.secondary)
+
+                Text(title)
+                    .font(.custom("Fredoka-Medium", size: 11))
+                    .foregroundColor(.secondary)
+            }
+            .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 16)
         .background(
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(color.opacity(0.3), lineWidth: 1)
-                .fill(color.opacity(0.1))
-                .shadow(color: .black.opacity(0.1), radius: 8, x: 0, y: 4)
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color(.systemBackground))
+                .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 4)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(color.opacity(0.15), lineWidth: 1)
         )
     }
 }

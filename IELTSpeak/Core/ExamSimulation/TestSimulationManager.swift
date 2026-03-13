@@ -7,6 +7,9 @@ import Speech
 private enum TestConstants {
     static let part2PreparationTime: TimeInterval = 60
     static let part2SpeakingTime: TimeInterval = 120
+    static let part1MaxDuration: TimeInterval = 30
+    static let part3MaxDuration: TimeInterval = 45
+    static let timeWarningThreshold: TimeInterval = 5
     static let defaultSilenceDuration: TimeInterval = 2.0
     static let part3SilenceDuration: TimeInterval = 3.0
     static let part2SilenceDuration: TimeInterval = 3.0
@@ -42,6 +45,8 @@ class TestSimulationManager: ObservableObject {
     @Published var errorMessage: String?
     @Published var backendResults: TestResults?
     @Published var isUploadingResponses = false
+    @Published var isTimeWarning: Bool = false
+    private var responseTimer: Timer?
     private var uploadedQuestions = Set<String>()
     private var activeUploadTasks = Set<Task<Void, Never>>()
 
@@ -252,9 +257,10 @@ class TestSimulationManager: ObservableObject {
             return ValidationResult(isValid: true, errors: [], warnings: ["Running in guest mode - backend features disabled"])
         }
 
-        // Check if we have an active session
+        // Check if we have an active session - treat as warning, not error
+        // The test can still proceed locally; uploads will fail gracefully
         if SupabaseService.shared.currentSession == nil {
-            errors.append("No active backend session")
+            warnings.append("No active backend session - test will proceed locally")
         }
 
         // Validate network connectivity by attempting a lightweight operation
@@ -266,7 +272,7 @@ class TestSimulationManager: ObservableObject {
             warnings.append("Backend connectivity check failed: \(error.localizedDescription)")
         }
 
-        return ValidationResult(isValid: errors.isEmpty, errors: errors, warnings: warnings)
+        return ValidationResult(isValid: true, errors: errors, warnings: warnings)
     }
     
     private func validateAudioSubsystem() -> ValidationResult {
@@ -327,6 +333,9 @@ class TestSimulationManager: ObservableObject {
         audioPlayerManager.stopAudio()
         part2SpeakingTimer?.invalidate()
         preparationTimer?.invalidate()
+        responseTimer?.invalidate()
+        responseTimer = nil
+        isTimeWarning = false
         print("TestSimulationManager: Cleaned up previous states.")
     }
     
@@ -473,7 +482,7 @@ class TestSimulationManager: ObservableObject {
         } else if recordingTime < 60 {
             print("TestSimulationManager: Part 2: User stopped speaking before 1 minute. Saving and proceeding.")
         }
-        
+
         stopUserResponseAndSave(
             part: part,
             order: currentQuestionIndex + 1,  // Convert to 1-based indexing
@@ -482,6 +491,7 @@ class TestSimulationManager: ObservableObject {
         )
         part2SpeakingTimer?.invalidate()
         part2SpeakingTimer = nil
+        isTimeWarning = false
         nextQuestionOrPart()
     }
 
@@ -532,6 +542,13 @@ class TestSimulationManager: ObservableObject {
     
     private func updatePart2SpeakingTimer() {
         part2SpeakingTimeRemaining -= 1
+
+        // Trigger warning when 5 seconds remaining
+        if part2SpeakingTimeRemaining <= TestConstants.timeWarningThreshold && !isTimeWarning {
+            isTimeWarning = true
+            print("TestSimulationManager: Part 2: Time warning triggered at \(Int(part2SpeakingTimeRemaining))s remaining")
+        }
+
         if part2SpeakingTimeRemaining <= 0 {
             handlePart2TimeLimit()
         }
@@ -541,6 +558,7 @@ class TestSimulationManager: ObservableObject {
         print("TestSimulationManager: Part 2: 2-minute speaking limit reached. Stopping recording.")
         part2SpeakingTimer?.invalidate()
         part2SpeakingTimer = nil
+        isTimeWarning = false
         stopUserResponseAndSave(part: currentPart, order: currentQuestionIndex + 1, questionText: currentQuestionText)  // Convert to 1-based indexing
         print("TestSimulationManager: SIMULATING PROMPT: Thank you, that's enough.")
         DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.nextQuestionDelay) {
@@ -567,6 +585,11 @@ class TestSimulationManager: ObservableObject {
                     if isPart2 {
                         self.handlePart2SpeechEnd(part: part, questionText: questionText, transcript: transcript)
                     } else {
+                        // Stop response timer since speech ended naturally
+                        self.responseTimer?.invalidate()
+                        self.responseTimer = nil
+                        self.isTimeWarning = false
+
                         print("TestSimulationManager: Part \(part): User stopped speaking. Saving and proceeding.")
                         self.stopUserResponseAndSave(
                             part: part,
@@ -579,8 +602,69 @@ class TestSimulationManager: ObservableObject {
                     }
                 }
             )
+
+            // Start max duration timer for Part 1 and Part 3
+            if !isPart2 {
+                startResponseTimer(for: part)
+            }
         } catch {
             handleRecordingError(error)
+        }
+    }
+
+    private func startResponseTimer(for part: Int) {
+        let maxDuration: TimeInterval
+        switch part {
+        case 1:
+            maxDuration = TestConstants.part1MaxDuration
+        case 3:
+            maxDuration = TestConstants.part3MaxDuration
+        default:
+            return
+        }
+
+        let warningTime = maxDuration - TestConstants.timeWarningThreshold
+        isTimeWarning = false
+
+        print("TestSimulationManager: Starting response timer for Part \(part). Max: \(maxDuration)s, Warning at: \(warningTime)s")
+
+        let startTime = Date()
+        responseTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { [weak self] timer in
+            guard let self = self else {
+                timer.invalidate()
+                return
+            }
+
+            let elapsed = Date().timeIntervalSince(startTime)
+
+            // Trigger warning at threshold
+            if elapsed >= warningTime && !self.isTimeWarning {
+                DispatchQueue.main.async {
+                    self.isTimeWarning = true
+                    print("TestSimulationManager: Part \(part): Time warning triggered at \(Int(elapsed))s")
+                }
+            }
+
+            // Stop recording at max duration
+            if elapsed >= maxDuration {
+                timer.invalidate()
+                DispatchQueue.main.async {
+                    self.handleResponseTimeLimit(part: part)
+                }
+            }
+        }
+    }
+
+    private func handleResponseTimeLimit(part: Int) {
+        print("TestSimulationManager: Part \(part): Max response time reached. Stopping recording.")
+        responseTimer?.invalidate()
+        responseTimer = nil
+        isTimeWarning = false
+
+        stopUserResponseAndSave(part: currentPart, order: currentQuestionIndex + 1, questionText: currentQuestionText)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + TestConstants.nextQuestionDelay) { [weak self] in
+            self?.nextQuestionOrPart()
         }
     }
     
@@ -847,7 +931,10 @@ class TestSimulationManager: ObservableObject {
         preparationTimer = nil
         part2SpeakingTimer?.invalidate()
         part2SpeakingTimer = nil
-        
+        responseTimer?.invalidate()
+        responseTimer = nil
+        isTimeWarning = false
+
         // Stop any ongoing audio operations
         audioPlayerManager.stopAudio()
         audioRecorderManager.stopRecording()

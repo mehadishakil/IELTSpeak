@@ -14,17 +14,20 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
     private var displayLink: CADisplayLink?
     private var tempAudioFileURL: URL?
     private var playbackCompletionHandler: (() -> Void)?
+    private var isAudioSessionConfigured = false
 
     override init() {
         super.init()
-        setupAudioSession()
+        // Audio session setup deferred to first use to avoid disrupting network connections
     }
 
-    private func setupAudioSession() {
+    private func ensureAudioSession() {
+        guard !isAudioSessionConfigured else { return }
         do {
             // Use .playAndRecord to be compatible with recording
             try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
             try AVAudioSession.sharedInstance().setActive(true)
+            isAudioSessionConfigured = true
             print("AudioPlayerManager: AVAudioSession set to playAndRecord and activated.")
         } catch {
             print("AudioPlayerManager: Failed to set up audio session for playback: \(error.localizedDescription)")
@@ -38,6 +41,7 @@ class AudioPlayerManager: NSObject, ObservableObject, AVAudioPlayerDelegate {
         }
 
         stopAudio()
+        ensureAudioSession()
 
         do {
             let tempFilename = ProcessInfo.processInfo.globallyUniqueString + ".m4a"
@@ -154,25 +158,7 @@ class AudioRecorderManager: NSObject, ObservableObject, AVAudioRecorderDelegate 
 
     override init() {
         super.init()
-        setupAudioSession()
-    }
-
-    private func setupAudioSession() {
-        do {
-            let audioSession = AVAudioSession.sharedInstance()
-            try audioSession.setCategory(.playAndRecord, mode: .default, options: [.defaultToSpeaker, .allowBluetooth])
-            try audioSession.setActive(true)
-            audioSession.requestRecordPermission { [weak self] allowed in
-                if !allowed {
-                    print("AudioRecorderManager: Microphone access denied.")
-                } else {
-                    print("AudioRecorderManager: Microphone access granted.")
-                }
-            }
-            print("AudioRecorderManager: AVAudioSession set to playAndRecord and activated.")
-        } catch {
-            print("AudioRecorderManager: Failed to set up audio session for recording: \(error.localizedDescription)")
-        }
+        // Audio session setup deferred to first recording to avoid disrupting network connections
     }
     
     func startRecording() throws {

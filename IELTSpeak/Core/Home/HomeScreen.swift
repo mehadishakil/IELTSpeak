@@ -17,37 +17,39 @@ struct HomeScreen: View {
     
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 0) {
-                    HomeHeaderSection()
-                    
+            ZStack {
+                Color(red: 245/255, green: 245/255, blue: 245/255)
+                    .ignoresSafeArea()
+
+                ScrollView {
                     VStack(spacing: 24) {
+                        HomeHeaderSection()
+
                         HomeHeroSection(
                             isLoading: isLoading,
                             onStartTest: startTest
                         )
-                        
+
                         TestNavigationOverlay(
                             isLoading: isLoading,
                             testQuestions: testQuestions,
                             showTestingView: $showTestingView,
                             navigationTrigger: $navigationTrigger
                         )
-                        
+
                         QuickStatsSection(
                             averageScore: averageScore,
                             testResults: testResults
                         )
-                        
+
                         InformationSection()
-                        
+
                         RecentTestsSection(
                             testResults: testResults,
                             onTestSelected: selectTest
                         )
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 20)
                     .padding(.bottom, 100)
                 }
             }
@@ -183,6 +185,7 @@ struct BackendEnabledTestSimulatorScreen: View {
                             recordingTime: testManager.recordingTime,
                             waveformData: testManager.audioPlayerManager.isPlaying ? testManager.generateVisualWaveformData(for: testManager.audioPlayerManager.currentPlaybackTime, duration: testManager.audioPlayerManager.currentAudioDuration, isSpeaking: testManager.isExaminerSpeaking) : Array(repeating: 0.0, count: 50),
                             userWaveformData: testManager.audioRecorderManager.isRecording ? testManager.generateUserVisualWaveformData(power: testManager.audioRecorderManager.averagePower) : Array(repeating: 0.0, count: 30),
+                            isTimeWarning: testManager.isTimeWarning,
                             onCancel: { dismiss() })
                     case .completed:
                         if let backendResults = testManager.backendResults {
@@ -269,68 +272,108 @@ struct BackendEnabledTestSimulatorScreen: View {
 class TestService {
     static let shared = TestService()
     private init() {}
-    
+
     func fetchTestQuestions(testTemplateId: String = "550e8400-e29b-41d4-a716-446655440000") async throws -> [Int: [QuestionItem]] {
         print("🔍 Fetching questions for test template ID: \(testTemplateId)")
-        
-        // Fetch and decode into QuestionRow with correct column names
+
+        // Try fetching from Go backend (R2 audio) first, fall back to Supabase Storage
+        do {
+            let result = try await fetchFromBackend(templateId: testTemplateId)
+            if !result.isEmpty {
+                return result
+            }
+        } catch {
+            print("⚠️ Backend fetch failed, falling back to Supabase Storage: \(error.localizedDescription)")
+        }
+
+        // Fallback: fetch from Supabase DB + Supabase Storage
+        return try await fetchFromSupabase(templateId: testTemplateId)
+    }
+
+    /// Fetch questions from Go backend with R2 pre-signed audio URLs.
+    private func fetchFromBackend(templateId: String) async throws -> [Int: [QuestionItem]] {
+        print("📡 Fetching questions from Go backend (R2 audio)...")
+
+        let questions = try await BackendService.shared.fetchTestQuestions(templateId: templateId)
+        print("📥 Got \(questions.count) questions from backend")
+
+        var parts: [Int: [QuestionItem]] = [:]
+
+        for q in questions {
+            do {
+                guard !q.audio_url.isEmpty else {
+                    print("⚠️ No audio URL for question \(q.id), skipping")
+                    continue
+                }
+
+                let audioData = try await BackendService.shared.downloadAudio(from: q.audio_url)
+                print("✅ Downloaded R2 audio for question \(q.id): \(audioData.count) bytes")
+
+                let item = QuestionItem(
+                    id: q.id,
+                    part: q.part_number,
+                    order: q.question_order,
+                    questionText: q.question_text,
+                    audioFile: audioData
+                )
+
+                let normalizedPart = q.part_number - 1
+                parts[normalizedPart, default: []].append(item)
+            } catch {
+                print("❌ Failed to download audio for question \(q.id): \(error.localizedDescription)")
+            }
+        }
+
+        print("📊 Backend fetch - question distribution:")
+        for (part, items) in parts.sorted(by: { $0.key < $1.key }) {
+            print("   Part \(part): \(items.count) questions")
+        }
+
+        return parts
+    }
+
+    /// Fallback: fetch from Supabase DB + Supabase Storage (legacy path).
+    private func fetchFromSupabase(templateId: String) async throws -> [Int: [QuestionItem]] {
+        print("📡 Fetching questions from Supabase Storage (fallback)...")
+
         let response = try await supabase
             .from("questions")
             .select()
-            .eq("test_template_id", value: testTemplateId)
+            .eq("test_template_id", value: templateId)
             .order("part_number", ascending: true)
             .order("question_order", ascending: true)
             .execute()
             .value as [QuestionRow]
-        
-//        print("📥 Fetched \(response.count) question rows from database")
-//        
-//        // Debug: Print first row structure
-//        if let firstRow = response.first {
-//            print("🔍 First row structure:")
-//            print("   ID: \(firstRow.id) (type: \(type(of: firstRow.id)))")
-//            print("   Part: \(firstRow.part)")
-//            print("   Order: \(firstRow.order)")
-//            print("   Audio URL: \(firstRow.audio_url)")
-//        }
-        
+
         var parts: [Int: [QuestionItem]] = [:]
-        
+
         for row in response {
             do {
-                print("📥 Processing question ID \(row.id): \(row.question_text.prefix(30))...")
-                
-                // Download audio file from Supabase Storage
                 let audioData = try await supabase.storage
                     .from("audio-question-set")
                     .download(path: row.audio_url)
-                
-                print("✅ Downloaded audio for question \(row.id): \(audioData.count) bytes")
-                
+
                 let item = QuestionItem(
-                    id: row.id,  // Database ID is already a UUID string
+                    id: row.id,
                     part: row.part,
                     order: row.order,
                     questionText: row.question_text,
                     audioFile: audioData
                 )
-                
-                let normalizedPart = row.part - 1  // Convert 1,2,3 to 0,1,2
+
+                let normalizedPart = row.part - 1
                 parts[normalizedPart, default: []].append(item)
-                
-                print("✅ Added question \(row.id) to part \(normalizedPart)")
-                
+
             } catch {
                 print("❌ Failed to process question \(row.id): \(error.localizedDescription)")
-                // Continue with other questions instead of failing completely
             }
         }
-        
-        print("📊 Final question distribution:")
+
+        print("📊 Supabase fallback - question distribution:")
         for (part, items) in parts.sorted(by: { $0.key < $1.key }) {
             print("   Part \(part): \(items.count) questions")
         }
-        
+
         return parts
     }
 }

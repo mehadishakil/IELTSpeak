@@ -27,13 +27,26 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Initialize Supabase store
+	// Initialize Supabase store (DB + legacy storage)
 	store, err := storage.NewSupabaseStore(cfg.DatabaseURL, cfg.SupabaseURL, cfg.SupabaseServiceKey)
 	if err != nil {
 		slog.Error("failed to connect to database", "error", err)
 		os.Exit(1)
 	}
 	defer store.Close()
+
+	// Initialize Cloudflare R2 client (optional, falls back to Supabase Storage)
+	var r2Client *storage.R2Client
+	if cfg.R2Enabled() {
+		r2Client, err = storage.NewR2Client(cfg.R2AccountID, cfg.R2AccessKey, cfg.R2SecretKey, cfg.R2BucketName)
+		if err != nil {
+			slog.Error("failed to initialize R2 client", "error", err)
+			os.Exit(1)
+		}
+		slog.Info("Cloudflare R2 storage initialized", "bucket", cfg.R2BucketName)
+	} else {
+		slog.Warn("Cloudflare R2 not configured, using Supabase Storage as fallback")
+	}
 
 	// Initialize Redis client options for Asynq
 	redisOpt := asynq.RedisClientOpt{
@@ -50,7 +63,7 @@ func main() {
 	azureClient := service.NewAzureClient(cfg.AzureSpeechKey, cfg.AzureSpeechRegion)
 	openaiClient := service.NewOpenAIClient(cfg.OpenAIKey, cfg.OpenAIModel)
 	scorer := service.NewScorer()
-	evaluator := service.NewEvaluator(store, azureClient, openaiClient, scorer)
+	evaluator := service.NewEvaluator(store, r2Client, azureClient, openaiClient, scorer)
 
 	// Initialize Asynq worker server
 	asynqServer := asynq.NewServer(redisOpt, asynq.Config{
@@ -72,11 +85,35 @@ func main() {
 		}
 	}()
 
-	// Set up HTTP server
+	// Set up HTTP handlers
 	h := handler.NewHandler(asynqClient, store, cfg.Secret)
+
+	// Upload handler (only if R2 is configured)
+	var uploadHandler *handler.UploadHandler
+	if r2Client != nil {
+		uploadHandler = handler.NewUploadHandler(r2Client, store, asynqClient, cfg.Secret)
+	}
+
+	// Questions handler (serves questions with R2 pre-signed audio URLs)
+	questionsHandler := handler.NewQuestionsHandler(r2Client, store, cfg.Secret)
+
+	// Set up HTTP routes
 	httpMux := http.NewServeMux()
+
+	// Core evaluation endpoints
 	httpMux.HandleFunc("POST /evaluate", h.Evaluate)
 	httpMux.HandleFunc("GET /health", h.Health)
+
+	// Questions endpoint (supports both server secret and Supabase JWT auth)
+	httpMux.HandleFunc("GET /test-questions", questionsHandler.GetTestQuestions)
+
+	// R2 upload endpoints (only registered if R2 is configured)
+	if uploadHandler != nil {
+		httpMux.HandleFunc("POST /generate-upload-url", uploadHandler.GenerateUploadURL)
+		httpMux.HandleFunc("POST /upload-complete", uploadHandler.UploadComplete)
+		httpMux.HandleFunc("GET /quota", uploadHandler.GetQuota)
+		slog.Info("R2 upload endpoints registered: /generate-upload-url, /upload-complete, /quota")
+	}
 
 	server := &http.Server{
 		Addr:         ":" + cfg.Port,

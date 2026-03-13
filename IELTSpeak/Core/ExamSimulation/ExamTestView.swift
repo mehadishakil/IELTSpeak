@@ -9,6 +9,7 @@ struct ExamTestView: View {
     let recordingTime: TimeInterval
     let waveformData: [Double]
     let userWaveformData: [Double]
+    var isTimeWarning: Bool = false
     var onCancel: (() -> Void)? = nil
 
     var body: some View {
@@ -26,6 +27,7 @@ struct ExamTestView: View {
                 isRecording: isRecording,
                 recordingTime: recordingTime,
                 userWaveformData: userWaveformData,
+                isTimeWarning: isTimeWarning,
                 onCancel: onCancel
             )
         }

@@ -24,6 +24,12 @@ struct CreateResponseRequest: Codable {
     let audio_file_path: String
 }
 
+struct CreateResponseWithR2Request: Codable {
+    let test_session_id: String
+    let question_id: String
+    let r2_key: String
+}
+
 struct UpdateSessionRequest: Codable {
     let status: String
     let all_responses_uploaded: Bool
@@ -113,85 +119,157 @@ class SupabaseService: ObservableObject {
         part: Int,
         order: Int
     ) async throws {
-        // OLD WAV FORMAT (COMMENTED OUT)
-        // // 1. Generate unique filename with .wav extension
-        // let filename = "\(sessionId)_part\(part)_q\(order).wav"
-        // let storagePath = "responses/\(filename)"
-
-        // NEW M4A FORMAT
-        // 1. Generate unique filename with .m4a extension
-        let filename = "\(sessionId)_part\(part)_q\(order).m4a"
-        let storagePath = "responses/\(filename)"
-
         let audioData = try Data(contentsOf: audioURL)
         let fileSizeMB = Double(audioData.count) / (1024 * 1024)
 
         print("📊 Audio file size: \(String(format: "%.2f", fileSizeMB)) MB (\(audioData.count) bytes)")
 
-        // 3. Check file size limits (M4A files are smaller due to compression)
-        // let maxSizeMB: Double = 25.0  // Increased from 10MB to 25MB for WAV files (OLD)
-        let maxSizeMB: Double = 10.0  // 10MB should be sufficient for M4A compressed audio
+        let maxSizeMB: Double = 10.0
         guard fileSizeMB <= maxSizeMB else {
             print("❌ Audio file too large: \(String(format: "%.2f", fileSizeMB))MB > \(maxSizeMB)MB")
             throw SupabaseError.fileTooLarge(fileSizeMB)
         }
 
-        // 4. Upload to Supabase Storage with correct content type
+        // Try R2 upload via Go backend first, fall back to Supabase Storage
         do {
-            // print("📤 Uploading WAV audio file: \(storagePath)") // OLD WAV FORMAT
-            print("📤 Uploading M4A audio file: \(storagePath)")
+            try await uploadToR2(
+                sessionId: sessionId,
+                questionId: questionId,
+                audioData: audioData,
+                part: part,
+                order: order
+            )
+            return
+        } catch {
+            print("⚠️ R2 upload failed, falling back to Supabase Storage: \(error.localizedDescription)")
+        }
 
+        // Fallback: Upload to Supabase Storage (legacy path)
+        try await uploadToSupabaseStorage(
+            sessionId: sessionId,
+            questionId: questionId,
+            audioData: audioData,
+            part: part,
+            order: order
+        )
+    }
+
+    /// Upload audio to R2 via Go backend pre-signed URL.
+    private func uploadToR2(
+        sessionId: String,
+        questionId: String,
+        audioData: Data,
+        part: Int,
+        order: Int
+    ) async throws {
+        let currentUser = try await supabase.auth.user()
+        let userID = currentUser.id.uuidString
+
+        print("📤 Uploading to R2 via backend...")
+
+        // 1. Get pre-signed upload URL from Go backend
+        let presigned = try await BackendService.shared.generateUploadURL(
+            userID: userID,
+            testID: sessionId,
+            partType: "part\(part)",
+            questionID: questionId,
+            fileExtension: ".m4a"
+        )
+
+        print("📎 Got pre-signed URL, R2 key: \(presigned.r2_key)")
+
+        // 2. Upload directly to R2
+        try await BackendService.shared.uploadToR2(
+            presignedURL: presigned.upload_url,
+            audioData: audioData,
+            contentType: "audio/mp4"
+        )
+
+        print("✅ Uploaded to R2: \(presigned.r2_key)")
+
+        // 3. Create response record in Supabase DB with r2_key
+        let responseRequest = CreateResponseWithR2Request(
+            test_session_id: sessionId,
+            question_id: questionId,
+            r2_key: presigned.r2_key
+        )
+
+        try await supabase
+            .from("responses")
+            .upsert(responseRequest, onConflict: "test_session_id,question_id")
+            .execute()
+
+        print("✅ Created response record with R2 key for question: \(questionId)")
+
+        // 4. Notify backend that upload is complete
+        try await BackendService.shared.notifyUploadComplete(
+            responseID: "",
+            r2Key: presigned.r2_key,
+            testSessionID: sessionId,
+            userID: userID,
+            templateID: "550e8400-e29b-41d4-a716-446655440000",
+            questionID: questionId,
+            triggerEvaluation: false
+        )
+    }
+
+    /// Legacy upload to Supabase Storage (fallback when backend is unavailable).
+    private func uploadToSupabaseStorage(
+        sessionId: String,
+        questionId: String,
+        audioData: Data,
+        part: Int,
+        order: Int
+    ) async throws {
+        let filename = "\(sessionId)_part\(part)_q\(order).m4a"
+        let storagePath = "responses/\(filename)"
+        let fileSizeMB = Double(audioData.count) / (1024 * 1024)
+
+        print("📤 Uploading M4A to Supabase Storage (fallback): \(storagePath)")
+
+        do {
             try await supabase.storage
                 .from("audio-responses")
                 .upload(
                     path: storagePath,
                     file: audioData,
                     options: FileOptions(
-                        // contentType: "audio/wav",  // OLD WAV FORMAT
-                        contentType: "audio/mp4",     // M4A uses audio/mp4 MIME type
-                        upsert: true  // Allow overwrite if exists
+                        contentType: "audio/mp4",
+                        upsert: true
                     )
                 )
 
-            // print("✅ Uploaded WAV audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)") // OLD
             print("✅ Uploaded M4A audio: \(storagePath) (\(String(format: "%.2f", fileSizeMB)) MB)")
 
         } catch {
             print("❌ Storage upload failed: \(error)")
-
-            // More specific error handling
             if let storageError = error as? StorageError {
                 if storageError.message.contains("Bucket not found") == true {
                     throw SupabaseError.bucketNotFound
                 }
             }
-
             throw error
         }
-        
-        // 5. Create response record in database
+
         let responseRequest = CreateResponseRequest(
             test_session_id: sessionId,
             question_id: questionId,
             audio_file_path: storagePath
         )
-        
+
         do {
             try await supabase
                 .from("responses")
                 .upsert(responseRequest, onConflict: "test_session_id,question_id")
                 .execute()
-            
+
             print("✅ Created response record for question: \(questionId)")
-            
+
         } catch {
             print("❌ Database insert failed: \(error)")
-            
-            // Clean up uploaded file if database insert fails
             try? await supabase.storage
                 .from("audio-responses")
                 .remove(paths: [storagePath])
-            
             throw error
         }
     }
@@ -261,25 +339,41 @@ class SupabaseService: ObservableObject {
     /// Mark session as completed and trigger evaluation directly
     func markSessionAsCompleted(sessionId: String) async throws {
         print("🔄 Marking session as completed: \(sessionId)")
-        
+
         let updateData = UpdateSessionRequest(
             status: "completed",
             all_responses_uploaded: true,
             completed_at: Date().toISOString()
         )
-        
+
         do {
             try await supabase
                 .from("test_sessions")
                 .update(updateData)
                 .eq("id", value: sessionId)
                 .execute()
-            
+
             print("✅ Session marked as completed: \(sessionId)")
-            
-            // Directly call edge function to trigger evaluation
-            try await triggerEvaluation(sessionId: sessionId)
-            
+
+            // Try triggering evaluation via Go backend's upload-complete endpoint
+            // (this directly enqueues an Asynq task, faster than edge function relay)
+            do {
+                let currentUser = try await supabase.auth.user()
+                try await BackendService.shared.notifyUploadComplete(
+                    responseID: "",
+                    r2Key: "",
+                    testSessionID: sessionId,
+                    userID: currentUser.id.uuidString,
+                    templateID: "550e8400-e29b-41d4-a716-446655440000",
+                    questionID: "",
+                    triggerEvaluation: true
+                )
+                print("✅ Evaluation triggered via Go backend")
+            } catch {
+                print("⚠️ Go backend trigger failed, falling back to edge function: \(error.localizedDescription)")
+                try await triggerEvaluation(sessionId: sessionId)
+            }
+
         } catch {
             print("❌ Failed to mark session as completed: \(error)")
             throw error

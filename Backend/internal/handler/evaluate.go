@@ -27,10 +27,9 @@ func NewHandler(asynqClient *asynq.Client, store *storage.SupabaseStore, secret 
 	}
 }
 
-// Evaluate handles POST /evaluate — validates, enqueues task to Redis, returns immediately.
+// Evaluate handles POST /evaluate -- validates, checks quota, enqueues task to Redis.
 func (h *Handler) Evaluate(w http.ResponseWriter, r *http.Request) {
-	// Authenticate
-	if !h.authenticate(r) {
+	if !authenticate(r, h.secret) {
 		writeJSON(w, http.StatusUnauthorized, model.EvaluateResponse{
 			Success: false,
 			Error:   "unauthorized",
@@ -38,7 +37,6 @@ func (h *Handler) Evaluate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse request
 	var req model.EvaluateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeJSON(w, http.StatusBadRequest, model.EvaluateResponse{
@@ -86,6 +84,21 @@ func (h *Handler) Evaluate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Enforce quota before enqueuing
+	if req.UserID != "" {
+		allowed, err := h.store.CheckUserQuota(req.UserID)
+		if err != nil {
+			slog.Error("quota check failed", "user_id", req.UserID, "error", err)
+		} else if !allowed {
+			writeJSON(w, http.StatusForbidden, model.EvaluateResponse{
+				Success:   false,
+				SessionID: req.SessionID,
+				Error:     "monthly test limit reached",
+			})
+			return
+		}
+	}
+
 	// Enqueue task
 	task, err := worker.NewEvaluateSessionTask(req.SessionID, req.UserID, req.TemplateID)
 	if err != nil {
@@ -130,23 +143,23 @@ func (h *Handler) Health(w http.ResponseWriter, r *http.Request) {
 		dbStatus = "disconnected"
 	}
 
-	// Note: Redis health is implicitly checked by Asynq server startup.
-	// A more thorough check could ping Redis directly.
 	writeJSON(w, http.StatusOK, model.HealthResponse{
 		Status:    "ok",
 		Redis:     "connected",
 		DB:        dbStatus,
+		R2:        "configured", // R2 health is checked at startup
 		Timestamp: time.Now(),
 	})
 }
 
-func (h *Handler) authenticate(r *http.Request) bool {
+// authenticate checks the Bearer token against the server secret.
+func authenticate(r *http.Request, secret string) bool {
 	auth := r.Header.Get("Authorization")
 	if auth == "" {
 		return false
 	}
 	token := strings.TrimPrefix(auth, "Bearer ")
-	return token == h.secret
+	return token == secret
 }
 
 func writeJSON(w http.ResponseWriter, statusCode int, data interface{}) {

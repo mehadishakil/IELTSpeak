@@ -11,9 +11,16 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/mehadishakil/ieltspeak-evaluator/internal/audio"
 	"github.com/mehadishakil/ieltspeak-evaluator/internal/model"
 )
 
+// ShortAudioThreshold is the max duration (seconds) for REST API pronunciation assessment.
+// Audio longer than this uses Azure Speech SDK continuous mode (build tag: azuresdk)
+// or chunked REST API (default fallback).
+const ShortAudioThreshold = 30.0
+
+// AzureClient wraps Azure Speech Services for pronunciation assessment.
 type AzureClient struct {
 	speechKey    string
 	speechRegion string
@@ -38,11 +45,10 @@ type azurePronAssessmentConfig struct {
 	EnableProsodyAssessment bool   `json:"EnableProsodyAssessment"`
 }
 
-// azureResponse is the top-level Azure API response.
 type azureResponse struct {
-	RecognitionStatus string        `json:"RecognitionStatus"`
-	Duration          int64         `json:"Duration"`
-	NBest             []azureNBest  `json:"NBest"`
+	RecognitionStatus string       `json:"RecognitionStatus"`
+	Duration          int64        `json:"Duration"`
+	NBest             []azureNBest `json:"NBest"`
 }
 
 type azureNBest struct {
@@ -60,8 +66,8 @@ type azurePronunciationAssessment struct {
 }
 
 type azureWord struct {
-	Word                    string                   `json:"Word"`
-	PronunciationAssessment azureWordPronAssessment  `json:"PronunciationAssessment"`
+	Word                    string                  `json:"Word"`
+	PronunciationAssessment azureWordPronAssessment `json:"PronunciationAssessment"`
 }
 
 type azureWordPronAssessment struct {
@@ -69,8 +75,32 @@ type azureWordPronAssessment struct {
 	ErrorType     string  `json:"ErrorType"`
 }
 
-// Assess sends a WAV file to Azure Pronunciation Assessment and returns the result.
+// Assess is the main entry point for Azure pronunciation assessment.
+// Routes to REST API (<=30s) or SDK continuous mode / chunked processing (>30s).
+//
+// Build with -tags azuresdk to use Azure Speech SDK continuous mode for >30s audio.
+// Default build uses chunked REST API as fallback.
 func (c *AzureClient) Assess(wavFilePath string) (*model.AzureResult, error) {
+	duration, err := audio.GetAudioDuration(wavFilePath)
+	if err != nil {
+		slog.Warn("could not determine audio duration, using short assessment", "error", err)
+		return c.assessShort(wavFilePath)
+	}
+
+	slog.Info("audio duration detected", "duration_secs", duration, "threshold", ShortAudioThreshold)
+
+	if duration <= ShortAudioThreshold {
+		return c.assessShort(wavFilePath)
+	}
+
+	// assessLong is defined in azure_sdk.go (build tag: azuresdk)
+	// or azure_chunked.go (default: !azuresdk)
+	return c.assessLong(wavFilePath)
+}
+
+// assessShort sends a single WAV file to Azure REST API for pronunciation assessment.
+// Optimal for audio <=30 seconds (~$0.000183/second).
+func (c *AzureClient) assessShort(wavFilePath string) (*model.AzureResult, error) {
 	var lastErr error
 
 	for attempt := 0; attempt < 3; attempt++ {
@@ -107,7 +137,6 @@ func (c *AzureClient) doAssess(wavFilePath string) (*model.AzureResult, error) {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	// Build pronunciation assessment config
 	pronConfig := azurePronAssessmentConfig{
 		ReferenceText:           "",
 		GradingSystem:           "HundredMark",
@@ -123,7 +152,6 @@ func (c *AzureClient) doAssess(wavFilePath string) (*model.AzureResult, error) {
 	req.Header.Set("Pronunciation-Assessment", string(pronConfigJSON))
 	req.Header.Set("Accept", "application/json")
 
-	// Set body to audio data
 	req.Body = io.NopCloser(bytesReader(audioData))
 	req.ContentLength = int64(len(audioData))
 
@@ -185,7 +213,7 @@ func (c *AzureClient) doAssess(wavFilePath string) (*model.AzureResult, error) {
 	}, nil
 }
 
-// bytesReader wraps a byte slice into an io.Reader.
+// bytesReaderWrapper wraps a byte slice into an io.Reader.
 type bytesReaderWrapper struct {
 	data []byte
 	pos  int

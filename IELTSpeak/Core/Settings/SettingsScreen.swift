@@ -507,7 +507,6 @@ struct SettingsScreen: View {
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Settings")
-            .navigationBarTitleDisplayMode(.large)
             .task {
                 await loadProfile()
             }
@@ -541,7 +540,7 @@ struct SettingsScreen: View {
                     .frame(width: 100, height: 100)
                 
                 Text(getFirstLetter())
-                    .font(.system(size: 36, weight: .semibold))
+                    .font(.custom("Fredoka-SemiBold", size: 36))
                     .foregroundColor(.white)
             }
             .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
@@ -557,8 +556,7 @@ struct SettingsScreen: View {
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .cornerRadius(20)
                             .padding(.horizontal)
-                            .font(.headline)
-                            .fontWeight(.semibold)
+                            .font(.custom("Fredoka-SemiBold", size: 18))
                             .foregroundStyle(.secondary.opacity(1.5))
                             .multilineTextAlignment(.center)
                             .transition(.asymmetric(
@@ -569,8 +567,7 @@ struct SettingsScreen: View {
                             ))
                     } else {
                         Text(fullName)
-                            .font(.headline)
-                            .bold()
+                            .font(.custom("Fredoka-SemiBold", size: 20))
                             .transition(.asymmetric(
                                 insertion:
                                         .scale(scale: 1.05)
@@ -582,7 +579,7 @@ struct SettingsScreen: View {
                     
                     
                     Text(email.isEmpty ? "No email" : email)
-                        .font(.subheadline)
+                        .font(.custom("Fredoka-Regular", size: 14))
                         .foregroundColor(.secondary)
                     
                     if isEditing {
@@ -594,10 +591,11 @@ struct SettingsScreen: View {
                         }) {
                             HStack(spacing: 8) {
                                 Image(systemName: "xmark")
+                                    .font(.system(size: 13))
                                 Text("Cancel")
+                                    .font(.custom("Fredoka-Medium", size: 14))
                             }
                             .frame(minWidth: 100)
-                            .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.errorRed)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -621,22 +619,22 @@ struct SettingsScreen: View {
                             if !isEditing {
                                 HStack(spacing: 8) {
                                     Image(systemName: "pencil")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13))
                                         .matchedGeometryEffect(id: "icon", in: animationNamespace)
                                     Text("Edit Profile")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.custom("Fredoka-Medium", size: 14))
                                 }
                                 .opacity(isEditing ? 0 : 1)
                             }
-                            
+
                             // "Save" state
                             if isEditing {
                                 HStack(spacing: 8) {
                                     Image(systemName: "button.angledtop.vertical.right.fill")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.system(size: 13))
                                         .matchedGeometryEffect(id: "icon", in: animationNamespace)
                                     Text("Save")
-                                        .font(.system(size: 14, weight: .medium))
+                                        .font(.custom("Fredoka-Medium", size: 14))
                                 }
                                 .opacity(isEditing ? 1 : 0)
                             }
@@ -728,7 +726,7 @@ struct SettingsScreen: View {
                     content: {
                         HStack(spacing: 8) {
                             Text(userTheme.rawValue.capitalized)
-                                .font(.system(size: 14))
+                                .font(.custom("Fredoka-Regular", size: 14))
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -750,7 +748,7 @@ struct SettingsScreen: View {
                     content: {
                         HStack(spacing: 8) {
                             Text(language.rawValue)
-                                .font(.system(size: 14))
+                                .font(.custom("Fredoka-Regular", size: 14))
                                 .foregroundColor(.secondary)
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 12, weight: .medium))
@@ -891,7 +889,7 @@ struct SettingsScreen: View {
     private func sectionHeader(_ title: String) -> some View {
         HStack {
             Text(title)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.custom("Fredoka-SemiBold", size: 16))
                 .foregroundColor(.primary)
             Spacer()
         }
@@ -919,7 +917,7 @@ struct SettingsScreen: View {
             
             // Title
             Text(title)
-                .font(.system(size: 16, weight: .medium))
+                .font(.custom("Fredoka-Medium", size: 16))
                 .foregroundColor(.primary)
             
             Spacer()

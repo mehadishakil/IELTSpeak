@@ -1,0 +1,38 @@
+# Production build: Azure Speech SDK continuous mode for >30s audio
+# Requires glibc (Debian) + native Speech SDK library
+#
+# Usage: docker build -f Dockerfile.sdk -t ielts-evaluator .
+
+FROM golang:1.22 AS builder
+WORKDIR /app
+
+# Install Azure Speech SDK native library (required for CGO build)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget build-essential libssl-dev ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN wget -q -O /tmp/SpeechSDK-Linux.tar.gz https://aka.ms/csspeech/linuxbinary \
+    && mkdir -p /tmp/speechsdk \
+    && tar -xzf /tmp/SpeechSDK-Linux.tar.gz -C /tmp/speechsdk --strip-components=1 \
+    && cp /tmp/speechsdk/lib/x64/libMicrosoft.CognitiveServices.Speech.core.so /usr/lib/ \
+    && cp -r /tmp/speechsdk/include/c_api/* /usr/include/ \
+    && ldconfig \
+    && rm -rf /tmp/SpeechSDK-Linux.tar.gz /tmp/speechsdk
+
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+
+ENV CGO_ENABLED=1
+RUN go build -tags azuresdk -o /server ./cmd/server
+
+# Runtime: Debian slim with Speech SDK + ffmpeg
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg ca-certificates libssl3 \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /usr/lib/libMicrosoft.CognitiveServices.Speech.core.so /usr/lib/
+RUN ldconfig
+COPY --from=builder /server /server
+EXPOSE 8080
+CMD ["/server"]

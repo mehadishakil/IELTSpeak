@@ -13,13 +13,17 @@ struct StudentSection: View {
     let isRecording: Bool
     let recordingTime: TimeInterval
     let userWaveformData: [Double]
+    var isTimeWarning: Bool = false
     var onCancel: (() -> Void)? = nil
 
     @State private var isFlipped = false
     @State private var showConfirmation = false
+    @State private var warningBlink = false
     private var isActive: Bool { isUserSpeaking || isRecording }
     private let activeBackground = Color(red: 237/255, green: 236/255, blue: 255/255) // #EDECFF
     private let activeStroke = Color(red: 180/255, green: 178/255, blue: 240/255)
+    private let warningStroke = Color.red.opacity(0.85)
+    private let warningGlow = Color.red.opacity(0.35)
 
     var body: some View {
         ZStack {
@@ -41,7 +45,28 @@ struct StudentSection: View {
             .cornerRadius(32)
             .overlay(
                 RoundedRectangle(cornerRadius: 32)
-                    .stroke(isActive ? activeStroke : Color.clear, lineWidth: 1.5)
+                    .stroke(
+                        isTimeWarning
+                            ? (warningBlink ? warningStroke : Color.red.opacity(0.18))
+                            : (isActive ? activeStroke : Color.clear),
+                        lineWidth: isTimeWarning ? (warningBlink ? 3.5 : 2.0) : 1.5
+                    )
+            )
+            .overlay(
+                // Focused warning pulse ring (inward)
+                RoundedRectangle(cornerRadius: 32)
+                    .strokeBorder(warningGlow, lineWidth: warningBlink ? 8 : 3)
+                    .scaleEffect(warningBlink ? 0.965 : 0.99)
+                    .blur(radius: warningBlink ? 5 : 2)
+                    .opacity(isTimeWarning ? (warningBlink ? 1 : 0) : 0)
+                    .allowsHitTesting(false)
+            )
+            .overlay(
+                // Subtle red wash for time warning
+                RoundedRectangle(cornerRadius: 32)
+                    .fill(Color.red.opacity(warningBlink ? 0.10 : 0.03))
+                    .allowsHitTesting(false)
+                    .opacity(isTimeWarning ? 1 : 0)
             )
             .opacity(isFlipped ? 0 : 1)
 
@@ -69,7 +94,30 @@ struct StudentSection: View {
                 scheduleAutoFlipBack()
             }
         }
+        .onChange(of: isTimeWarning) { warning in
+            if warning {
+                startWarningBlink()
+            } else {
+                warningBlink = false
+            }
+        }
         .padding(.horizontal, 16)
+    }
+
+    private func startWarningBlink() {
+        func blink() {
+            guard isTimeWarning else {
+                warningBlink = false
+                return
+            }
+            withAnimation(.easeInOut(duration: 0.45)) {
+                warningBlink.toggle()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                blink()
+            }
+        }
+        blink()
     }
 
     private func scheduleAutoFlipBack() {

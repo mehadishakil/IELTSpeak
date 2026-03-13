@@ -11,21 +11,24 @@ import SwiftUI
 struct QuickStatsSection: View {
     let averageScore: Double
     let testResults: [TestResult]
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Your Progress")
-                .font(.custom("Fredoka-Medium", size: 18))
-                .foregroundColor(.primary)
-            
+            HStack {
+                Text("Your Progress")
+                    .font(.custom("Fredoka-SemiBold", size: 20))
+                    .foregroundColor(.primary)
+
+                Spacer()
+            }
+
             StatsCardsRow(
                 averageScore: averageScore,
                 testCount: testResults.count
             )
-            
+
             ScoreBarChart(testResults: testResults)
         }
-        .padding()
     }
 }
 
@@ -33,9 +36,9 @@ struct QuickStatsSection: View {
 struct StatsCardsRow: View {
     let averageScore: Double
     let testCount: Int
-    
+
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 12) {
             StatCard(
                 title: "Average Score",
                 value: String(format: "%.1f", averageScore),

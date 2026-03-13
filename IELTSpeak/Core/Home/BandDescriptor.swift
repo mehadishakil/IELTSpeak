@@ -670,15 +670,15 @@ struct CriteriaButton: View {
 // MARK: - Band Descriptors Navigation Button for HomeScreen
 struct BandDescriptorsNavigationCard: View {
     @State private var showBandDescriptors = false
-    
+
     var body: some View {
         Button(action: {
             showBandDescriptors = true
         }) {
             HStack(spacing: 16) {
-                // Icon Section
+                // Icon
                 ZStack {
-                    Circle()
+                    RoundedRectangle(cornerRadius: 14)
                         .fill(
                             LinearGradient(
                                 colors: [Color.brandGreen, Color.primaryVariant],
@@ -686,44 +686,42 @@ struct BandDescriptorsNavigationCard: View {
                                 endPoint: .bottomTrailing
                             )
                         )
-                        .frame(width: 50, height: 50)
-                    
+                        .frame(width: 48, height: 48)
+
                     Image(systemName: "chart.bar.doc.horizontal")
-                        .font(.title2)
+                        .font(.system(size: 20))
                         .foregroundColor(.white)
-                        .fontWeight(.semibold)
                 }
-                
-                // Content Section
-                VStack(alignment: .leading, spacing: 4) {
+
+                VStack(alignment: .leading, spacing: 3) {
                     Text("Band Descriptors")
-                        .font(.custom("Fredoka-Medium", size: 18))
+                        .font(.custom("Fredoka-SemiBold", size: 16))
                         .foregroundColor(.primary)
-                    
+
                     Text("Learn about IELTS scoring criteria")
-                        .font(.custom("Fredoka-Regular", size: 14))
+                        .font(.custom("Fredoka-Regular", size: 13))
                         .foregroundColor(.secondary)
-                        .multilineTextAlignment(.leading)
                 }
-                
+
                 Spacer()
-                
-                // Arrow Icon
+
                 Image(systemName: "chevron.right")
-                    .font(.caption)
+                    .font(.system(size: 13, weight: .semibold))
                     .foregroundColor(.secondary)
-                    .fontWeight(.semibold)
+                    .padding(8)
+                    .background(
+                        Circle()
+                            .fill(Color(.systemGray6))
+                    )
             }
-            .padding(20)
+            .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(UIColor.secondarySystemBackground))
-                    .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+                RoundedRectangle(cornerRadius: 18)
+                    .fill(Color(.systemBackground))
+                    .shadow(color: .black.opacity(0.06), radius: 10, x: 0, y: 4)
             )
         }
         .buttonStyle(PlainButtonStyle())
-        .scaleEffect(showBandDescriptors ? 0.98 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: showBandDescriptors)
         .sheet(isPresented: $showBandDescriptors) {
             IELTSSpeakingBandDescriptorsView()
         }
@@ -779,9 +777,9 @@ struct InformationSection: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
                 Text("Information")
-                    .font(.custom("Fredoka-Medium", size: 20))
+                    .font(.custom("Fredoka-SemiBold", size: 20))
                     .foregroundColor(.primary)
-                
+
                 Spacer()
             }
             

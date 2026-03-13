@@ -7,21 +7,27 @@ import (
 )
 
 type Config struct {
-	Port       string
-	Secret     string
-	RedisAddr  string
+	Port          string
+	Secret        string
+	RedisAddr     string
 	RedisPassword string
-	RedisDB    int
+	RedisDB       int
 
-	DatabaseURL          string
-	SupabaseURL          string
-	SupabaseServiceKey   string
+	DatabaseURL        string
+	SupabaseURL        string
+	SupabaseServiceKey string
 
 	AzureSpeechKey    string
 	AzureSpeechRegion string
 
 	OpenAIKey   string
 	OpenAIModel string
+
+	// Cloudflare R2
+	R2AccountID  string
+	R2AccessKey  string
+	R2SecretKey  string
+	R2BucketName string
 
 	MaxConcurrentEvaluations int
 }
@@ -40,6 +46,10 @@ func Load() (*Config, error) {
 		AzureSpeechRegion:        getEnv("AZURE_SPEECH_REGION", "eastus"),
 		OpenAIKey:                getEnv("OPENAI_API_KEY", ""),
 		OpenAIModel:              getEnv("OPENAI_MODEL", "gpt-4o-mini"),
+		R2AccountID:              getEnv("CLOUDFLARE_R2_ACCOUNT_ID", ""),
+		R2AccessKey:              getEnv("CLOUDFLARE_R2_ACCESS_KEY", ""),
+		R2SecretKey:              getEnv("CLOUDFLARE_R2_SECRET_KEY", ""),
+		R2BucketName:             getEnv("R2_BUCKET_NAME", "ielts-audio"),
 		MaxConcurrentEvaluations: getEnvInt("MAX_CONCURRENT_EVALUATIONS", 5),
 	}
 
@@ -49,14 +59,19 @@ func Load() (*Config, error) {
 	return cfg, nil
 }
 
+// R2Enabled returns true if all R2 configuration is present.
+func (c *Config) R2Enabled() bool {
+	return c.R2AccountID != "" && c.R2AccessKey != "" && c.R2SecretKey != ""
+}
+
 func (c *Config) validate() error {
 	required := map[string]string{
-		"SERVER_SECRET":          c.Secret,
-		"DATABASE_URL":           c.DatabaseURL,
-		"SUPABASE_URL":           c.SupabaseURL,
+		"SERVER_SECRET":             c.Secret,
+		"DATABASE_URL":              c.DatabaseURL,
+		"SUPABASE_URL":              c.SupabaseURL,
 		"SUPABASE_SERVICE_ROLE_KEY": c.SupabaseServiceKey,
-		"AZURE_SPEECH_KEY":       c.AzureSpeechKey,
-		"OPENAI_API_KEY":         c.OpenAIKey,
+		"AZURE_SPEECH_KEY":          c.AzureSpeechKey,
+		"OPENAI_API_KEY":            c.OpenAIKey,
 	}
 	for name, val := range required {
 		if val == "" {

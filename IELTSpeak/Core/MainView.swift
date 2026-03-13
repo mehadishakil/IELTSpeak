@@ -6,6 +6,7 @@ import StoreKit
 struct MainView: View {
   @State var isAuthenticated = false
   @AppStorage("isGuestMode") private var isGuestMode = false
+  @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
   @State private var showingSignOutAlert = false
   @State private var isCheckingAuth = true
 
@@ -14,6 +15,8 @@ struct MainView: View {
       if isCheckingAuth {
         // Show loading indicator while checking auth state
         ProgressView()
+      } else if !hasCompletedOnboarding {
+        OnboardingView()
       } else if isAuthenticated || isGuestMode {
           ContentView()
             .toolbar {
