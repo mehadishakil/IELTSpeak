@@ -191,6 +191,7 @@ struct UserProgress: Codable {
     var itemProgress: [String: ItemProgress] // itemId -> progress
     var streaks: [String: Int] // categoryId -> streak count
     var lastUpdated: Date
+    var studiedItems: [String: String]? // itemId -> subcategoryId mapping for accurate counting
 }
 
 struct CategoryProgress: Codable {

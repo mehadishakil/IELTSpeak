@@ -217,12 +217,15 @@ class LessonDataManager: ObservableObject {
             let title = formatTopicTitle(topic)
             let description = "Essential vocabulary for \(title.lowercased())"
             
+            let subcategoryId = "vocab_\(topic)"
+            let progress = userProgress?.subcategoryProgress[subcategoryId]?.progress ?? 0.0
+
             return Subcategory(
-                id: "vocab_\(topic)",
+                id: subcategoryId,
                 title: title,
                 description: description,
                 itemCount: itemCount,
-                progress: 0.0, // You can implement progress tracking later
+                progress: progress,
                 color: color,
                 isLocked: false
             )
@@ -389,7 +392,15 @@ class LessonDataManager: ObservableObject {
     // MARK: - Progress Updates
     func markItemCompleted(itemId: String, subcategoryId: String, categoryId: String) {
         guard var progress = userProgress else { return }
-        
+
+        // Skip if already studied (avoid redundant saves)
+        if progress.studiedItems?[itemId] != nil { return }
+
+        // Track which subcategory this item belongs to
+        var studiedItems = progress.studiedItems ?? [:]
+        studiedItems[itemId] = subcategoryId
+        progress.studiedItems = studiedItems
+
         // Update item progress
         progress.itemProgress[itemId] = ItemProgress(
             itemId: itemId,
@@ -398,34 +409,57 @@ class LessonDataManager: ObservableObject {
             studyCount: (progress.itemProgress[itemId]?.studyCount ?? 0) + 1,
             masteryLevel: min((progress.itemProgress[itemId]?.masteryLevel ?? 0) + 1, 5)
         )
-        
+
         // Update subcategory progress
-        updateSubcategoryProgress(subcategoryId: subcategoryId, progress: &progress)
-        
+        updateSubcategoryProgress(subcategoryId: subcategoryId, categoryId: categoryId, progress: &progress)
+
         // Update category progress
         updateCategoryProgress(categoryId: categoryId, progress: &progress)
-        
+
         progress.lastUpdated = Date()
         self.userProgress = progress
         saveUserProgress()
-        
-        // Refresh categories to show updated progress
-        self.categories = convertToViewModels()
+
+        // Defer category rebuild to avoid blocking swipe animations
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.categories = self?.convertToViewModels() ?? []
+        }
     }
-    
-    private func updateSubcategoryProgress(subcategoryId: String, progress: inout UserProgress) {
-        guard let lessonData = lessonData else { return }
-        
-        let totalItems = lessonData.vocabularyItems.filter { $0.subcategoryId == subcategoryId }.count +
-                        lessonData.idiomItems.filter { $0.subcategoryId == subcategoryId }.count +
-                        lessonData.phrasalVerbItems.filter { $0.subcategoryId == subcategoryId }.count
-        
-        let completedItems = progress.itemProgress.values.filter {
-            $0.isCompleted && getItemSubcategoryId(itemId: $0.itemId) == subcategoryId
-        }.count
-        
+
+    func isItemStudied(_ stableId: String) -> Bool {
+        return userProgress?.studiedItems?[stableId] != nil
+    }
+
+    private func getTotalItemCount(for subcategoryId: String, categoryId: String) -> Int {
+        // New vocabulary topics (format: vocab_topicname)
+        if subcategoryId.hasPrefix("vocab_") {
+            let topic = String(subcategoryId.dropFirst(6))
+            return newVocabularyItems.filter { $0.topic == topic }.count
+        }
+        // Real idioms
+        if subcategoryId.hasPrefix("real_idioms_") {
+            return realIdiomsSubcategories.first { $0.id == subcategoryId }?.itemCount ?? 0
+        }
+        // Real phrasal verbs
+        if subcategoryId.hasPrefix("real_phrasal_verbs_") {
+            return realPhrasalVerbsSubcategories.first { $0.id == subcategoryId }?.itemCount ?? 0
+        }
+        // Legacy lesson_data.json items
+        guard let lessonData = lessonData else { return 0 }
+        return lessonData.vocabularyItems.filter { $0.subcategoryId == subcategoryId }.count +
+               lessonData.idiomItems.filter { $0.subcategoryId == subcategoryId }.count +
+               lessonData.phrasalVerbItems.filter { $0.subcategoryId == subcategoryId }.count
+    }
+
+    private func updateSubcategoryProgress(subcategoryId: String, categoryId: String, progress: inout UserProgress) {
+        let totalItems = getTotalItemCount(for: subcategoryId, categoryId: categoryId)
+
+        // Count completed items for this subcategory using the studiedItems map
+        let studiedItems = progress.studiedItems ?? [:]
+        let completedItems = studiedItems.filter { $0.value == subcategoryId }.count
+
         let progressPercentage = totalItems > 0 ? Double(completedItems) / Double(totalItems) : 0.0
-        
+
         var subProgress = progress.subcategoryProgress[subcategoryId] ?? SubcategoryProgress(
             subcategoryId: subcategoryId,
             progress: 0.0,
@@ -433,22 +467,29 @@ class LessonDataManager: ObservableObject {
             isUnlocked: true,
             lastStudiedDate: nil
         )
-        
-        subProgress.progress = progressPercentage
+
+        subProgress.progress = min(progressPercentage, 1.0)
         subProgress.lastStudiedDate = Date()
         progress.subcategoryProgress[subcategoryId] = subProgress
     }
-    
+
     private func updateCategoryProgress(categoryId: String, progress: inout UserProgress) {
-        guard let lessonData = lessonData else { return }
-        
-        let subcategories = lessonData.subcategories.filter { $0.categoryId == categoryId }
-        let totalProgress = subcategories.reduce(0.0) { sum, sub in
-            sum + (progress.subcategoryProgress[sub.id]?.progress ?? 0.0)
+        // Get all subcategory IDs for this category
+        let subcategoryIds = getAllSubcategoryIds(for: categoryId)
+        guard !subcategoryIds.isEmpty else { return }
+
+        // Sum total items and completed items across all subcategories
+        var totalItems = 0
+        var completedItems = 0
+        let studiedItems = progress.studiedItems ?? [:]
+
+        for subId in subcategoryIds {
+            totalItems += getTotalItemCount(for: subId, categoryId: categoryId)
+            completedItems += studiedItems.filter { $0.value == subId }.count
         }
-        
-        let overallProgress = subcategories.count > 0 ? totalProgress / Double(subcategories.count) : 0.0
-        
+
+        let overallProgress = totalItems > 0 ? Double(completedItems) / Double(totalItems) : 0.0
+
         var catProgress = progress.categoryProgress[categoryId] ?? CategoryProgress(
             categoryId: categoryId,
             overallProgress: 0.0,
@@ -456,27 +497,47 @@ class LessonDataManager: ObservableObject {
             currentStreak: 0,
             lastStudiedDate: nil
         )
-        
-        catProgress.overallProgress = overallProgress
+
+        catProgress.overallProgress = min(overallProgress, 1.0)
         catProgress.lastStudiedDate = Date()
         progress.categoryProgress[categoryId] = catProgress
     }
-    
-    private func getItemSubcategoryId(itemId: String) -> String? {
-        guard let lessonData = lessonData else { return nil }
-        
-        if let vocab = lessonData.vocabularyItems.first(where: { $0.id == itemId }) {
-            return vocab.subcategoryId
+
+    private func getAllSubcategoryIds(for categoryId: String) -> [String] {
+        switch categoryId {
+        case "vocabulary":
+            return getUniqueTopics().map { "vocab_\($0)" }
+        case "idioms":
+            return realIdiomsSubcategories.map { $0.id }
+        case "phrasal-verbs":
+            return realPhrasalVerbsSubcategories.map { $0.id }
+        default:
+            guard let lessonData = lessonData else { return [] }
+            return lessonData.subcategories.filter { $0.categoryId == categoryId }.map { $0.id }
         }
-        if let idiom = lessonData.idiomItems.first(where: { $0.id == itemId }) {
-            return idiom.subcategoryId
-        }
-        if let phrasal = lessonData.phrasalVerbItems.first(where: { $0.id == itemId }) {
-            return phrasal.subcategoryId
-        }
-        return nil
     }
-    
+
+    // MARK: - Direct Count Methods for Leaderboard
+    func getStudiedVocabularyCount() -> Int {
+        guard let progress = userProgress, let studiedItems = progress.studiedItems else { return 0 }
+        return studiedItems.filter { $0.value.hasPrefix("vocab_") }.count
+    }
+
+    func getStudiedIdiomsCount() -> Int {
+        guard let progress = userProgress, let studiedItems = progress.studiedItems else { return 0 }
+        return studiedItems.filter { $0.value.hasPrefix("real_idioms_") }.count
+    }
+
+    func getStudiedPhrasalVerbsCount() -> Int {
+        guard let progress = userProgress, let studiedItems = progress.studiedItems else { return 0 }
+        return studiedItems.filter { $0.value.hasPrefix("real_phrasal_verbs_") }.count
+    }
+
+    func getStudiedCountForSubcategory(_ subcategoryId: String) -> Int {
+        guard let progress = userProgress, let studiedItems = progress.studiedItems else { return 0 }
+        return studiedItems.filter { $0.value == subcategoryId }.count
+    }
+
     // MARK: - New Vocabulary Methods
     func getUniqueTopics() -> [String] {
         return Array(Set(newVocabularyItems.map { $0.topic })).sorted()
@@ -493,32 +554,40 @@ class LessonDataManager: ObservableObject {
         let part1Count = sampleAnswersData?.part_1_sample_answers.reduce(0) { $0 + $1.questions.count } ?? 0
         let part2Count = sampleAnswersData?.part_2_sample_answers.count ?? 0
         let part3Count = sampleAnswersData?.part_3_sample_answers.reduce(0) { $0 + $1.questions.count } ?? 0
-        
+
+        let part1Studied = getStudiedCountForSubcategory("sample-answers-part1")
+        let part2Studied = getStudiedCountForSubcategory("sample-answers-part2")
+        let part3Studied = getStudiedCountForSubcategory("sample-answers-part3")
+
+        let part1Progress = part1Count > 0 ? Double(part1Studied) / Double(part1Count) : 0.0
+        let part2Progress = part2Count > 0 ? Double(part2Studied) / Double(part2Count) : 0.0
+        let part3Progress = part3Count > 0 ? Double(part3Studied) / Double(part3Count) : 0.0
+
         return [
             Subcategory(
                 id: "sample-answers-part1",
                 title: "Part 1: Introduction & Interview",
                 description: "Personal questions about familiar topics",
                 itemCount: part1Count,
-                progress: 0.0,
+                progress: part1Progress,
                 color: .blue,
                 isLocked: false
             ),
             Subcategory(
-                id: "sample-answers-part2", 
+                id: "sample-answers-part2",
                 title: "Part 2: Individual Long Turn",
                 description: "2-minute talk on a given topic",
                 itemCount: part2Count,
-                progress: 0.0,
+                progress: part2Progress,
                 color: .green,
                 isLocked: false
             ),
             Subcategory(
                 id: "sample-answers-part3",
-                title: "Part 3: Two-way Discussion", 
+                title: "Part 3: Two-way Discussion",
                 description: "Abstract and complex questions",
                 itemCount: part3Count,
-                progress: 0.0,
+                progress: part3Progress,
                 color: .purple,
                 isLocked: false
             )

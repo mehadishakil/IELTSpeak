@@ -11,21 +11,11 @@ struct Part1SampleAnswersView: View {
     let data: [Part1SampleAnswer]
 
     @State private var searchText = ""
-    @State private var selectedTopic: String? = nil
 
     private let accentPurple = Color(red: 100/255, green: 96/255, blue: 180/255)
 
-    private var availableTopics: [String] {
-        let topics = data.map { $0.topic }.sorted()
-        return ["All Topics"] + topics
-    }
-
     private var filteredData: [Part1SampleAnswer] {
         var filtered = data
-
-        if let selectedTopic = selectedTopic, selectedTopic != "All Topics" {
-            filtered = filtered.filter { $0.topic == selectedTopic }
-        }
 
         if !searchText.isEmpty {
             filtered = filtered.filter { answer in
@@ -75,25 +65,6 @@ struct Part1SampleAnswersView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 12)
 
-                // Topic Filter Pills
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(availableTopics, id: \.self) { topic in
-                            TopicFilterChip(
-                                title: topic,
-                                isSelected: selectedTopic == topic,
-                                accentColor: accentPurple
-                            ) {
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    selectedTopic = (selectedTopic == topic) ? nil : topic
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 14)
-                }
-
                 // Stats bar
                 HStack {
                     Text("\(filteredData.count) topics")
@@ -127,37 +98,6 @@ struct Part1SampleAnswersView: View {
         .navigationTitle("Part 1 Sample Answers")
         .navigationBarTitleDisplayMode(.inline)
         .background(Color(red: 245/255, green: 245/255, blue: 245/255))
-        .onAppear {
-            if selectedTopic == nil {
-                selectedTopic = "All Topics"
-            }
-        }
-    }
-}
-
-struct TopicFilterChip: View {
-    let title: String
-    let isSelected: Bool
-    var accentColor: Color = Color(red: 100/255, green: 96/255, blue: 180/255)
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.custom("Fredoka-Medium", size: 14))
-                .foregroundColor(isSelected ? .white : .primary)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(isSelected ? accentColor : Color(.systemGray6))
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(isSelected ? Color.clear : Color(.systemGray4), lineWidth: 1)
-                )
-        }
-        .buttonStyle(PlainButtonStyle())
     }
 }
 
@@ -165,6 +105,7 @@ struct Part1TopicCard: View {
     let topicData: Part1SampleAnswer
     var accentColor: Color = Color(red: 100/255, green: 96/255, blue: 180/255)
     @State private var isExpanded = false
+    private let dataManager = LessonDataManager.shared
 
     private var topicIcon: String {
         let topic = topicData.topic.lowercased()
@@ -208,6 +149,9 @@ struct Part1TopicCard: View {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     isExpanded.toggle()
                 }
+                if isExpanded {
+                    markTopicStudied()
+                }
             } label: {
                 HStack(spacing: 14) {
                     // Icon
@@ -223,10 +167,18 @@ struct Part1TopicCard: View {
 
                     // Title & count
                     VStack(alignment: .leading, spacing: 3) {
-                        Text(topicData.topic)
-                            .font(.custom("Fredoka-SemiBold", size: 17))
-                            .foregroundColor(.primary)
-                            .multilineTextAlignment(.leading)
+                        HStack(spacing: 6) {
+                            Text(topicData.topic)
+                                .font(.custom("Fredoka-SemiBold", size: 17))
+                                .foregroundColor(.primary)
+                                .multilineTextAlignment(.leading)
+
+                            if isTopicStudied {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.brandGreen)
+                            }
+                        }
 
                         Text("\(topicData.questions.count) questions")
                             .font(.custom("Fredoka-Medium", size: 13))
@@ -280,6 +232,24 @@ struct Part1TopicCard: View {
                 .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
         )
         .clipShape(RoundedRectangle(cornerRadius: 20))
+    }
+
+    private var isTopicStudied: Bool {
+        topicData.questions.allSatisfy { q in
+            let stableId = "sample_p1_\(topicData.topic.lowercased())_\(q.question.prefix(40).lowercased())"
+            return dataManager.isItemStudied(stableId)
+        }
+    }
+
+    private func markTopicStudied() {
+        for question in topicData.questions {
+            let stableId = "sample_p1_\(topicData.topic.lowercased())_\(question.question.prefix(40).lowercased())"
+            dataManager.markItemCompleted(
+                itemId: stableId,
+                subcategoryId: "sample-answers-part1",
+                categoryId: "sample-answers"
+            )
+        }
     }
 }
 

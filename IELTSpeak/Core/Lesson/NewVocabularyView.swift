@@ -85,13 +85,47 @@ struct NewVocabularyView: View {
             if dataManager.newVocabularyItems.isEmpty {
                 dataManager.loadData()
             }
+            // Resume from first unstudied item
+            if currentIndex == 0 {
+                resumeFromLastPosition()
+            }
         }
+    }
+
+    private func resumeFromLastPosition() {
+        let items = filteredVocabulary
+        for (index, item) in items.enumerated() {
+            let topic = preSelectedTopic ?? item.topic
+            let stableId = "vocab_\(item.word.lowercased())_\(topic)"
+            if !dataManager.isItemStudied(stableId) {
+                currentIndex = index
+                return
+            }
+        }
+        // All studied — stay at last item
+        if !items.isEmpty {
+            currentIndex = items.count - 1
+        }
+    }
+
+    private func isCurrentItemStudied() -> Bool {
+        guard currentIndex < filteredVocabulary.count else { return false }
+        let item = filteredVocabulary[currentIndex]
+        let topic = preSelectedTopic ?? item.topic
+        let stableId = "vocab_\(item.word.lowercased())_\(topic)"
+        return dataManager.isItemStudied(stableId)
     }
 
     // MARK: - Header View
     private var headerView: some View {
-        HStack {
+        HStack(spacing: 8) {
             if !filteredVocabulary.isEmpty {
+                if isCurrentItemStudied() {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.brandGreen)
+                }
+
                 Text("\(currentIndex + 1) of \(filteredVocabulary.count)")
                     .font(.custom("Fredoka-Medium", size: 14))
                     .foregroundColor(.secondary)
@@ -124,7 +158,8 @@ struct NewVocabularyView: View {
                         item: filteredVocabulary[currentIndex],
                         isFlipped: $isFlipped,
                         currentIndex: currentIndex,
-                        totalCount: filteredVocabulary.count
+                        totalCount: filteredVocabulary.count,
+                        isStudied: isCurrentItemStudied()
                     )
                     .id(currentIndex)
                     .offset(x: dragOffset)
@@ -140,6 +175,7 @@ struct NewVocabularyView: View {
                                         dragOffset = -UIScreen.main.bounds.width
                                     }
                                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                        markCurrentVocabStudied()
                                         currentIndex += 1
                                         isFlipped = false
                                         dragOffset = 0
@@ -256,10 +292,25 @@ struct NewVocabularyView: View {
 
     private func moveToNextCard() {
         guard canMoveToNext else { return }
+        markCurrentVocabStudied()
         withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
             currentIndex += 1
             isFlipped = false
         }
+    }
+
+    private func markCurrentVocabStudied() {
+        guard currentIndex < filteredVocabulary.count else { return }
+        let item = filteredVocabulary[currentIndex]
+        let topic = preSelectedTopic ?? item.topic
+        let subcategoryId = "vocab_\(topic)"
+        // Use word+topic as stable key so progress persists across app launches
+        let stableId = "vocab_\(item.word.lowercased())_\(item.topic)"
+        dataManager.markItemCompleted(
+            itemId: stableId,
+            subcategoryId: subcategoryId,
+            categoryId: "vocabulary"
+        )
     }
 
     private func toggleFlip() {
@@ -406,6 +457,7 @@ struct NewVocabularyCard: View {
     @Binding var isFlipped: Bool
     let currentIndex: Int
     let totalCount: Int
+    var isStudied: Bool = false
 
     private let cardGradientFront = LinearGradient(
         colors: [Color.white, Color(red: 248/255, green: 247/255, blue: 255/255)],

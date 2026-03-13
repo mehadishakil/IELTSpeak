@@ -8,58 +8,53 @@ struct DLMode: View {
     @AppStorage("userTheme") private var userTheme: Theme = .system
     
     var body: some View{
-        VStack{
-            VStack(spacing: 20){
-                HStack(alignment: .center){
-                    Text("Appearance")
-                        
-                }
-                .bold().font(.title3)
-                .padding(.bottom)
-                
-                HStack(spacing: 40){
-                    Button {
-                        userTheme = .light
-                    } label: {
-                        UIButton(mode: .light, currentMode: $userTheme, Rbg: .LB, Rbgi: .LBI, ibg: .white)
-                    }
-                    .tint(.primary)
-                    Button {
-                        userTheme = .dark
-                    } label: {
-                        UIButton(mode: .dark, currentMode: $userTheme, Rbg: .DB, Rbgi: .DBI, ibg: .black)
-                    }
-                    .tint(.primary)
-                    
-                    
-                    ZStack {
-                        UIButton(mode: .system, currentMode: $userTheme, Rbg: .LB, Rbgi: .LBI, ibg: .white)
-                        UIButton(mode: .system, currentMode: $userTheme, Rbg: .DB, Rbgi: .DBI, ibg: .black)
-                            .mask{
-                                RoundedRectangle(cornerRadius: 10)
-                                    .frame(width: 50, height: 200)
-                                    .offset(x: -24)
-                            }
-                    }
-                    .onTapGesture {
-                        userTheme = .system
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .preferredColorScheme(scheme)
-                
-                Spacer()
+        VStack(spacing: 20){
+            HStack(alignment: .center){
+                Text("Appearance")
+
             }
-            .padding(.top, 30)
+            .bold().font(.title3)
+            .padding(.bottom)
+
+            HStack(spacing: 40){
+                Button {
+                    userTheme = .light
+                } label: {
+                    UIButton(mode: .light, currentMode: $userTheme, Rbg: .LB, Rbgi: .LBI, ibg: .white)
+                }
+                .tint(.primary)
+                Button {
+                    userTheme = .dark
+                } label: {
+                    UIButton(mode: .dark, currentMode: $userTheme, Rbg: .DB, Rbgi: .DBI, ibg: .black)
+                }
+                .tint(.primary)
+
+
+                ZStack {
+                    UIButton(mode: .system, currentMode: $userTheme, Rbg: .LB, Rbgi: .LBI, ibg: .white)
+                    UIButton(mode: .system, currentMode: $userTheme, Rbg: .DB, Rbgi: .DBI, ibg: .black)
+                        .mask{
+                            RoundedRectangle(cornerRadius: 10)
+                                .frame(width: 50, height: 200)
+                                .offset(x: -24)
+                        }
+                }
+                .onTapGesture {
+                    userTheme = .system
+                }
+            }
             .frame(maxWidth: .infinity)
+            .preferredColorScheme(scheme)
+
+            Spacer()
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, 30)
+        .frame(maxWidth: .infinity)
         .frame(height: 270)
-        .background(.background)
         .clipShape(.rect(cornerRadius: 30))
         .padding(.horizontal, 15)
         .environment(\.colorScheme, scheme)
-        .shadow(color: .gray, radius: 2)
     }
 }
 

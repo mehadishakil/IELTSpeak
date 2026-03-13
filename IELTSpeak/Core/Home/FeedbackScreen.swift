@@ -237,6 +237,8 @@ struct FeedbackScreen: View {
     let testResult: TestResult
     @Environment(\.dismiss) private var dismiss
     @State private var selectedTab = 0
+    @State private var showShareSheet = false
+    @State private var shareImage: UIImage?
     @Namespace private var animationNamespace
     private var groupedConversations: [Int: [Conversation]] {
         Dictionary(grouping: testResult.conversations) { $0.part }
@@ -248,7 +250,7 @@ struct FeedbackScreen: View {
                 headerSection
 
                 tabSelector_Icons
-                
+
                 TabView(selection: $selectedTab) {
                     aiFeedbackTab
                         .tag(0)
@@ -258,6 +260,11 @@ struct FeedbackScreen: View {
                 .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             }
             .navigationBarHidden(true)
+            .sheet(isPresented: $showShareSheet) {
+                if let image = shareImage {
+                    ShareSheet(items: [image])
+                }
+            }
         }
     }
 
@@ -276,13 +283,14 @@ struct FeedbackScreen: View {
                     .fontWeight(.semibold)
                     .foregroundColor(.white)
                 Spacer()
-                Button(action: {}) {
+                Button(action: { generateAndShare() }) {
                     Image(systemName: "square.and.arrow.up")
                         .font(.title2)
                         .foregroundColor(.white.opacity(0.8))
                 }
             }
-            .padding(20)
+            .padding(.top, 20)
+            .padding(.horizontal, 20)
 
             VStack(spacing: 4) {
                 Text("Overall Band Score")
@@ -292,10 +300,23 @@ struct FeedbackScreen: View {
                 Text(String(format: "%.1f", testResult.bandScore))
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
+
+                Text(cefrLevelForScore(testResult.bandScore))
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color.white.opacity(0.25))
+                    )
+
                 Text(testResult.date, style: .date)
                     .font(.caption)
                     .foregroundColor(.white.opacity(0.7))
                     .fontDesign(.rounded)
+                    .padding(.top, 2)
             }
             .padding(.bottom, 30)
         }
@@ -483,6 +504,17 @@ struct FeedbackScreen: View {
                                 .fill(Color(.systemGray6))
                         )
                     }
+
+                    // CEFR note for criteria
+                    HStack(spacing: 6) {
+                        Image(systemName: "info.circle")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                        Text("Scores are mapped to CEFR levels (A1–C2)")
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 2)
                 }
 
                 // AI Feedback
@@ -552,5 +584,153 @@ struct FeedbackScreen: View {
         default: return .errorRed
         }
     }
+
+    private func cefrLevelForScore(_ score: Double) -> String {
+        switch score {
+        case 8.5...9.0: return "CEFR C2"
+        case 7.0..<8.5: return "CEFR C1"
+        case 5.5..<7.0: return "CEFR B2"
+        case 4.0..<5.5: return "CEFR B1"
+        case 3.0..<4.0: return "CEFR A2"
+        case 1.0..<3.0: return "CEFR A1"
+        default: return ""
+        }
+    }
+
+    private func generateAndShare() {
+        let cardView = ShareScoreCard(
+            bandScore: testResult.bandScore,
+            cefrLevel: cefrLevelForScore(testResult.bandScore),
+            date: testResult.date,
+            criteriaScores: testResult.criteriaScores,
+            scoreColorFn: scoreColor
+        )
+
+        let renderer = ImageRenderer(content: cardView)
+        renderer.scale = 3.0
+
+        if let image = renderer.uiImage {
+            shareImage = image
+            showShareSheet = true
+        }
+    }
+}
+
+// MARK: - Share Score Card (rendered as image)
+private struct ShareScoreCard: View {
+    let bandScore: Double
+    let cefrLevel: String
+    let date: Date
+    let criteriaScores: [String: Double]
+    let scoreColorFn: (Double) -> Color
+
+    private var dateString: String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .long
+        return formatter.string(from: date)
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header gradient
+            VStack(spacing: 12) {
+                HStack {
+                    Image(systemName: "waveform.circle.fill")
+                        .font(.system(size: 22))
+                        .foregroundColor(.white)
+                    Text("IELTSpeak")
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    Spacer()
+                    Text(dateString)
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundColor(.white.opacity(0.7))
+                }
+
+                VStack(spacing: 6) {
+                    Text("Overall Band Score")
+                        .font(.system(size: 13, design: .rounded))
+                        .foregroundColor(.white.opacity(0.8))
+
+                    Text(String(format: "%.1f", bandScore))
+                        .font(.system(size: 56, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+
+                    if !cefrLevel.isEmpty {
+                        Text(cefrLevel)
+                            .font(.system(size: 12, weight: .semibold, design: .rounded))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.white.opacity(0.25))
+                            )
+                    }
+                }
+                .padding(.vertical, 8)
+            }
+            .padding(24)
+            .background(
+                LinearGradient(
+                    colors: [Color.brandGreen, Color.primaryVariant],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+
+            // Criteria scores
+            VStack(spacing: 0) {
+                ForEach(criteriaScores.sorted(by: { $0.key < $1.key }), id: \.key) { criterion, score in
+                    HStack {
+                        Text(criterion)
+                            .font(.system(size: 14, design: .rounded))
+                            .foregroundColor(Color(red: 75/255, green: 75/255, blue: 75/255))
+
+                        Spacer()
+
+                        Text(String(format: "%.1f", score))
+                            .font(.system(size: 15, weight: .bold, design: .rounded))
+                            .foregroundColor(scoreColorFn(score))
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+
+                    if criterion != criteriaScores.sorted(by: { $0.key < $1.key }).last?.key {
+                        Divider()
+                            .padding(.horizontal, 24)
+                    }
+                }
+            }
+            .padding(.vertical, 8)
+
+            // Footer
+            HStack {
+                Spacer()
+                Text("Practice with IELTSpeak")
+                    .font(.system(size: 11, weight: .medium, design: .rounded))
+                    .foregroundColor(Color(red: 150/255, green: 150/255, blue: 150/255))
+                Spacer()
+            }
+            .padding(.bottom, 16)
+            .padding(.top, 4)
+        }
+        .frame(width: 340)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 4)
+        .padding(20)
+    }
+}
+
+// MARK: - UIKit Share Sheet wrapper
+struct ShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 

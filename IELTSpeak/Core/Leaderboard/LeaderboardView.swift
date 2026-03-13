@@ -92,10 +92,14 @@ class ProgressViewModel: ObservableObject {
         let calendar = Calendar.current
         let today = calendar.startOfDay(for: Date())
 
+        // Only count completed/evaluated tests for streak and active days
+        let completedSessions = sessions.filter { $0.status == "completed" || $0.status == "evaluated" }
+
         var activeDates: Set<Date> = []
-        for session in sessions {
-            guard let dateStr = session.started_at else { continue }
-            if let date = formatter.date(from: dateStr) ?? fallbackFormatter.date(from: dateStr) {
+        for session in completedSessions {
+            let dateStr = session.completed_at ?? session.started_at
+            guard let dateString = dateStr else { continue }
+            if let date = formatter.date(from: dateString) ?? fallbackFormatter.date(from: dateString) {
                 activeDates.insert(calendar.startOfDay(for: date))
             }
         }
@@ -161,34 +165,16 @@ class ProgressViewModel: ObservableObject {
 
     private func loadLessonProgress() {
         let manager = LessonDataManager.shared
-        guard let progress = manager.userProgress else { return }
 
         // Total items from view model data
         data.totalVocabulary = manager.newVocabularyItems.count
         data.totalIdioms = manager.realIdiomsSubcategories.reduce(0) { $0 + $1.itemCount }
         data.totalPhrasalVerbs = manager.realPhrasalVerbsSubcategories.reduce(0) { $0 + $1.itemCount }
 
-        // Use category progress to estimate learned counts
-        // Category IDs are defined in lesson_data.json
-        for (catId, catProgress) in progress.categoryProgress {
-            let learned = Int(catProgress.overallProgress * Double(totalForCategory(catId)))
-            let name = catId.lowercased()
-            if name.contains("idiom") {
-                data.idiomsLearned = learned
-            } else if name.contains("phrasal") {
-                data.phrasalVerbsLearned = learned
-            } else if name.contains("vocab") {
-                data.vocabularyLearned = learned
-            }
-        }
-    }
-
-    private func totalForCategory(_ catId: String) -> Int {
-        let name = catId.lowercased()
-        if name.contains("idiom") { return data.totalIdioms }
-        if name.contains("phrasal") { return data.totalPhrasalVerbs }
-        if name.contains("vocab") { return data.totalVocabulary }
-        return 0
+        // Use direct counts from studiedItems map
+        data.vocabularyLearned = manager.getStudiedVocabularyCount()
+        data.idiomsLearned = manager.getStudiedIdiomsCount()
+        data.phrasalVerbsLearned = manager.getStudiedPhrasalVerbsCount()
     }
 
     private func dailyGoalCount(for goal: String) -> Int {

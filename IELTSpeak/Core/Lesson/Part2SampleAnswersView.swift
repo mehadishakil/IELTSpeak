@@ -116,8 +116,14 @@ struct Part2QuestionCard: View {
     var accentColor: Color = Color(red: 76/255, green: 175/255, blue: 80/255)
     @State private var isExpanded = false
     @State private var showSecondAnswer = false
+    @State private var isStudied = false
+    private let dataManager = LessonDataManager.shared
 
     private let altAnswerColor = Color(red: 100/255, green: 96/255, blue: 180/255)
+
+    private var stableId: String {
+        "sample_p2_\(questionData.question.prefix(50).lowercased())"
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -125,6 +131,14 @@ struct Part2QuestionCard: View {
             Button {
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.85)) {
                     isExpanded.toggle()
+                }
+                if isExpanded && !isStudied {
+                    isStudied = true
+                    dataManager.markItemCompleted(
+                        itemId: stableId,
+                        subcategoryId: "sample-answers-part2",
+                        categoryId: "sample-answers"
+                    )
                 }
             } label: {
                 HStack(spacing: 14) {
@@ -134,9 +148,15 @@ struct Part2QuestionCard: View {
                             .fill(accentColor.opacity(0.12))
                             .frame(width: 48, height: 48)
 
-                        Text("\(index)")
-                            .font(.custom("Fredoka-Bold", size: 20))
-                            .foregroundColor(accentColor)
+                        if isStudied {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 16, weight: .bold))
+                                .foregroundColor(accentColor)
+                        } else {
+                            Text("\(index)")
+                                .font(.custom("Fredoka-Bold", size: 20))
+                                .foregroundColor(accentColor)
+                        }
                     }
 
                     // Question text
@@ -286,6 +306,9 @@ struct Part2QuestionCard: View {
                 .shadow(color: .black.opacity(0.06), radius: 12, x: 0, y: 4)
         )
         .clipShape(RoundedRectangle(cornerRadius: 20))
+        .onAppear {
+            isStudied = dataManager.isItemStudied(stableId)
+        }
     }
 }
 

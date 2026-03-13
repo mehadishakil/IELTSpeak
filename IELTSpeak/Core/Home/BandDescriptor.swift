@@ -539,13 +539,26 @@ struct IELTSSpeakingBandDescriptorsView: View {
                     VStack(alignment: .leading, spacing: 16) {
                         // Band Header
                         HStack(alignment: .bottom) {
-                            Text("Band \(selectedBand)")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(colorForBand(selectedBand))
-                            
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Band \(selectedBand)")
+                                    .font(.title)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(colorForBand(selectedBand))
+
+                                Text(cefrLevelForBand(selectedBand))
+                                    .font(.caption)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(colorForBand(selectedBand))
+                                    )
+                            }
+
                             Spacer()
-                            
+
                             Text(selectedCriteria)
                                 .font(.caption)
                                 .foregroundColor(
@@ -599,6 +612,18 @@ struct IELTSSpeakingBandDescriptorsView: View {
         case 2: return Color(red: 0.8, green: 0.2, blue: 0.2)
         case 1: return Color(red: 0.6, green: 0.1, blue: 0.1)
         default: return .textGray
+        }
+    }
+
+    private func cefrLevelForBand(_ band: Int) -> String {
+        switch band {
+        case 9: return "CEFR C2"
+        case 7, 8: return "CEFR C1"
+        case 6: return "CEFR B2"
+        case 4, 5: return "CEFR B1"
+        case 3: return "CEFR A2"
+        case 1, 2: return "CEFR A1"
+        default: return ""
         }
     }
 }

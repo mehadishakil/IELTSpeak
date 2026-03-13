@@ -253,7 +253,13 @@ struct CardLearningView: View {
                 loadingView
             } else {
                 // Header
-                HStack {
+                HStack(spacing: 8) {
+                    if isCurrentItemStudied() {
+                        Image(systemName: "checkmark.circle.fill")
+                            .font(.system(size: 14))
+                            .foregroundColor(.brandGreen)
+                    }
+
                     Text("\(currentIndex + 1) of \(items.count)")
                         .font(.custom("Fredoka-Medium", size: 14))
                         .foregroundColor(.secondary)
@@ -320,7 +326,42 @@ struct CardLearningView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             loadItems()
+            resumeFromLastPosition()
         }
+    }
+
+    private func resumeFromLastPosition() {
+        guard !items.isEmpty else { return }
+        for (index, item) in items.enumerated() {
+            let stableId = getStableId(for: item)
+            if !stableId.isEmpty && !dataManager.isItemStudied(stableId) {
+                currentIndex = index
+                return
+            }
+        }
+        // All studied — stay at last
+        currentIndex = items.count - 1
+    }
+
+    private func getStableId(for item: Any) -> String {
+        if let vocabItem = item as? VocabularyItem {
+            return "legacy_vocab_\(vocabItem.word.lowercased())"
+        } else if let idiomItem = item as? IdiomItem {
+            return "legacy_idiom_\(idiomItem.idiom.lowercased())"
+        } else if let realIdiomItem = item as? RealIdiomItemViewModel {
+            return "idiom_\(realIdiomItem.idiom.lowercased())_\(realIdiomItem.category.lowercased())"
+        } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
+            return "phrasal_\(realPhrasalVerbItem.phrasalVerb.lowercased())_\(realPhrasalVerbItem.category.lowercased())"
+        } else if let phrasalItem = item as? PhrasalVerbItem {
+            return "legacy_phrasal_\(phrasalItem.verb.lowercased())"
+        }
+        return ""
+    }
+
+    private func isCurrentItemStudied() -> Bool {
+        guard currentIndex < items.count else { return false }
+        let stableId = getStableId(for: items[currentIndex])
+        return !stableId.isEmpty && dataManager.isItemStudied(stableId)
     }
 
     private var loadingView: some View {
@@ -371,26 +412,11 @@ struct CardLearningView: View {
     }
     
     private func markCurrentItemCompleted() {
-        let item = items[currentIndex]
-        var itemId: String = ""
-        
-        if let vocabItem = item as? VocabularyItem {
-            itemId = vocabItem.id
-        } else if let idiomItem = item as? IdiomItem {
-            itemId = idiomItem.id
-        } else if let realIdiomItem = item as? RealIdiomItemViewModel {
-            itemId = realIdiomItem.id.uuidString
-        } else if let realPhrasalVerbItem = item as? RealPhrasalVerbItemViewModel {
-            itemId = realPhrasalVerbItem.id.uuidString
-        } else if let phrasalItem = item as? PhrasalVerbItem {
-            itemId = phrasalItem.id
-        }
-        
-        if !itemId.isEmpty {
-            // You'll need to determine the categoryId based on your data structure
+        let stableId = getStableId(for: items[currentIndex])
+        if !stableId.isEmpty {
             let categoryId = getCategoryId(for: subcategory.id)
             dataManager.markItemCompleted(
-                itemId: itemId,
+                itemId: stableId,
                 subcategoryId: subcategory.id,
                 categoryId: categoryId
             )

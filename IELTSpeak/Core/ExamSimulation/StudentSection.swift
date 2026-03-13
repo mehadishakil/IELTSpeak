@@ -20,7 +20,7 @@ struct StudentSection: View {
     @State private var showConfirmation = false
     @State private var warningBlink = false
     private var isActive: Bool { isUserSpeaking || isRecording }
-    private let activeBackground = Color(red: 237/255, green: 236/255, blue: 255/255) // #EDECFF
+    private let activeBackground = Color(red: 242/255, green: 242/255, blue: 255/255)
     private let activeStroke = Color(red: 180/255, green: 178/255, blue: 240/255)
     private let warningStroke = Color.red.opacity(0.85)
     private let warningGlow = Color.red.opacity(0.35)
