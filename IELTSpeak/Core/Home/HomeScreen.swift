@@ -9,7 +9,8 @@ struct HomeScreen: View {
     @State private var isLoading = false
     @State private var testQuestions: [Int: [QuestionItem]] = [:]
     @State private var navigationTrigger = false
-    
+    @State private var showAllTests = false
+
     var averageScore: Double {
         let total = testResults.reduce(0) { $0 + $1.bandScore }
         return testResults.isEmpty ? 0 : total / Double(testResults.count)
@@ -46,7 +47,8 @@ struct HomeScreen: View {
 
                         RecentTestsSection(
                             testResults: testResults,
-                            onTestSelected: selectTest
+                            onTestSelected: selectTest,
+                            onViewAll: { showAllTests = true }
                         )
                     }
                     .padding(.horizontal, 20)
@@ -54,6 +56,12 @@ struct HomeScreen: View {
                 }
             }
             .navigationBarHidden(true)
+            .navigationDestination(isPresented: $showAllTests) {
+                AllTestsView(
+                    testResults: testResults,
+                    onTestSelected: selectTest
+                )
+            }
             .sheet(item: $selectedTestResult) { result in
                 FeedbackScreen(testResult: result)
             }

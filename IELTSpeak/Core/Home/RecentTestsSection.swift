@@ -11,16 +11,24 @@ import SwiftUI
 struct RecentTestsSection: View {
     let testResults: [TestResult]
     let onTestSelected: (TestResult) -> Void
+    let onViewAll: () -> Void
+
+    private var recentTests: [TestResult] {
+        Array(testResults.prefix(5))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            RecentTestsHeader()
+            RecentTestsHeader(
+                showViewAll: !testResults.isEmpty,
+                onViewAll: onViewAll
+            )
 
             if testResults.isEmpty {
                 EmptyTestsState()
             } else {
                 TestResultsList(
-                    testResults: testResults,
+                    testResults: recentTests,
                     onTestSelected: onTestSelected
                 )
             }
@@ -30,6 +38,9 @@ struct RecentTestsSection: View {
 
 // MARK: - Recent Tests Header
 struct RecentTestsHeader: View {
+    let showViewAll: Bool
+    let onViewAll: () -> Void
+
     var body: some View {
         HStack(alignment: .bottom) {
             Text("Recent Tests")
@@ -38,11 +49,13 @@ struct RecentTestsHeader: View {
 
             Spacer()
 
-            Button("View All") {
-                // Handle view all
+            if showViewAll {
+                Button("View All") {
+                    onViewAll()
+                }
+                .font(.custom("Fredoka-Medium", size: 14))
+                .foregroundColor(.brandGreen)
             }
-            .font(.custom("Fredoka-Medium", size: 14))
-            .foregroundColor(.brandGreen)
         }
     }
 }
