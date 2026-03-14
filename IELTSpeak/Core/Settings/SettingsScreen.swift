@@ -486,7 +486,15 @@ struct SettingsScreen: View {
     @State private var showAuthSheet = false
     @Namespace private var animationNamespace
     @AppStorage("stepsGoal") private var stepsGoal: Int = 5000
-    
+    @AppStorage("dailyPracticeGoal") private var dailyPracticeGoal: String = "regular"
+    @AppStorage("dailyVocabularyGoal") private var dailyVocabularyGoal: Int = 10
+    @AppStorage("dailyIdiomsGoal") private var dailyIdiomsGoal: Int = 5
+    @AppStorage("dailyPhrasalVerbsGoal") private var dailyPhrasalVerbsGoal: Int = 5
+    @State private var showGoalsSheet = false
+    @State private var showVocabularyGoalSheet = false
+    @State private var showIdiomsGoalSheet = false
+    @State private var showPhrasalVerbsGoalSheet = false
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -497,6 +505,7 @@ struct SettingsScreen: View {
                     // MARK: Settings Sections
                     VStack(spacing: 16) {
                         personalizationSection
+                        dailyGoalsSection
                         accessibilitySection
                         aboutSection
                         signOutSection
@@ -770,6 +779,270 @@ struct SettingsScreen: View {
         }
     }
     
+    private var dailyGoalsSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            sectionHeader("Daily Goals")
+
+            VStack(spacing: 0) {
+                // Tests per day
+                settingsRow(
+                    icon: "mic.fill",
+                    title: "Tests per Day",
+                    iconColor: .brandGreen,
+                    content: {
+                        HStack(spacing: 8) {
+                            Text(dailyPracticeGoalLabel)
+                                .font(.custom("Fredoka-Regular", size: 14))
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                )
+                .onTapGesture { showGoalsSheet = true }
+
+                Divider()
+                    .padding(.leading, 56)
+
+                // Vocabulary per day
+                settingsRow(
+                    icon: "textformat.abc",
+                    title: "Vocabulary",
+                    iconColor: .infoBlue,
+                    content: {
+                        HStack(spacing: 8) {
+                            Text("\(dailyVocabularyGoal) words/day")
+                                .font(.custom("Fredoka-Regular", size: 14))
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                )
+                .onTapGesture { showVocabularyGoalSheet = true }
+
+                Divider()
+                    .padding(.leading, 56)
+
+                // Idioms per day
+                settingsRow(
+                    icon: "quote.bubble.fill",
+                    title: "Idioms",
+                    iconColor: .warningOrange,
+                    content: {
+                        HStack(spacing: 8) {
+                            Text("\(dailyIdiomsGoal) idioms/day")
+                                .font(.custom("Fredoka-Regular", size: 14))
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                )
+                .onTapGesture { showIdiomsGoalSheet = true }
+
+                Divider()
+                    .padding(.leading, 56)
+
+                // Phrasal verbs per day
+                settingsRow(
+                    icon: "text.word.spacing",
+                    title: "Phrasal Verbs",
+                    iconColor: .primaryVariant,
+                    content: {
+                        HStack(spacing: 8) {
+                            Text("\(dailyPhrasalVerbsGoal) verbs/day")
+                                .font(.custom("Fredoka-Regular", size: 14))
+                                .foregroundColor(.secondary)
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                )
+                .onTapGesture { showPhrasalVerbsGoalSheet = true }
+            }
+            .background(Color(.systemBackground))
+            .cornerRadius(12)
+        }
+        .sheet(isPresented: $showGoalsSheet) {
+            goalPickerSheet(
+                title: "Daily Practice Goal",
+                options: [
+                    GoalOption(title: "Casual", subtitle: "1 test per day ~ 12 min", value: 1, icon: "leaf.fill", color: .brandGreen),
+                    GoalOption(title: "Regular", subtitle: "2 tests per day ~ 24 min", value: 2, icon: "figure.walk", color: .infoBlue),
+                    GoalOption(title: "Serious", subtitle: "3 tests per day ~ 36 min", value: 3, icon: "flame.fill", color: .warningOrange),
+                    GoalOption(title: "Intense", subtitle: "4 tests per day ~ 48 min", value: 4, icon: "bolt.fill", color: .errorRed),
+                ],
+                selectedValue: practiceGoalIntValue,
+                onSelect: { value in
+                    dailyPracticeGoal = practiceGoalStringValue(for: value)
+                    showGoalsSheet = false
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showVocabularyGoalSheet) {
+            goalPickerSheet(
+                title: "Daily Vocabulary Goal",
+                options: [
+                    GoalOption(title: "Light", subtitle: "5 words per day", value: 5, icon: "leaf.fill", color: .brandGreen),
+                    GoalOption(title: "Moderate", subtitle: "10 words per day", value: 10, icon: "book.fill", color: .infoBlue),
+                    GoalOption(title: "Ambitious", subtitle: "15 words per day", value: 15, icon: "flame.fill", color: .warningOrange),
+                    GoalOption(title: "Power Learner", subtitle: "20 words per day", value: 20, icon: "bolt.fill", color: .errorRed),
+                ],
+                selectedValue: dailyVocabularyGoal,
+                onSelect: { value in
+                    dailyVocabularyGoal = value
+                    showVocabularyGoalSheet = false
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showIdiomsGoalSheet) {
+            goalPickerSheet(
+                title: "Daily Idioms Goal",
+                options: [
+                    GoalOption(title: "Light", subtitle: "3 idioms per day", value: 3, icon: "leaf.fill", color: .brandGreen),
+                    GoalOption(title: "Moderate", subtitle: "5 idioms per day", value: 5, icon: "book.fill", color: .infoBlue),
+                    GoalOption(title: "Ambitious", subtitle: "8 idioms per day", value: 8, icon: "flame.fill", color: .warningOrange),
+                    GoalOption(title: "Power Learner", subtitle: "10 idioms per day", value: 10, icon: "bolt.fill", color: .errorRed),
+                ],
+                selectedValue: dailyIdiomsGoal,
+                onSelect: { value in
+                    dailyIdiomsGoal = value
+                    showIdiomsGoalSheet = false
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+        .sheet(isPresented: $showPhrasalVerbsGoalSheet) {
+            goalPickerSheet(
+                title: "Daily Phrasal Verbs Goal",
+                options: [
+                    GoalOption(title: "Light", subtitle: "3 phrasal verbs per day", value: 3, icon: "leaf.fill", color: .brandGreen),
+                    GoalOption(title: "Moderate", subtitle: "5 phrasal verbs per day", value: 5, icon: "book.fill", color: .infoBlue),
+                    GoalOption(title: "Ambitious", subtitle: "8 phrasal verbs per day", value: 8, icon: "flame.fill", color: .warningOrange),
+                    GoalOption(title: "Power Learner", subtitle: "10 phrasal verbs per day", value: 10, icon: "bolt.fill", color: .errorRed),
+                ],
+                selectedValue: dailyPhrasalVerbsGoal,
+                onSelect: { value in
+                    dailyPhrasalVerbsGoal = value
+                    showPhrasalVerbsGoalSheet = false
+                }
+            )
+            .presentationDetents([.medium])
+            .presentationDragIndicator(.visible)
+        }
+    }
+
+    // MARK: - Goal Helpers
+
+    private var dailyPracticeGoalLabel: String {
+        switch dailyPracticeGoal {
+        case "casual": return "Casual (1 test)"
+        case "regular": return "Regular (2 tests)"
+        case "serious": return "Serious (3 tests)"
+        case "intense": return "Intense (4 tests)"
+        default: return "Regular (2 tests)"
+        }
+    }
+
+    private var practiceGoalIntValue: Int {
+        switch dailyPracticeGoal {
+        case "casual": return 1
+        case "regular": return 2
+        case "serious": return 3
+        case "intense": return 4
+        default: return 2
+        }
+    }
+
+    private func practiceGoalStringValue(for intValue: Int) -> String {
+        switch intValue {
+        case 1: return "casual"
+        case 2: return "regular"
+        case 3: return "serious"
+        case 4: return "intense"
+        default: return "regular"
+        }
+    }
+
+    private struct GoalOption {
+        let title: String
+        let subtitle: String
+        let value: Int
+        let icon: String
+        let color: Color
+    }
+
+    private func goalPickerSheet(
+        title: String,
+        options: [GoalOption],
+        selectedValue: Int,
+        onSelect: @escaping (Int) -> Void
+    ) -> some View {
+        VStack(spacing: 20) {
+            Text(title)
+                .font(.custom("Fredoka-SemiBold", size: 20))
+                .padding(.top, 8)
+
+            VStack(spacing: 12) {
+                ForEach(options, id: \.value) { option in
+                    Button(action: { onSelect(option.value) }) {
+                        HStack(spacing: 14) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(option.color.opacity(0.15))
+                                    .frame(width: 38, height: 38)
+                                Image(systemName: option.icon)
+                                    .font(.system(size: 17, weight: .medium))
+                                    .foregroundColor(option.color)
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(option.title)
+                                    .font(.custom("Fredoka-Medium", size: 16))
+                                    .foregroundColor(.primary)
+                                Text(option.subtitle)
+                                    .font(.custom("Fredoka-Regular", size: 12))
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+
+                            if selectedValue == option.value {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 22))
+                                    .foregroundColor(option.color)
+                            }
+                        }
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(selectedValue == option.value ? option.color.opacity(0.08) : Color(.systemBackground))
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14)
+                                .stroke(selectedValue == option.value ? option.color.opacity(0.3) : Color(.systemGray5), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .padding(.horizontal, 20)
+
+            Spacer()
+        }
+        .padding(.top, 16)
+    }
+
     private var accessibilitySection: some View {
         VStack(alignment: .leading, spacing: 0) {
             sectionHeader("Support & Feedback")
